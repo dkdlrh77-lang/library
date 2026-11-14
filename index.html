@@ -1810,10 +1810,6 @@ async function boot(){
     $app.innerHTML = '<div class="state" style="padding-top:120px"><b>서재를 열지 못했어요.</b><p>인터넷 연결을 확인해 주세요.</p><button class="btn" onclick="location.reload()">다시 시도</button></div>';
     return;
   }
-  // 로그인 유지: 기기에 저장해 두고, 만료 전에 알아서 연장해요
-  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: { persistSession: true, autoRefreshToken: true, storageKey: 'gebujang-auth', storage: window.localStorage }
-  });
   // 예전 저장 이름에 있던 로그인 정보는 새 이름으로 옮겨 둬요 (한 번만)
   try {
     if (!localStorage.getItem('gebujang-auth')) {
@@ -1821,6 +1817,10 @@ async function boot(){
       if (oldKey) localStorage.setItem('gebujang-auth', localStorage.getItem(oldKey));
     }
   } catch(e){}
+  // 로그인 유지: 기기에 저장해 두고, 만료 전에 알아서 연장해요
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { persistSession: true, autoRefreshToken: true, storageKey: 'gebujang-auth', storage: window.localStorage }
+  });
   // 아이폰이 저장 공간을 함부로 비우지 않게 부탁해요
   try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch(e){}
   // 앱을 다시 열 때마다 로그인 연장을 바로 확인해요
