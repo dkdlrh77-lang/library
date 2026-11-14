@@ -1,0 +1,13 @@
+{
+  "name": "게부장 타임",
+  "short_name": "게부장 타임",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#FFF5F7",
+  "theme_color": "#FFF5F7",
+  "icons": [
+    { "src": "img/apple-touch-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any" },
+    { "src": "img/favicon.png", "sizes": "64x64", "type": "image/png" }
+  ]
+}
