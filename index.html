@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>나의 서재</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@400;600;700&family=Nanum+Myeongjo:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+:root{
+  --bg:#fbfaf8; --fg:#232220; --muted:#8a8680; --line:#e8e5e0; --card:#ffffff; --soft:#f2efea; --accent:#3f6b5c; --danger:#b4473b;
+  --ui:"Noto Sans KR",system-ui,-apple-system,sans-serif;
+  --rfont:"Noto Serif KR",serif; --rsize:17px; --rlh:1.95; --rwidth:680px; --pgap:0em;
+}
+body.sepia{ --bg:#f4ecdc; --fg:#3b3127; --muted:#8f8070; --line:#e2d6bf; --card:#faf4e8; --soft:#ebe0cb; --accent:#7a5a32; }
+body.dark{ --bg:#18191b; --fg:#dcdad5; --muted:#86847f; --line:#2d2f32; --card:#202225; --soft:#26282b; --accent:#8cc0ab; --danger:#e07a6c; }
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--ui);-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
+button{font-family:inherit;color:inherit;cursor:pointer}
+input,select{font-family:inherit}
+.hidden{display:none!important}
+
+/* ---------- library ---------- */
+.wrap{max-width:860px;margin:0 auto;padding:40px 22px 120px}
+.lib-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:28px}
+.lib-title{font-family:"Gowun Batang",serif;font-size:32px;font-weight:700;letter-spacing:-.02em;margin:0;cursor:text;border-radius:6px}
+.lib-title:hover{background:var(--soft)}
+.lib-sub{color:var(--muted);font-size:13px;margin-top:6px}
+.head-actions{display:flex;gap:8px;flex-shrink:0}
+.btn{border:1px solid var(--line);background:var(--card);padding:9px 14px;border-radius:999px;font-size:14px;display:inline-flex;align-items:center;gap:6px;transition:border-color .15s,background .15s}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn.primary:hover{opacity:.88}
+.btn.ghost{border-color:transparent;background:transparent}
+.btn.ghost:hover{background:var(--soft)}
+.btn.danger{color:var(--danger)}
+.icon-btn{border:none;background:transparent;width:36px;height:36px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:18px;color:var(--muted)}
+.icon-btn:hover{background:var(--soft);color:var(--fg)}
+
+.tabs{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.tab{border:1px solid var(--line);background:transparent;padding:7px 14px;border-radius:999px;font-size:14px;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+.tab .n{font-size:12px;opacity:.7}
+.tab:hover{color:var(--fg)}
+.tab.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.tab.add{border-style:dashed}
+.toolbar{display:flex;justify-content:space-between;align-items:center;padding:12px 2px;color:var(--muted);font-size:13px;gap:10px}
+.toolbar-left{display:flex;align-items:center;gap:4px}
+.toolbar select{border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer}
+
+.list{display:flex;flex-direction:column}
+.item{display:flex;align-items:center;gap:14px;padding:18px 4px;border-bottom:1px solid var(--line);cursor:pointer;transition:background .15s}
+.item:hover{background:var(--soft)}
+.item-main{flex:1;min-width:0}
+.item-title{font-family:"Gowun Batang",serif;font-size:19px;font-weight:700;margin:0 0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item-meta{font-size:12.5px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{background:var(--soft);padding:2px 8px;border-radius:5px}
+.item.read .item-title{color:var(--muted);font-weight:400}
+.readmark{color:var(--accent);font-weight:500}
+.tab .lock{font-size:11px;opacity:.8}
+.check{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:14px;cursor:pointer;user-select:none}
+.check input{width:18px!important;height:18px;margin:0!important;accent-color:var(--accent)}
+.check small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.end-actions{display:flex;justify-content:center;gap:8px;margin-top:24px;flex-wrap:wrap}
+.pbar{width:64px;height:3px;background:var(--line);border-radius:3px;overflow:hidden;display:inline-block;vertical-align:middle}
+.pbar i{display:block;height:100%;background:var(--accent)}
+.empty{text-align:center;padding:70px 20px;color:var(--muted);border:1.5px dashed var(--line);border-radius:16px;margin-top:20px}
+.empty b{display:block;color:var(--fg);font-size:17px;margin-bottom:8px;font-weight:500}
+.empty .btn{margin-top:18px}
+.notice{font-size:13px;padding:10px 14px;border-radius:10px;background:var(--soft);color:var(--muted);margin-bottom:18px}
+
+.drop{position:fixed;inset:0;background:color-mix(in srgb,var(--bg) 85%,transparent);display:flex;align-items:center;justify-content:center;z-index:50;pointer-events:none}
+.drop div{border:2px dashed var(--accent);border-radius:20px;padding:50px 60px;font-size:18px;color:var(--accent);background:var(--card)}
+
+/* ---------- reader ---------- */
+.rbar{position:fixed;top:0;left:0;right:0;height:54px;display:flex;align-items:center;gap:8px;padding:0 12px;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line);z-index:20;transition:transform .25s}
+.rbar.up{transform:translateY(-100%)}
+.rbar-title{flex:1;min-width:0;font-size:14px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
+.rprog{position:fixed;top:0;left:0;height:2px;background:var(--accent);z-index:30;width:0;transition:width .1s}
+.article{max-width:var(--rwidth);margin:0 auto;padding:110px 24px 60px}
+.a-folder{font-size:13px;color:var(--accent);margin-bottom:14px;letter-spacing:.02em}
+.a-title{font-family:var(--rfont);font-size:calc(var(--rsize) * 1.75);line-height:1.35;font-weight:700;margin:0 0 14px;letter-spacing:-.015em;word-break:keep-all}
+.a-meta{font-size:13px;color:var(--muted);padding-bottom:36px;border-bottom:1px solid var(--line);margin-bottom:44px}
+.body{font-family:var(--rfont);font-size:var(--rsize);line-height:var(--rlh);word-break:keep-all;overflow-wrap:anywhere}
+.body.txt p{margin:0 0 var(--pgap);white-space:pre-wrap}
+.body.txt .gap{height:calc(var(--rsize) * var(--rlh) * .9)}
+.body.txt p.brk{text-align:center;color:var(--muted);margin:1.2em 0}
+.body.md p{margin:0 0 calc(1em + var(--pgap))}
+.body.md h1,.body.md h2,.body.md h3{line-height:1.4;margin:2em 0 .8em}
+.body.md blockquote{margin:1.4em 0;padding:.2em 1.2em;border-left:3px solid var(--line);color:var(--muted)}
+.body.md hr,.body.txt hr{border:none;text-align:center;margin:2.4em 0}
+.body.md hr::after{content:"⁂";color:var(--muted)}
+.body.md img{max-width:100%}
+.body.md code{font-size:.88em;background:var(--soft);padding:.1em .35em;border-radius:4px}
+.body.md pre{background:var(--soft);padding:1em;border-radius:8px;overflow:auto}
+.a-end{max-width:var(--rwidth);margin:0 auto;padding:30px 24px 120px}
+.end-mark{text-align:center;color:var(--muted);font-size:13px;letter-spacing:.3em;margin-bottom:40px}
+.nav-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.nav-card{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:14px 16px;text-align:left;font-size:14px;min-height:72px}
+.nav-card small{display:block;color:var(--muted);font-size:12px;margin-bottom:4px}
+.nav-card.next{text-align:right}
+.nav-card:disabled{opacity:.35;cursor:default}
+.loading{color:var(--muted);text-align:center;padding:60px 0}
+
+/* ---------- sheets / modals ---------- */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.32);z-index:60;display:flex;align-items:center;justify-content:center;padding:20px;animation:fade .15s}
+@keyframes fade{from{opacity:0}}
+.modal{background:var(--card);color:var(--fg);border-radius:16px;width:100%;max-width:380px;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.2)}
+.modal h3{margin:0 0 6px;font-size:17px;font-weight:600}
+.modal p{margin:0 0 14px;color:var(--muted);font-size:14px;line-height:1.6}
+.modal input,.modal select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:15px;background:var(--bg);color:var(--fg);margin:8px 0 4px;outline:none}
+.modal input:focus,.modal select:focus{border-color:var(--accent)}
+.modal .acts{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.sheet-list{display:flex;flex-direction:column;margin:10px -8px 0}
+.sheet-list button{border:none;background:none;text-align:left;padding:12px;border-radius:10px;font-size:15px}
+.sheet-list button:hover{background:var(--soft)}
+.sheet-list button.danger{color:var(--danger)}
+
+.settings{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);border-radius:18px 18px 0 0;padding:20px 22px 28px;z-index:40;box-shadow:0 -10px 40px rgba(0,0,0,.12);max-width:560px;margin:0 auto;animation:slideup .2s}
+@keyframes slideup{from{transform:translateY(100%)}}
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0}
+.set-row label{font-size:14px;color:var(--muted);flex-shrink:0;width:64px}
+.seg{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;flex:1}
+.seg button{border:1px solid var(--line);background:var(--bg);padding:7px 12px;border-radius:8px;font-size:13px}
+.seg button.on{border-color:var(--fg);background:var(--fg);color:var(--bg)}
+.step{display:flex;align-items:center;gap:10px}
+.step button{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--bg);font-size:16px}
+.step span{min-width:44px;text-align:center;font-size:14px}
+.sw{width:22px;height:22px;border-radius:50%;padding:0!important;border:2px solid var(--line)!important}
+.sw.on{outline:2px solid var(--accent);outline-offset:2px}
+
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:11px 18px;border-radius:999px;font-size:14px;z-index:80;max-width:90vw;text-align:center;animation:fade .2s}
+@media (max-width:600px){
+  .wrap{padding:28px 16px 100px}
+  .lib-head{flex-direction:column;align-items:stretch}
+  .head-actions{justify-content:flex-start}
+  .lib-title{font-size:27px}
+  .article{padding:90px 20px 40px}
+}
+/* hearts */
+:root{--heart:#e0607e}
+body.dark{--heart:#ef8aa1}
+.rates{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
+.rate-row{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);white-space:nowrap}
+.rate-row .who{max-width:64px;overflow:hidden;text-overflow:ellipsis}
+.hearts{display:inline-flex;letter-spacing:0;line-height:1}
+.hearts i{font-style:normal;color:var(--line);font-size:13px;width:14px;text-align:center}
+.hearts i.on{color:var(--heart)}
+.hearts.edit i{cursor:pointer;font-size:17px;width:19px;padding:2px 0;transition:transform .1s}
+.hearts.edit i:hover{transform:scale(1.2)}
+.hearts.edit:hover i{color:color-mix(in srgb,var(--heart) 45%,var(--line))}
+.hearts.edit:hover i.hv{color:var(--heart)}
+.rate-row.mine .who{color:var(--fg)}
+.end-rate{text-align:center;margin:0 0 34px}
+.end-rate p{font-size:13px;color:var(--muted);margin:0 0 8px}
+.end-rate .hearts.edit i{font-size:28px;width:34px}
+.end-rate .others{font-size:12.5px;color:var(--muted);margin-top:10px;display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
+@media (max-width:600px){ .rate-row .who{max-width:40px} .hearts.edit i{font-size:15px;width:16px} }
+/* login */
+.login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.login-box{width:100%;max-width:340px;text-align:center}
+.login-box h1{font-family:"Gowun Batang",serif;font-size:30px;margin:0 0 6px}
+.login-box p{color:var(--muted);font-size:14px;margin:0 0 26px}
+.login-box input{width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:12px;font-size:15px;background:var(--card);color:var(--fg);margin-bottom:10px;outline:none}
+.login-box input:focus{border-color:var(--accent)}
+.login-box .btn{width:100%;justify-content:center;padding:13px;font-size:15px;margin-top:6px}
+.login-err{color:var(--danger);font-size:13px;min-height:20px;margin-top:10px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<input type="file" id="fileInput" accept=".txt,.md,.markdown,text/plain,text/markdown" multiple class="hidden">
+
+<script>
+/* ================= 설정: Supabase 프로젝트 값 두 개만 넣으면 돼요 ================= */
+const SUPABASE_URL = 'https://synnujkimpfnyhknnpjl.supabase.co';        // 예: https://abcdefgh.supabase.co
+const SUPABASE_ANON_KEY = 'sb_publishable_KP_w0F5TwVuAGBuVZ2_DpQ_gXEc1_R2';
+const ID_DOMAIN = 'library.local';               // 아이디만 입력하면 '아이디@library.local'로 로그인
+/* ============================================================================== */
+
+(function(){
+"use strict";
+const $app = document.getElementById('app');
+const fileInput = document.getElementById('fileInput');
+
+/* ---------- state ---------- */
+let sb = null, me = null, isOwner = false, ready = false, loadNote = '';
+let lib = { name: '나의 서재', folders: [], novels: [] };
+let progress = {};
+let ratings = {};   // novelId -> { userId: score }
+let members = {};   // userId -> name
+const textCache = {};
+let curFolder = 'all', sortMode = 'name', view = 'library', readerId = null;
+
+const defaults = { theme:'light', font:'serif', size:17, lh:1.95, width:680, pgap:0 };
+let prefs = Object.assign({}, defaults);
+try { const s = localStorage.getItem('reader-prefs'); if (s) prefs = Object.assign(prefs, JSON.parse(s)); } catch(e){}
+try { const s = localStorage.getItem('lib-ui'); if (s) { const u = JSON.parse(s); curFolder = u.f || 'all'; sortMode = u.s || 'name'; } } catch(e){}
+function saveUi(){ try{ localStorage.setItem('lib-ui', JSON.stringify({f:curFolder,s:sortMode})); }catch(e){} }
+function savePrefs(){ try{ localStorage.setItem('reader-prefs', JSON.stringify(prefs)); }catch(e){} }
+
+const FONTS = {
+  serif: { label:'명조', css:'"Noto Serif KR", serif' },
+  batang:{ label:'고운바탕', css:'"Gowun Batang", serif' },
+  nanum: { label:'나눔명조', css:'"Nanum Myeongjo", serif' },
+  sans:  { label:'고딕', css:'"Noto Sans KR", sans-serif' }
+};
+function applyPrefs(){
+  document.body.classList.remove('sepia','dark');
+  if (prefs.theme !== 'light') document.body.classList.add(prefs.theme);
+  const r = document.documentElement.style;
+  r.setProperty('--rfont', (FONTS[prefs.font]||FONTS.serif).css);
+  r.setProperty('--rsize', prefs.size + 'px');
+  r.setProperty('--rlh', prefs.lh);
+  r.setProperty('--rwidth', prefs.width + 'px');
+  r.setProperty('--pgap', prefs.pgap + 'em');
+}
+applyPrefs();
+
+/* ---------- helpers ---------- */
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtN = n => n >= 10000 ? (n/10000).toFixed(1).replace(/\.0$/,'') + '만' : n.toLocaleString();
+const fmtD = t => { const d = new Date(t); return d.getFullYear() + '.' + String(d.getMonth()+1).padStart(2,'0') + '.' + String(d.getDate()).padStart(2,'0'); };
+function toast(msg, ms){
+  document.querySelectorAll('.toast').forEach(t => t.remove());
+  const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t); setTimeout(() => t.remove(), ms || 2600);
+}
+const getFolder = id => lib.folders.find(x => x.id === id);
+const getNovel = id => lib.novels.find(x => x.id === id);
+function folderName(id){ const f = getFolder(id); return f ? f.name : '폴더 없음'; }
+const isPrivFolder = id => { const f = getFolder(id); return !!(f && f.private); };
+const isRead = id => (progress[id] || 0) >= 0.95;
+function sorted(list){
+  const a = list.slice();
+  const byTitle = (x,y) => x.title.localeCompare(y.title, 'ko', {numeric:true});
+  if (sortMode === 'new') a.sort((x,y) => y.added - x.added);
+  else if (sortMode === 'old') a.sort((x,y) => x.added - y.added);
+  else if (sortMode === 'mine') a.sort((x,y) => (myScore(y.id) - myScore(x.id)) || byTitle(x,y));
+  else if (sortMode === 'avg') a.sort((x,y) => (avgScore(y.id) - avgScore(x.id)) || (rateCount(y.id) - rateCount(x.id)) || byTitle(x,y));
+  else a.sort(byTitle);
+  return a;
+}
+const myScore = id => (ratings[id] && me && ratings[id][me.id]) || 0;
+const rateCount = id => ratings[id] ? Object.keys(ratings[id]).length : 0;
+function avgScore(id){
+  const r = ratings[id]; if (!r) return 0;
+  const v = Object.values(r); return v.length ? v.reduce((s, x) => s + x, 0) / v.length : 0;
+}
+const memberName = uid => (me && uid === me.id) ? '나' : (members[uid] || '함께 읽는 사람');
+function heartsHTML(id, score, editable){
+  let h = '<span class="hearts' + (editable ? ' edit' : '') + '"' + (editable ? ' data-rate="' + id + '" title="하트 매기기 (같은 칸을 다시 누르면 취소)"' : ' aria-label="하트 ' + score + '개"') + '>';
+  for (let i = 1; i <= 5; i++) h += '<i data-s="' + i + '"' + (i <= score ? ' class="on"' : '') + '>♥</i>';
+  return h + '</span>';
+}
+// list: my editable hearts on top, then everyone else who rated
+function ratesBlock(id){
+  let h = '<div class="rates"><div class="rate-row mine"><span class="who">나</span>' + heartsHTML(id, myScore(id), true) + '</div>';
+  const r = ratings[id] || {};
+  Object.keys(r).filter(u => !me || u !== me.id).forEach(u => {
+    h += '<div class="rate-row"><span class="who">' + esc(memberName(u)) + '</span>' + heartsHTML(id, r[u], false) + '</div>';
+  });
+  return h + '</div>';
+}
+function bindHearts(root, after){
+  root.querySelectorAll('.hearts.edit').forEach(el => {
+    const items = Array.from(el.querySelectorAll('i'));
+    items.forEach(i => {
+      i.onmouseenter = () => items.forEach(x => x.classList.toggle('hv', +x.dataset.s <= +i.dataset.s));
+      i.onclick = e => { e.stopPropagation(); setRating(el.dataset.rate, +i.dataset.s); after(); };
+    });
+    el.onclick = e => e.stopPropagation();
+  });
+}
+function visibleNovels(){
+  return sorted(curFolder === 'all' ? lib.novels : lib.novels.filter(n => n.folderId === curFolder));
+}
+// run a supabase query, throw on error
+async function q(p){ const { data, error } = await p; if (error) throw error; return data; }
+function failMsg(e){
+  const m = (e && (e.message || '')) + '';
+  if (/JWT|session|auth/i.test(m)) return '로그인이 만료됐어요. 다시 로그인해 주세요.';
+  if (/Failed to fetch|NetworkError/i.test(m)) return '인터넷 연결을 확인해 주세요.';
+  if (/too large|413|payload/i.test(m)) return '파일이 너무 커서 저장하지 못했어요.';
+  return '저장하지 못했어요. 잠시 후 다시 시도해 주세요.';
+}
+const mapFolder = f => ({ id: f.id, name: f.name, private: !!f.is_private, sort: f.sort });
+const mapNovel = n => ({ id: n.id, folderId: n.folder_id, title: n.title, type: n.type, chars: n.chars, added: Date.parse(n.created_at) });
+
+/* ---------- modals ---------- */
+function modal(build){
+  return new Promise(resolve => {
+    const ov = document.createElement('div'); ov.className = 'overlay';
+    const box = document.createElement('div'); box.className = 'modal';
+    ov.appendChild(box); document.body.appendChild(ov);
+    const close = v => { ov.remove(); document.removeEventListener('keydown', onKey); resolve(v); };
+    const onKey = e => { if (e.key === 'Escape') close(null); };
+    document.addEventListener('keydown', onKey);
+    ov.addEventListener('mousedown', e => { if (e.target === ov) close(null); });
+    build(box, close);
+  });
+}
+function askText(title, value, placeholder, okLabel){
+  return modal((box, close) => {
+    box.innerHTML = '<h3></h3><input type="text" maxlength="80"><div class="acts"><button class="btn ghost" data-x>취소</button><button class="btn primary" data-ok></button></div>';
+    box.querySelector('h3').textContent = title;
+    const inp = box.querySelector('input'); inp.value = value || ''; inp.placeholder = placeholder || '';
+    box.querySelector('[data-ok]').textContent = okLabel || '확인';
+    const ok = () => { const v = inp.value.trim(); if (v) close(v); else inp.focus(); };
+    box.querySelector('[data-ok]').onclick = ok;
+    box.querySelector('[data-x]').onclick = () => close(null);
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) ok(); });
+    setTimeout(() => { inp.focus(); inp.select(); }, 30);
+  });
+}
+function folderDialog(title, name, priv, okLabel){
+  return modal((box, close) => {
+    box.innerHTML = '<h3></h3><input type="text" maxlength="60" placeholder="폴더 이름 (예: 장편, 단편, 완결작)">' +
+      '<label class="check"><input type="checkbox"><span>🔒 비공개 폴더<small>나만 볼 수 있어요. 다른 사람에게는 폴더도 작품도 보이지 않아요.</small></span></label>' +
+      '<div class="acts"><button class="btn ghost" data-x>취소</button><button class="btn primary" data-ok></button></div>';
+    box.querySelector('h3').textContent = title;
+    const inp = box.querySelector('input[type=text]'); inp.value = name || '';
+    const cb = box.querySelector('input[type=checkbox]'); cb.checked = !!priv;
+    box.querySelector('[data-ok]').textContent = okLabel || '확인';
+    const ok = () => { const v = inp.value.trim(); if (v) close({ name: v, private: cb.checked }); else inp.focus(); };
+    box.querySelector('[data-ok]').onclick = ok;
+    box.querySelector('[data-x]').onclick = () => close(null);
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) ok(); });
+    setTimeout(() => { inp.focus(); inp.select(); }, 30);
+  });
+}
+function confirmBox(title, msg, okLabel, danger){
+  return modal((box, close) => {
+    box.innerHTML = '<h3></h3><p></p><div class="acts"><button class="btn ghost" data-x>취소</button><button class="btn primary" data-ok></button></div>';
+    box.querySelector('h3').textContent = title;
+    box.querySelector('p').textContent = msg;
+    const ok = box.querySelector('[data-ok]'); ok.textContent = okLabel || '확인';
+    if (danger) { ok.style.background = 'var(--danger)'; ok.style.borderColor = 'var(--danger)'; ok.style.color = '#fff'; }
+    ok.onclick = () => close(true);
+    box.querySelector('[data-x]').onclick = () => close(false);
+  });
+}
+function actionSheet(title, actions){
+  return modal((box, close) => {
+    box.innerHTML = '<h3></h3><div class="sheet-list"></div>';
+    box.querySelector('h3').textContent = title;
+    const list = box.querySelector('.sheet-list');
+    actions.forEach(a => {
+      const b = document.createElement('button'); b.textContent = a.label;
+      if (a.danger) b.className = 'danger';
+      b.onclick = () => close(a.key); list.appendChild(b);
+    });
+  });
+}
+function chooseFolder(title, current, folders, allowNew){
+  return modal((box, close) => {
+    box.innerHTML = '<h3></h3><select></select><div class="acts"><button class="btn ghost" data-x>취소</button><button class="btn primary" data-ok>확인</button></div>';
+    box.querySelector('h3').textContent = title;
+    const sel = box.querySelector('select');
+    (folders || lib.folders).forEach(f => { const o = document.createElement('option'); o.value = f.id; o.textContent = (f.private ? '🔒 ' : '') + f.name; if (f.id === current) o.selected = true; sel.appendChild(o); });
+    if (allowNew !== false) { const o = document.createElement('option'); o.value = '__new'; o.textContent = '+ 새 폴더 만들기'; sel.appendChild(o); }
+    box.querySelector('[data-ok]').onclick = () => close(sel.value);
+    box.querySelector('[data-x]').onclick = () => close(null);
+  });
+}
+
+/* ---------- data ---------- */
+async function loadAll(){
+  const [meta, folders, novels, prog, owner, rates, mems] = await Promise.all([
+    q(sb.from('meta').select('value').eq('key', 'name').maybeSingle()),
+    q(sb.from('folders').select('id,name,is_private,sort').order('sort').order('created_at')),
+    q(sb.from('novels').select('id,folder_id,title,type,chars,created_at')),
+    q(sb.from('progress').select('novel_id,pct')),
+    q(sb.rpc('is_owner')),
+    q(sb.from('ratings').select('user_id,novel_id,score')),
+    q(sb.from('members').select('user_id,name'))
+  ]);
+  isOwner = !!owner;
+  lib = { name: (meta && meta.value) || '나의 서재', folders: folders.map(mapFolder), novels: novels.map(mapNovel) };
+  progress = {}; prog.forEach(p => progress[p.novel_id] = p.pct);
+  ratings = {}; rates.forEach(r => { (ratings[r.novel_id] = ratings[r.novel_id] || {})[r.user_id] = r.score; });
+  members = {}; mems.forEach(m => members[m.user_id] = m.name);
+  if (!members[me.id]) {
+    // first visit: register a display name from the login id
+    const nm = ((me.email || '').split('@')[0] || '독자').slice(0, 20);
+    members[me.id] = nm;
+    sb.from('members').upsert({ user_id: me.id, name: nm }).then(() => {}, () => {});
+  }
+  ready = true;
+  if (curFolder !== 'all' && !getFolder(curFolder)) curFolder = 'all';
+}
+async function refresh(){
+  try { await loadAll(); loadNote = ''; } catch(e) { loadNote = '서재를 불러오지 못했어요. ' + failMsg(e); ready = true; }
+  if (view === 'library') { document.title = lib.name; render(); }
+  else if (view === 'reader' && !document.querySelector('.body')) renderReader(readerId);
+}
+
+let progQ = Promise.resolve();
+function setRead(id, pct){
+  if (pct <= 0) delete progress[id]; else progress[id] = pct;
+  progQ = progQ.then(() => pct <= 0
+    ? q(sb.from('progress').delete().eq('novel_id', id).eq('user_id', me.id))
+    : q(sb.from('progress').upsert({ user_id: me.id, novel_id: id, pct, updated_at: new Date().toISOString() }, { onConflict: 'user_id,novel_id' }))
+  ).catch(() => {});
+}
+
+const rateQ = {};
+function setRating(id, score){
+  const cur = myScore(id);
+  const next = cur === score ? 0 : score;          // tapping the same heart again clears it
+  const r = ratings[id] = ratings[id] || {};
+  if (next) r[me.id] = next; else delete r[me.id];
+  rateQ[id] = (rateQ[id] || Promise.resolve()).then(() => next
+    ? q(sb.from('ratings').upsert({ user_id: me.id, novel_id: id, score: next, updated_at: new Date().toISOString() }, { onConflict: 'user_id,novel_id' }))
+    : q(sb.from('ratings').delete().eq('novel_id', id).eq('user_id', me.id))
+  ).catch(e => toast(failMsg(e)));
+}
+
+/* ---------- backup ---------- */
+const safeName = s => (s || '제목없음').replace(/[\\/:*?"<>|\x00-\x1f]/g, '_').replace(/\s+$/,'').slice(0, 100) || '제목없음';
+async function backupAll(){
+  if (!window.JSZip) { toast('백업 도구를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.'); return; }
+  if (!lib.novels.length) { toast('백업할 작품이 없어요'); return; }
+  const zip = new window.JSZip();
+  const ids = lib.novels.map(n => n.id);
+  const texts = {};
+  try {
+    for (let i = 0; i < ids.length; i += 20) {
+      toast('백업 준비 중… ' + Math.min(i + 20, ids.length) + ' / ' + ids.length, 60000);
+      const rows = await q(sb.from('novels').select('id,content').in('id', ids.slice(i, i + 20)));
+      rows.forEach(r => texts[r.id] = r.content || '');
+    }
+  } catch(e) { toast('백업하지 못했어요. ' + failMsg(e)); return; }
+  const used = {};
+  const info = { library: lib.name, backedUpAt: new Date().toISOString(), folders: [], novels: [] };
+  lib.folders.forEach(f => info.folders.push({ name: f.name, private: f.private }));
+  lib.novels.forEach(n => {
+    const dir = (isPrivFolder(n.folderId) ? '🔒 ' : '') + safeName(folderName(n.folderId));
+    let base = dir + '/' + safeName(n.title), path = base + '.' + (n.type === 'md' ? 'md' : 'txt'), k = 2;
+    while (used[path]) path = base + ' (' + (k++) + ').' + (n.type === 'md' ? 'md' : 'txt');
+    used[path] = 1;
+    zip.file(path, texts[n.id] != null ? texts[n.id] : '');
+    const r = ratings[n.id] || {}, hearts = {};
+    Object.keys(r).forEach(u => hearts[members[u] || u] = r[u]);
+    info.novels.push({ file: path, title: n.title, folder: folderName(n.folderId), uploaded: new Date(n.added).toISOString(), hearts, myReadPercent: Math.round((progress[n.id] || 0) * 100) });
+  });
+  zip.file('서재정보.json', JSON.stringify(info, null, 2));
+  const blob = await zip.generateAsync({ type: 'blob' });
+  const d = new Date(), stamp = d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = safeName(lib.name) + '_백업_' + stamp + '.zip';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+  toast('작품 ' + lib.novels.length + '편을 zip으로 내려받았어요', 3500);
+}
+
+async function accountMenu(){
+  const acts = [{key:'name', label:'내 표시 이름 바꾸기 (지금: ' + (members[me.id] || '') + ')'}];
+  if (isOwner) acts.push({key:'backup', label:'전체 백업 내려받기 (zip)'});
+  acts.push({key:'out', label:'로그아웃', danger:true});
+  const k = await actionSheet('계정', acts);
+  if (k === 'name') {
+    const v = await askText('하트 옆에 보일 내 이름', members[me.id] || '', '예: 지은', '저장');
+    if (v) {
+      try { await q(sb.from('members').upsert({ user_id: me.id, name: v.slice(0, 20) })); members[me.id] = v.slice(0, 20); toast('이름을 바꿨어요'); }
+      catch(e) { toast(failMsg(e)); }
+    }
+  }
+  if (k === 'backup') backupAll();
+  if (k === 'out') { await sb.auth.signOut(); location.hash = ''; showLogin(); }
+}
+
+async function loadText(n){
+  if (textCache[n.id] != null) return textCache[n.id];
+  const row = await q(sb.from('novels').select('content').eq('id', n.id).single());
+  return (textCache[n.id] = row.content || '');
+}
+
+async function readFileText(file){
+  const buf = await file.arrayBuffer();
+  const b = new Uint8Array(buf);
+  if (b[0] === 0xFF && b[1] === 0xFE) return new TextDecoder('utf-16le').decode(buf);
+  if (b[0] === 0xFE && b[1] === 0xFF) return new TextDecoder('utf-16be').decode(buf);
+  try { return new TextDecoder('utf-8', {fatal:true}).decode(buf).replace(/^﻿/, ''); }
+  catch(e) { try { return new TextDecoder('euc-kr').decode(buf); } catch(e2) { return new TextDecoder().decode(buf); } }
+}
+
+async function createFolder(){
+  const r = await folderDialog('새 폴더', '', false, '만들기');
+  if (!r) return null;
+  try {
+    const sort = lib.folders.reduce((m, f) => Math.max(m, f.sort || 0), 0) + 1;
+    const row = await q(sb.from('folders').insert({ name: r.name, is_private: r.private, sort }).select().single());
+    lib.folders.push(mapFolder(row));
+    return row.id;
+  } catch(e) { toast(failMsg(e)); return null; }
+}
+
+async function uploadFiles(files){
+  if (!isOwner) return;
+  files = Array.from(files).filter(f => /\.(txt|md|markdown)$/i.test(f.name) || /^text\//.test(f.type));
+  if (!files.length) { toast('txt나 md 파일만 올릴 수 있어요'); return; }
+  let target = curFolder !== 'all' && getFolder(curFolder) ? curFolder : null;
+  if (!target) {
+    if (!lib.folders.length) target = await createFolder();
+    else {
+      target = await chooseFolder(files.length + '개 파일을 어느 폴더에 넣을까요?', lib.folders[0].id);
+      if (target === '__new') target = await createFolder();
+    }
+    if (!target) return;
+  }
+  let done = 0, failed = 0, lastErr = null;
+  for (const file of files) {
+    toast('올리는 중… ' + (done + failed + 1) + ' / ' + files.length, 60000);
+    try {
+      const text = (await readFileText(file)).replace(/\r\n?/g, '\n');
+      const row = await q(sb.from('novels').insert({
+        folder_id: target,
+        title: file.name.replace(/\.(txt|md|markdown)$/i, ''),
+        type: /\.(md|markdown)$/i.test(file.name) ? 'md' : 'txt',
+        chars: text.replace(/\s/g, '').length,
+        content: text
+      }).select('id,folder_id,title,type,chars,created_at').single());
+      lib.novels.push(mapNovel(row)); textCache[row.id] = text;
+      done++;
+    } catch(e) { failed++; lastErr = e; }
+  }
+  curFolder = target; saveUi(); render();
+  toast(failed ? done + '개 저장, ' + failed + '개 실패 — ' + failMsg(lastErr) : done + '개 작품을 서재에 담았어요', failed ? 5000 : 2600);
+}
+
+async function deleteNovel(id){
+  try { await q(sb.from('novels').delete().eq('id', id)); }
+  catch(e) { toast(failMsg(e)); return false; }
+  lib.novels = lib.novels.filter(x => x.id !== id);
+  delete textCache[id]; delete progress[id];
+  return true;
+}
+
+/* ---------- library view ---------- */
+function renderLibrary(){
+  const novels = visibleNovels();
+  const counts = {}; lib.novels.forEach(n => counts[n.folderId] = (counts[n.folderId]||0) + 1);
+  const readCount = lib.novels.filter(n => isRead(n.id)).length;
+  let h = '<div class="wrap">';
+  if (loadNote) h += '<div class="notice">' + esc(loadNote) + '</div>';
+  h += '<div class="lib-head"><div><h1 class="lib-title" id="libName"' + (isOwner ? ' title="눌러서 이름 바꾸기"' : ' style="cursor:default"') + '>' + esc(lib.name) + '</h1>' +
+       '<div class="lib-sub">작품 ' + lib.novels.length + '편 · 읽음 ' + readCount + '편' + (isOwner ? ' · 폴더 ' + lib.folders.length + '개' : '') + '</div></div>' +
+       '<div class="head-actions"><button class="btn ghost" id="acctBtn" title="계정 · 백업">' + esc(members[me.id] || '계정') + ' ⋯</button>' +
+       '<button class="btn" id="themeBtn">' + ({light:'☀︎',sepia:'◐',dark:'☾'})[prefs.theme] + ' 테마</button>' +
+       (isOwner ? '<button class="btn primary" id="upBtn">＋ 파일 올리기</button>' : '') + '</div></div>';
+
+  h += '<div class="tabs"><button class="tab' + (curFolder==='all'?' on':'') + '" data-f="all">전체 <span class="n">' + lib.novels.length + '</span></button>';
+  lib.folders.forEach(f => {
+    h += '<button class="tab' + (curFolder===f.id?' on':'') + '" data-f="' + f.id + '">' + (f.private ? '<span class="lock">🔒</span>' : '') + esc(f.name) + ' <span class="n">' + (counts[f.id]||0) + '</span></button>';
+  });
+  if (isOwner) h += '<button class="tab add" id="addFolder">＋ 새 폴더</button>';
+  h += '</div>';
+
+  const isFolder = curFolder !== 'all';
+  const cf = isFolder ? getFolder(curFolder) : null;
+  h += '<div class="toolbar"><div class="toolbar-left">' +
+       (isFolder && isOwner ? '<button class="btn ghost" id="folderMenu" style="padding:6px 10px;font-size:13px">폴더 설정 ⋯</button>' +
+         (cf && cf.private ? '<span style="font-size:12px">나만 보는 폴더</span>' : '') : '<span>' + (isFolder ? esc(cf ? cf.name : '') : '모든 작품') + '</span>') +
+       '</div><select id="sortSel">' +
+       '<option value="name"' + (sortMode==='name'?' selected':'') + '>제목순</option>' +
+       '<option value="old"' + (sortMode==='old'?' selected':'') + '>올린 순서</option>' +
+       '<option value="new"' + (sortMode==='new'?' selected':'') + '>최근 올린 순</option>' +
+       '<option value="mine"' + (sortMode==='mine'?' selected':'') + '>내 하트순</option>' +
+       '<option value="avg"' + (sortMode==='avg'?' selected':'') + '>평균 하트순</option></select></div>';
+
+  if (!ready) {
+    h += '<div class="loading">서재를 불러오는 중…</div>';
+  } else if (!novels.length) {
+    h += '<div class="empty"><b>' + (isFolder ? '이 폴더는 비어 있어요' : '아직 서재가 비어 있어요') + '</b>' +
+         (isOwner ? 'txt나 md 파일을 이 화면에 끌어다 놓거나<br>아래 버튼으로 올려 주세요.<br><button class="btn primary" id="upBtn2">＋ 파일 올리기</button>' : '아직 올라온 작품이 없어요.') + '</div>';
+  } else {
+    h += '<div class="list">';
+    novels.forEach(n => {
+      const p = progress[n.id] || 0, rd = p >= 0.95;
+      h += '<div class="item' + (rd ? ' read' : '') + '" data-n="' + n.id + '"><div class="item-main">' +
+           '<div class="item-title">' + esc(n.title) + '</div><div class="item-meta">' +
+           (rd ? '<span class="readmark">✓ 읽음</span>' : '') +
+           (isFolder ? '' : '<span class="chip">' + (isPrivFolder(n.folderId) ? '🔒 ' : '') + esc(folderName(n.folderId)) + '</span>') +
+           '<span>' + fmtN(n.chars) + '자</span><span>' + fmtD(n.added) + '</span>' +
+           (!rd && p > 0.01 ? '<span class="pbar"><i style="width:' + Math.round(p*100) + '%"></i></span><span>' + Math.round(p*100) + '%</span>' : '') +
+           '</div></div>' + ratesBlock(n.id) + '<button class="icon-btn" data-menu="' + n.id + '" aria-label="메뉴">⋯</button></div>';
+    });
+    h += '</div>';
+  }
+  h += '</div>';
+  $app.innerHTML = h;
+
+  const on = (sel, fn) => { const el = $app.querySelector(sel); if (el) el.onclick = fn; };
+  on('#upBtn', () => fileInput.click());
+  on('#upBtn2', () => fileInput.click());
+  on('#acctBtn', accountMenu);
+  bindHearts($app, () => render());
+  on('#themeBtn', () => {
+    prefs.theme = prefs.theme === 'light' ? 'sepia' : prefs.theme === 'sepia' ? 'dark' : 'light';
+    savePrefs(); applyPrefs(); render();
+  });
+  if (isOwner) on('#libName', async () => {
+    const v = await askText('서재 이름', lib.name, '', '저장');
+    if (v && v !== lib.name) {
+      try { await q(sb.from('meta').upsert({ key: 'name', value: v })); lib.name = v; document.title = v; render(); }
+      catch(e) { toast(failMsg(e)); }
+    }
+  });
+  $app.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { curFolder = b.dataset.f; saveUi(); render(); });
+  on('#addFolder', async () => { const id = await createFolder(); if (id) { curFolder = id; saveUi(); render(); } });
+  $app.querySelector('#sortSel').onchange = e => { sortMode = e.target.value; saveUi(); render(); };
+  on('#folderMenu', folderMenu);
+  $app.querySelectorAll('.item').forEach(el => el.onclick = e => {
+    if (e.target.closest('[data-menu]')) return;
+    openNovel(el.dataset.n);
+  });
+  $app.querySelectorAll('[data-menu]').forEach(b => b.onclick = () => novelMenu(b.dataset.menu));
+}
+
+async function folderMenu(){
+  const fid = curFolder; const f0 = getFolder(fid); if (!f0) return;
+  const k = await actionSheet((f0.private ? '🔒 ' : '') + f0.name, [
+    {key:'up', label:'이 폴더에 파일 올리기'},
+    {key:'edit', label:'이름 · 공개 설정'},
+    {key:'readall', label:'폴더 전체 읽음으로 표시'},
+    {key:'left', label:'← 앞으로 옮기기'},
+    {key:'right', label:'뒤로 옮기기 →'},
+    {key:'del', label:'폴더 삭제', danger:true}
+  ]);
+  if (k === 'up') fileInput.click();
+  if (k === 'readall') { lib.novels.filter(n => n.folderId === fid).forEach(n => setRead(n.id, 1)); render(); }
+  if (k === 'edit') {
+    const r = await folderDialog('폴더 설정', f0.name, f0.private, '저장');
+    if (!r) return;
+    if (r.private !== f0.private && !await confirmBox(r.private ? '비공개로 바꿀까요?' : '공개로 바꿀까요?',
+        r.private ? '이 폴더와 안의 작품이 다른 사람에게 더 이상 보이지 않아요.' : '로그인한 다른 사람도 이 폴더의 작품을 읽을 수 있게 돼요.', '바꾸기')) return;
+    try {
+      await q(sb.from('folders').update({ name: r.name, is_private: r.private }).eq('id', fid));
+      f0.name = r.name; f0.private = r.private; render();
+      toast(r.private ? '🔒 나만 보는 폴더예요' : '공개 폴더예요');
+    } catch(e) { toast(failMsg(e)); }
+  }
+  if (k === 'left' || k === 'right') {
+    const i = lib.folders.indexOf(f0), j = k === 'left' ? i - 1 : i + 1;
+    if (j < 0 || j >= lib.folders.length) return;
+    [lib.folders[i], lib.folders[j]] = [lib.folders[j], lib.folders[i]];
+    render();
+    try {
+      for (let x = 0; x < lib.folders.length; x++) {
+        const f = lib.folders[x];
+        if (f.sort !== x) { await q(sb.from('folders').update({ sort: x }).eq('id', f.id)); f.sort = x; }
+      }
+    } catch(e) { toast(failMsg(e)); }
+  }
+  if (k === 'del') {
+    const insideIds = lib.novels.filter(n => n.folderId === fid).map(n => n.id);
+    if (insideIds.length && lib.folders.length > 1) {
+      const how = await actionSheet('폴더 안에 작품 ' + insideIds.length + '편이 있어요', [
+        {key:'move', label:'작품은 다른 폴더로 옮기고 폴더만 삭제'},
+        {key:'all', label:'작품까지 모두 삭제', danger:true}
+      ]);
+      if (!how) return;
+      if (how === 'move') {
+        const to = await chooseFolder('어느 폴더로 옮길까요?', null, lib.folders.filter(x => x.id !== fid), false);
+        if (!to) return;
+        try {
+          await q(sb.from('novels').update({ folder_id: to }).eq('folder_id', fid));
+          await q(sb.from('folders').delete().eq('id', fid));
+        } catch(e) { toast(failMsg(e)); return; }
+        lib.novels.forEach(n => { if (n.folderId === fid) n.folderId = to; });
+        lib.folders = lib.folders.filter(x => x.id !== fid); curFolder = to; saveUi(); render();
+        toast('옮기고 폴더를 지웠어요');
+        return;
+      }
+      if (!await confirmBox('정말 삭제할까요?', '「' + f0.name + '」 폴더와 작품 ' + insideIds.length + '편이 지워지고 되돌릴 수 없어요.', '삭제', true)) return;
+    } else if (!await confirmBox('폴더를 삭제할까요?', insideIds.length ? '「' + f0.name + '」 폴더와 작품 ' + insideIds.length + '편이 지워지고 되돌릴 수 없어요.' : '「' + f0.name + '」 폴더를 지워요.', '삭제', true)) return;
+    try { await q(sb.from('folders').delete().eq('id', fid)); }      // novels go with it (on delete cascade)
+    catch(e) { toast(failMsg(e)); return; }
+    lib.folders = lib.folders.filter(x => x.id !== fid);
+    lib.novels = lib.novels.filter(n => n.folderId !== fid);
+    curFolder = 'all'; saveUi(); render();
+  }
+}
+
+async function novelMenu(id){
+  const n = getNovel(id); if (!n) return;
+  const rd = isRead(id);
+  const acts = [{key:'read', label:'읽기'}, {key:'mark', label: rd ? '안 읽음으로 표시' : '읽음으로 표시'}];
+  if (!rd && progress[id]) acts.push({key:'reset', label:'읽은 위치 초기화'});
+  if (isOwner) acts.push({key:'rename', label:'제목 바꾸기'}, {key:'move', label:'다른 폴더로 옮기기'}, {key:'del', label:'삭제', danger:true});
+  const k = await actionSheet(n.title, acts);
+  if (k === 'read') openNovel(id);
+  if (k === 'mark') { setRead(id, rd ? 0 : 1); render(); }
+  if (k === 'reset') { setRead(id, 0); render(); }
+  if (k === 'rename') {
+    const v = await askText('제목 바꾸기', n.title, '', '저장');
+    if (v && v !== n.title) {
+      try { await q(sb.from('novels').update({ title: v }).eq('id', id)); n.title = v; render(); } catch(e) { toast(failMsg(e)); }
+    }
+  }
+  if (k === 'move') {
+    let to = await chooseFolder('어느 폴더로 옮길까요?', n.folderId);
+    if (to === '__new') to = await createFolder();
+    if (to && to !== n.folderId) {
+      try { await q(sb.from('novels').update({ folder_id: to }).eq('id', id)); n.folderId = to; render(); toast('「' + folderName(to) + '」로 옮겼어요'); }
+      catch(e) { toast(failMsg(e)); }
+    }
+  }
+  if (k === 'del') {
+    if (await confirmBox('작품을 삭제할까요?', '「' + n.title + '」을(를) 서재에서 지워요. 되돌릴 수 없어요.', '삭제', true)) {
+      if (await deleteNovel(id)) { render(); toast('삭제했어요'); }
+    }
+  }
+}
+
+/* ---------- reader ---------- */
+function renderBody(n, text){
+  if (n.type === 'md' && window.marked) {
+    let html = window.marked.parse(text, { breaks: true, gfm: true });
+    html = window.DOMPurify ? window.DOMPurify.sanitize(html) : '<p style="white-space:pre-wrap">' + esc(text) + '</p>';
+    return '<div class="body md">' + html + '</div>';
+  }
+  const brk = /^\s*([*＊\-—=~◆◇●○■□☆★#·.・※]\s*){1,12}$/;
+  const out = text.split('\n').map(l => {
+    if (!l.trim()) return '<div class="gap"></div>';
+    if (brk.test(l)) return '<p class="brk">' + esc(l.trim()) + '</p>';
+    return '<p>' + esc(l) + '</p>';
+  });
+  return '<div class="body txt">' + out.join('') + '</div>';
+}
+
+let saveTimer = null, lastY = 0;
+async function renderReader(id){
+  const n = getNovel(id);
+  if (!n) {
+    if (!ready) { $app.innerHTML = '<div class="loading" style="padding-top:120px">불러오는 중…</div>'; return; }
+    location.hash = ''; view = 'library'; readerId = null; render(); return;
+  }
+  document.title = n.title + ' · ' + lib.name;
+  $app.innerHTML =
+    '<div class="rprog" id="rprog"></div>' +
+    '<div class="rbar" id="rbar"><button class="icon-btn" id="backBtn" aria-label="서재로">←</button>' +
+    '<div class="rbar-title">' + esc(n.title) + '</div>' +
+    '<button class="icon-btn" id="setBtn" aria-label="보기 설정" style="font-family:serif;font-size:16px;width:auto;padding:0 10px;border-radius:999px">가가</button></div>' +
+    '<article class="article"><div class="a-folder">' + (isPrivFolder(n.folderId) ? '🔒 ' : '') + esc(folderName(n.folderId)) + '</div>' +
+    '<h1 class="a-title">' + esc(n.title) + '</h1>' +
+    '<div class="a-meta">' + fmtN(n.chars) + '자 · ' + fmtD(n.added) + (isRead(n.id) ? ' · <span class="readmark">✓ 읽음</span>' : '') + '</div>' +
+    '<div id="bodyHost"><div class="loading">본문을 불러오는 중…</div></div></article>' +
+    '<div class="a-end hidden" id="aEnd"></div>';
+  $app.querySelector('#backBtn').onclick = () => { location.hash = ''; };
+  $app.querySelector('#setBtn').onclick = toggleSettings;
+  window.scrollTo(0, 0);
+
+  let text;
+  try { text = await loadText(n); } catch(e) { const h = $app.querySelector('#bodyHost'); if (h) h.innerHTML = '<div class="loading">본문을 불러오지 못했어요. 잠시 후 다시 열어 주세요.</div>'; return; }
+  if (readerId !== id) return;
+  $app.querySelector('#bodyHost').innerHTML = renderBody(n, text);
+
+  const sib = sorted(lib.novels.filter(x => x.folderId === n.folderId));
+  const i = sib.findIndex(x => x.id === n.id);
+  const prev = sib[i-1], next = sib[i+1];
+  const end = $app.querySelector('#aEnd');
+  end.classList.remove('hidden');
+  const drawEnd = () => {
+    const r = ratings[n.id] || {};
+    const others = Object.keys(r).filter(u => u !== me.id);
+    end.innerHTML = '<div class="end-mark">— 끝 —</div>' +
+      '<div class="end-rate"><p>이 작품에 하트를 남겨 주세요</p>' + heartsHTML(n.id, myScore(n.id), true) +
+      (others.length ? '<div class="others">' + others.map(u => '<span>' + esc(memberName(u)) + ' ' + heartsHTML(n.id, r[u], false) + '</span>').join('') + '</div>' : '') +
+      '</div><div class="nav-cards">' +
+      '<button class="nav-card" ' + (prev ? 'data-go="' + prev.id + '"' : 'disabled') + '><small>← 이전 작품</small>' + (prev ? esc(prev.title) : '없음') + '</button>' +
+      '<button class="nav-card next" ' + (next ? 'data-go="' + next.id + '"' : 'disabled') + '><small>다음 작품 →</small>' + (next ? esc(next.title) : '없음') + '</button></div>' +
+      '<div class="end-actions"><button class="btn" id="markBtn">' + (isRead(n.id) ? '✓ 읽음 (취소하기)' : '읽음으로 표시') + '</button><button class="btn" id="toLib">서재로 돌아가기</button></div>';
+    end.querySelectorAll('[data-go]').forEach(b => b.onclick = () => openNovel(b.dataset.go));
+    end.querySelector('#toLib').onclick = () => { location.hash = ''; };
+    end.querySelector('#markBtn').onclick = () => { setRead(n.id, isRead(n.id) ? 0 : 1); drawEnd(); };
+    bindHearts(end, drawEnd);
+  };
+  drawEnd();
+  end._redraw = drawEnd;
+
+  const p = progress[n.id];
+  if (p && p > 0.01 && p < 0.95) {
+    requestAnimationFrame(() => {
+      const max = document.documentElement.scrollHeight - innerHeight;
+      window.scrollTo(0, p * max);
+      toast('읽던 곳부터 이어서 보여 드려요');
+    });
+  }
+  updateProg();
+}
+
+function updateProg(){
+  const max = document.documentElement.scrollHeight - innerHeight;
+  const pct = max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 1;
+  const bar = document.getElementById('rprog'); if (bar) bar.style.width = (pct*100) + '%';
+  const rbar = document.getElementById('rbar');
+  if (rbar && !document.querySelector('.settings')) {
+    if (scrollY > lastY + 6 && scrollY > 120) rbar.classList.add('up');
+    else if (scrollY < lastY - 6) rbar.classList.remove('up');
+  }
+  lastY = scrollY;
+  return pct;
+}
+window.addEventListener('scroll', () => {
+  if (view !== 'reader' || !readerId || !document.querySelector('.body')) return;
+  const pct = updateProg();
+  clearTimeout(saveTimer);
+  const id = readerId;
+  saveTimer = setTimeout(() => {
+    if (isRead(id)) return;
+    if (Math.abs((progress[id] || 0) - pct) > 0.004) {
+      setRead(id, pct >= 0.95 ? 1 : pct);
+      if (pct >= 0.95) { const e = document.getElementById('aEnd'); if (e && e._redraw) e._redraw(); }
+    }
+  }, 1500);
+}, { passive: true });
+
+function toggleSettings(){
+  const ex = document.querySelector('.settings');
+  if (ex) { ex.remove(); return; }
+  const s = document.createElement('div'); s.className = 'settings';
+  const draw = () => {
+    s.innerHTML =
+      '<div class="set-row"><label>배경</label><div class="seg">' +
+        ['light','sepia','dark'].map(t => '<button class="sw' + (prefs.theme===t?' on':'') + '" data-theme="' + t + '" style="background:' + ({light:'#fbfaf8',sepia:'#f4ecdc',dark:'#18191b'})[t] + '" aria-label="' + t + '"></button>').join('') +
+      '</div></div>' +
+      '<div class="set-row"><label>글꼴</label><div class="seg">' +
+        Object.keys(FONTS).map(k => '<button data-font="' + k + '" class="' + (prefs.font===k?'on':'') + '" style="font-family:' + FONTS[k].css.replace(/"/g,"'") + '">' + FONTS[k].label + '</button>').join('') +
+      '</div></div>' +
+      stepRow('글자 크기', 'size', prefs.size + 'px') +
+      stepRow('줄 간격', 'lh', prefs.lh.toFixed(2)) +
+      stepRow('문단 간격', 'pgap', prefs.pgap.toFixed(1)) +
+      stepRow('본문 너비', 'width', prefs.width + '') +
+      '<div style="text-align:center;margin-top:10px"><button class="btn ghost" data-reset style="font-size:13px">기본값으로</button></div>';
+    s.querySelectorAll('[data-theme]').forEach(b => b.onclick = () => { prefs.theme = b.dataset.theme; commit(); });
+    s.querySelectorAll('[data-font]').forEach(b => b.onclick = () => { prefs.font = b.dataset.font; commit(); });
+    s.querySelectorAll('[data-step]').forEach(b => b.onclick = () => {
+      const [k, d] = b.dataset.step.split(':'); const dir = +d;
+      if (k === 'size') prefs.size = Math.min(26, Math.max(13, prefs.size + dir));
+      if (k === 'lh') prefs.lh = Math.round(Math.min(2.6, Math.max(1.4, prefs.lh + dir*0.1))*100)/100;
+      if (k === 'pgap') prefs.pgap = Math.round(Math.min(2, Math.max(0, prefs.pgap + dir*0.2))*10)/10;
+      if (k === 'width') prefs.width = Math.min(960, Math.max(480, prefs.width + dir*40));
+      commit();
+    });
+    s.querySelector('[data-reset]').onclick = () => { prefs = Object.assign({}, defaults); commit(); };
+  };
+  const commit = () => {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    const pct = max > 0 ? scrollY / max : 0;
+    savePrefs(); applyPrefs(); draw();
+    const m2 = document.documentElement.scrollHeight - innerHeight; window.scrollTo(0, pct * m2);
+  };
+  draw();
+  document.body.appendChild(s);
+  setTimeout(() => {
+    const off = e => { if (!s.contains(e.target) && !e.target.closest('#setBtn')) { s.remove(); document.removeEventListener('mousedown', off); document.removeEventListener('touchstart', off); } };
+    document.addEventListener('mousedown', off); document.addEventListener('touchstart', off, {passive:true});
+  }, 0);
+}
+function stepRow(label, key, val){
+  return '<div class="set-row"><label>' + label + '</label><div class="step">' +
+    '<button data-step="' + key + ':-1">−</button><span>' + val + '</span><button data-step="' + key + ':1">＋</button></div></div>';
+}
+
+/* ---------- routing ---------- */
+function openNovel(id){ location.hash = 'r-' + id; if (view !== 'reader' || readerId !== id) route(); }
+function route(){
+  if (!me) return;
+  const m = location.hash.match(/^#r-([A-Za-z0-9-]+)$/);
+  document.querySelectorAll('.settings').forEach(s => s.remove());
+  if (m) {
+    if (view === 'reader' && readerId === m[1] && document.querySelector('.body')) return;
+    view = 'reader'; readerId = m[1]; renderReader(readerId);
+  } else {
+    const was = view; view = 'library'; readerId = null; document.title = lib.name; render();
+    if (was === 'reader') window.scrollTo(0, 0);
+  }
+}
+window.addEventListener('hashchange', route);
+function render(){
+  if (!me) return;
+  if (view === 'library') renderLibrary();
+  else if (view === 'reader' && !document.querySelector('.body')) renderReader(readerId);
+}
+
+/* ---------- drag & drop / input ---------- */
+fileInput.addEventListener('change', () => { const f = fileInput.files; if (f && f.length) uploadFiles(f); fileInput.value = ''; });
+let dragDepth = 0, dropEl = null;
+document.addEventListener('dragenter', e => {
+  if (!isOwner || view !== 'library' || !e.dataTransfer || !Array.from(e.dataTransfer.types || []).includes('Files')) return;
+  dragDepth++;
+  if (!dropEl) { dropEl = document.createElement('div'); dropEl.className = 'drop'; dropEl.innerHTML = '<div>여기에 놓으면 ' + (curFolder !== 'all' ? '「' + esc(folderName(curFolder)) + '」에 ' : '') + '저장돼요</div>'; document.body.appendChild(dropEl); }
+});
+document.addEventListener('dragleave', () => { dragDepth = Math.max(0, dragDepth - 1); if (!dragDepth && dropEl) { dropEl.remove(); dropEl = null; } });
+document.addEventListener('dragover', e => { if (view === 'library') e.preventDefault(); });
+document.addEventListener('drop', e => {
+  e.preventDefault(); dragDepth = 0; if (dropEl) { dropEl.remove(); dropEl = null; }
+  if (isOwner && view === 'library' && e.dataTransfer && e.dataTransfer.files.length) uploadFiles(e.dataTransfer.files);
+});
+document.addEventListener('visibilitychange', () => { if (me && document.visibilityState === 'visible' && view === 'library') refresh(); });
+
+/* ---------- login / boot ---------- */
+function showLogin(msg){
+  me = null; ready = false; isOwner = false;
+  $app.innerHTML = '<div class="login"><form class="login-box" id="loginForm">' +
+    '<h1>나의 서재</h1><p>아이디와 비밀번호를 입력해 주세요</p>' +
+    '<input id="lid" type="text" autocomplete="username" placeholder="아이디 또는 이메일" autocapitalize="off">' +
+    '<input id="lpw" type="password" autocomplete="current-password" placeholder="비밀번호">' +
+    '<button class="btn primary" type="submit">들어가기</button><div class="login-err" id="lerr"></div></form></div>';
+  if (msg) $app.querySelector('#lerr').textContent = msg;
+  $app.querySelector('#loginForm').onsubmit = async e => {
+    e.preventDefault();
+    let id = $app.querySelector('#lid').value.trim();
+    const pw = $app.querySelector('#lpw').value;
+    if (!id || !pw) return;
+    if (!id.includes('@')) id = id + '@' + ID_DOMAIN;
+    const btn = e.target.querySelector('button'); btn.disabled = true; btn.textContent = '확인 중…';
+    const { data, error } = await sb.auth.signInWithPassword({ email: id.toLowerCase(), password: pw });
+    if (error) {
+      btn.disabled = false; btn.textContent = '들어가기';
+      $app.querySelector('#lerr').textContent = /Invalid login/i.test(error.message) ? '아이디나 비밀번호가 맞지 않아요.' : '로그인하지 못했어요. 잠시 후 다시 시도해 주세요.';
+      return;
+    }
+    startSession(data.user);
+  };
+  setTimeout(() => { const i = $app.querySelector('#lid'); if (i) i.focus(); }, 30);
+}
+function startSession(user){
+  me = user; ready = false; view = 'library';
+  route();
+  refresh();
+}
+async function boot(){
+  if (!window.supabase || SUPABASE_URL.startsWith('YOUR_')) {
+    $app.innerHTML = '<div class="login"><div class="login-box"><h1>나의 서재</h1><p>' +
+      (!window.supabase ? '필요한 파일을 불러오지 못했어요. 인터넷 연결을 확인해 주세요.' : 'index.html 안의 SUPABASE_URL, SUPABASE_ANON_KEY 칸에 Supabase 주소와 키를 넣어 주세요.') + '</p></div></div>';
+    return;
+  }
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const { data } = await sb.auth.getSession();
+  if (data && data.session) startSession(data.session.user); else showLogin();
+}
+boot();
+})();
+</script>
+</body>
+</html>
