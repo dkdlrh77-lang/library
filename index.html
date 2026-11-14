@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@400;600;700&family=Nanum+Myeongjo:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@noonnu/ridi-batang@0.1.0/index.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -15,7 +16,7 @@
 :root{
   --bg:#fbfaf8; --fg:#232220; --muted:#8a8680; --line:#e8e5e0; --card:#ffffff; --soft:#f2efea; --accent:#3f6b5c; --danger:#b4473b;
   --ui:"Noto Sans KR",system-ui,-apple-system,sans-serif;
-  --rfont:"Noto Serif KR",serif; --rsize:17px; --rlh:1.95; --rwidth:680px; --pgap:0em;
+  --rfont:"RIDIBatang","Noto Serif KR",serif; --rsize:17px; --rlh:1.95; --rwidth:680px; --pgap:0em;
 }
 body.sepia{ --bg:#f4ecdc; --fg:#3b3127; --muted:#8f8070; --line:#e2d6bf; --card:#faf4e8; --soft:#ebe0cb; --accent:#7a5a32; }
 body.dark{ --bg:#18191b; --fg:#dcdad5; --muted:#86847f; --line:#2d2f32; --card:#202225; --soft:#26282b; --accent:#8cc0ab; --danger:#e07a6c; }
@@ -197,14 +198,17 @@ let members = {};   // userId -> name
 const textCache = {};
 let curFolder = 'all', sortMode = 'name', view = 'library', readerId = null;
 
-const defaults = { theme:'light', font:'serif', size:17, lh:1.95, width:680, pgap:0 };
+const defaults = { theme:'light', font:'ridi', size:17, lh:1.95, width:680, pgap:0 };
 let prefs = Object.assign({}, defaults);
 try { const s = localStorage.getItem('reader-prefs'); if (s) prefs = Object.assign(prefs, JSON.parse(s)); } catch(e){}
+// one-time switch to the new default font (RIDIBatang) for settings saved before it existed
+if (!prefs.ridiDefault) { prefs.font = 'ridi'; prefs.ridiDefault = true; try { localStorage.setItem('reader-prefs', JSON.stringify(prefs)); } catch(e){} }
 try { const s = localStorage.getItem('lib-ui'); if (s) { const u = JSON.parse(s); curFolder = u.f || 'all'; sortMode = u.s || 'name'; } } catch(e){}
 function saveUi(){ try{ localStorage.setItem('lib-ui', JSON.stringify({f:curFolder,s:sortMode})); }catch(e){} }
 function savePrefs(){ try{ localStorage.setItem('reader-prefs', JSON.stringify(prefs)); }catch(e){} }
 
 const FONTS = {
+  ridi:  { label:'리디바탕', css:'"RIDIBatang", "Noto Serif KR", serif' },
   serif: { label:'명조', css:'"Noto Serif KR", serif' },
   batang:{ label:'고운바탕', css:'"Gowun Batang", serif' },
   nanum: { label:'나눔명조', css:'"Nanum Myeongjo", serif' },
@@ -214,7 +218,7 @@ function applyPrefs(){
   document.body.classList.remove('sepia','dark');
   if (prefs.theme !== 'light') document.body.classList.add(prefs.theme);
   const r = document.documentElement.style;
-  r.setProperty('--rfont', (FONTS[prefs.font]||FONTS.serif).css);
+  r.setProperty('--rfont', (FONTS[prefs.font]||FONTS.ridi).css);
   r.setProperty('--rsize', prefs.size + 'px');
   r.setProperty('--rlh', prefs.lh);
   r.setProperty('--rwidth', prefs.width + 'px');
@@ -849,7 +853,7 @@ function toggleSettings(){
       if (k === 'width') prefs.width = Math.min(960, Math.max(480, prefs.width + dir*40));
       commit();
     });
-    s.querySelector('[data-reset]').onclick = () => { prefs = Object.assign({}, defaults); commit(); };
+    s.querySelector('[data-reset]').onclick = () => { prefs = Object.assign({}, defaults, { ridiDefault: true }); commit(); };
   };
   const commit = () => {
     const max = document.documentElement.scrollHeight - innerHeight;
