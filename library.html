@@ -21,6 +21,10 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
+@font-face{font-family:'ShillaCulture';src:url('fonts/shilla-culture-bold.otf') format('opentype');font-weight:700;font-display:swap}
+@font-face{font-family:'DongpaKkeujeogim';src:url('fonts/dongpa-regular.woff2') format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:'DongpaKkeujeogim';src:url('fonts/dongpa-bold.woff2') format('woff2');font-weight:700;font-display:swap}
+@font-face{font-family:'Galmuri9';src:url('fonts/galmuri9.woff2') format('woff2');font-display:swap}
 /* =========================================================
    게부장 타임 — 낮: 은빛 딸기우유 / 밤: 먹색 금장
    ========================================================= */
@@ -885,6 +889,27 @@ body[data-theme="night"] .yz-stamp{color:#d9675b;border-color:#d9675b}
 }
 @media (max-width:390px){.yz-name{font-size:44px}.yz-pair img{width:76px;height:68px}}
 @media (prefers-reduced-motion:reduce){.yz-hrt,.yz-pals .a,.yz-pals .b{animation:none}}
+/* ===== 글꼴 바꾸기 (2026-11-15): 간판 신라문화체 · 탭/댓글 동파 끄적임 · 작은 숫자 갈무리9 ===== */
+.yz-name{font:700 84px/1.15 'ShillaCulture',var(--f-logo);letter-spacing:.01em;-webkit-text-stroke:2.4px var(--ink);text-shadow:5px 5px 0 var(--ink);padding:2px 0 4px}
+.yz-sign{padding:26px 34px 24px}
+.yz .tab{font:700 17px/1 'DongpaKkeujeogim','Jua',var(--f-ui)}
+.yz .tab .n{font:400 10px/1 'Galmuri9',var(--f-ui)}
+.yz .tab.add{font-weight:700}
+.yz .r-meta,.yz .r-status{font-family:'Galmuri9',var(--f-ui);font-size:10px;letter-spacing:.02em}
+.yz .row .rate .who{font-family:'Galmuri9',var(--f-ui);font-size:10px}
+.yz .fbar-n{font:400 10px/1 'Galmuri9',var(--f-ui)}
+.yz-pager .pg{font:400 12px/1 'Galmuri9',var(--f-ui)}
+.c-body{font:400 17px/1.6 'DongpaKkeujeogim',var(--f-ui)}
+.c-head time{font:400 10px/1 'Galmuri9',var(--f-ui)}
+@media (max-width:767px){
+ .yz-name{font-size:54px;-webkit-text-stroke:1.8px var(--ink);text-shadow:3.5px 3.5px 0 var(--ink)}
+ .yz-sign{padding:18px 18px 17px}
+ .yz .tab{font-size:15.5px}
+ .yz .r-meta,.yz .r-status,.yz .row .rate .who{font-size:10px}
+ .yz-pager .pg{font-size:12px}
+ .c-body{font-size:16.5px}
+}
+@media (max-width:390px){.yz-name{font-size:47px}}
 </style>
 </head>
 <body data-theme="berry">
@@ -1488,7 +1513,6 @@ function renderLibrary(){
       '<img class="yz-hiji" src="img/hijikata-top.webp" alt="마요네즈를 둔 히지카타"></div>' +
     (isOwner ? '<button class="yz-name editable" id="libName" aria-label="서재 이름 바꾸기, 지금: ' + esc(lib.name) + '">' + esc(lib.name) + '</button>'
              : '<h1 class="yz-name">' + esc(lib.name) + '</h1>') +
-    '<div class="yz-sum">' + (ready ? '작품 ' + lib.novels.length + '편 · 읽음 ' + readCount + '편' + (isOwner ? ' · 폴더 ' + lib.folders.length + '개' : '') : '&nbsp;') + '</div>' +
     '<span class="yz-seal" aria-hidden="true">書<br>齋</span></div></div>';
 
   // 서류함 탭 + 파일 올리기
