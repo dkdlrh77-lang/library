@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>게부장 타임</title>
+<title>서재 | 게부장 타임</title>
 <meta name="theme-color" content="#3F4A63">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" href="img/favicon.png">
@@ -940,7 +940,9 @@ const ID_DOMAIN = 'library.local';               // 아이디만 입력하면 '�
 "use strict";
 const $app = document.getElementById('app');
 const fileInput = document.getElementById('fileInput');
-const DEFAULT_NAME = '게부장 타임';
+const DEFAULT_NAME = '게부장떠먹이기';
+const SITE_NAME = '게부장 타임';                // 사이트 이름 (서재는 그 안의 메뉴)
+const pageTitle = t => t + ' | ' + SITE_NAME;
 const OLD_NAMES = ['겨울의 서재'];               // 예전 기본 이름은 새 이름으로 바꿔 보여요
 
 /* ---------- icons ---------- */
@@ -1014,7 +1016,8 @@ const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3 4.6
 
 /* ---------- state ---------- */
 let sb = null, me = null, isOwner = false, ready = false, loadFailed = false;
-let lib = { name: DEFAULT_NAME, folders: [], novels: [] };
+// 간판 이름: 지난번에 불러온 이름을 기억해 두었다가 처음부터 보여 줘요
+let lib = { name: (() => { try { const n = localStorage.getItem('lib-name'); return n && OLD_NAMES.indexOf(n) < 0 ? n : DEFAULT_NAME; } catch(e) { return DEFAULT_NAME; } })(), folders: [], novels: [] };
 let progress = {}, ratings = {}, members = {};
 let cmtMeta = {}, cmtSeen = {}, cmtOK = true;   // novelId -> [{user_id, created_at}] / novelId -> seen time
 const textCache = {};
@@ -1323,7 +1326,7 @@ async function refresh(){
   try { await loadAll(); loadFailed = false; try { localStorage.setItem('lib-name', lib.name); } catch(e){} }
   catch(e) { loadFailed = true; ready = true; }
   if (layerOpen()) return;
-  if (view === 'library') { document.title = lib.name; render(); }
+  if (view === 'library') { document.title = pageTitle(lib.name); render(); }
   else if (view === 'reader' && !document.querySelector('.body')) renderReader(readerId);
 }
 
@@ -1586,7 +1589,7 @@ function renderLibrary(){
   on('#libName', async () => {
     const v = await askText('서재 이름', '서재 이름', lib.name, DEFAULT_NAME, '저장');
     if (v && v !== lib.name) {
-      try { await q(sb.from('meta').upsert({ key: 'name', value: v })); lib.name = v; document.title = v; try { localStorage.setItem('lib-name', v); } catch(e){} render(); }
+      try { await q(sb.from('meta').upsert({ key: 'name', value: v })); lib.name = v; document.title = pageTitle(v); try { localStorage.setItem('lib-name', v); } catch(e){} render(); }
       catch(e) { toast(failMsg(e)); }
     }
   });
@@ -1751,7 +1754,7 @@ async function renderReader(id){
     if (!ready) { $app.innerHTML = '<div class="r-loading" style="padding-top:120px">불러오는 중…</div>'; return; }
     location.hash = ''; view = 'library'; readerId = null; render(); return;
   }
-  document.title = n.title + ' · ' + lib.name;
+  document.title = pageTitle(n.title);
   const st = () => isRead(n.id) ? '읽음' : (progress[n.id] > 0.01 ? '읽는 중' : '');
   $app.innerHTML =
     '<div class="rprog" id="rprog"></div>' +
@@ -1971,7 +1974,7 @@ function route(){
     if (view === 'reader' && readerId === m[1] && document.querySelector('.body')) return;
     view = 'reader'; readerId = m[1]; renderReader(readerId);
   } else {
-    const was = view; view = 'library'; readerId = null; document.title = lib.name; render();
+    const was = view; view = 'library'; readerId = null; document.title = pageTitle(lib.name); render();
     if (was === 'reader') window.scrollTo(0, 0);
   }
 }
@@ -2024,7 +2027,7 @@ function showLogin(msg){
   me = null; ready = false; isOwner = false; view = 'library';
   setDeco(false);
   let ln = DEFAULT_NAME; try { ln = fixName(localStorage.getItem('lib-name')); } catch(e){}
-  document.title = ln;
+  document.title = pageTitle(ln);
   $app.innerHTML = '<div class="login">' + themeBtnHTML('login-theme') +
     '<div class="login-card"><div class="login-garland">' + GARLAND + '</div><div class="login-inner">' +
     '<div class="login-side"><form id="loginForm" novalidate>' +
