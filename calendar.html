@@ -931,7 +931,7 @@ async function openBell(){
   const onKey = e => { if (e.key === 'Escape') close(); };
   addEventListener('keydown', onKey);
   el.addEventListener('mousedown', e => { if (e.target === el) close(); });
-  let prefs = { events: true, anniv: true, partner: true, comments: true, quests: true };
+  let prefs = { events: true, anniv: true, partner: true, comments: true };
   try { const p = await q(sb.from('push_prefs').select('*').eq('user_id', me.id).maybeSingle()); if (p) prefs = p; } catch (e) {}
   const draw = async (msg) => {
     const sup = pushSupport(), sub = sup === 'ok' ? await currentSub() : null, perm = 'Notification' in window ? Notification.permission : 'default';
@@ -943,15 +943,15 @@ async function openBell(){
     else h += '<p class="st">' + (on ? '<b>이 기기로 알림이 와요.</b>' : '이 기기는 아직 알림을 받지 않아요.') + '</p><button type="button" class="' + (on ? 'ghost' : 'go') + ' big" id="pOn">' + (on ? '이 기기 알림 끄기' : '이 기기에서 알림 받기') + '</button>';
     if (msg) h += '<p class="st">' + esc(msg) + '</p>';
     const ck = (k, t, s) => '<label class="ck"><input class="sr" type="checkbox" data-pref="' + k + '"' + (prefs[k] !== false ? ' checked' : '') + '><span class="box">' + SVG_CHECK + '</span><span><b>' + t + '</b><small>' + s + '</small></span></label>';
-    h += '<div>' + ck('events', '일정 알림', '일정마다 정한 시간(30분 전 등)에 와요') + ck('anniv', '기념일 · 특별한 날', '아침 9시에 와요. 100일 같은 큰 날은 일주일 전에도') + ck('partner', '상대가 일정을 적었을 때', '') + ck('comments', '상대가 댓글을 달았을 때', '') + ck('quests', '퀘스트 로그', '상대가 퀘스트를 등록·클리어하거나 \'나도!\'·한마디를 남겼을 때') + '</div>';
+    h += '<div>' + ck('events', '일정 알림', '일정마다 정한 시간(30분 전 등)에 와요') + ck('anniv', '기념일 · 특별한 날', '아침 9시에 와요. 100일 같은 큰 날은 일주일 전에도') + ck('partner', '상대가 일정을 적었을 때', '') + ck('comments', '상대가 댓글을 달았을 때', '') + '</div>';
     h += '<p class="st" style="font-size:12.5px;color:var(--muted);margin-top:-6px">이 체크는 내 모든 기기에 똑같이 적용돼요.</p>';
     h += '<div class="dlg-btns">' + (on ? '<button type="button" class="ghost" id="pTest">시험 알림 보내기</button>' : '') + '<button type="button" class="go" id="pClose">닫기</button></div></div></div>';
     el.innerHTML = h;
     $('pClose').onclick = close;
     el.querySelectorAll('[data-pref]').forEach(c => c.onchange = async () => {
       prefs[c.dataset.pref] = c.checked;
-      try { await q(sb.from('push_prefs').upsert({ user_id: me.id, events: prefs.events !== false, anniv: prefs.anniv !== false, partner: prefs.partner !== false, comments: prefs.comments !== false, quests: prefs.quests !== false }, { onConflict: 'user_id' })); }
-      catch (e) { toast(/quests/.test(((e && e.message) || '') + '') ? 'Supabase에서 퀘스트_추가.sql을 한 번 더 실행해 주세요.' : isMissing(e) ? 'Supabase에서 푸시_추가.sql을 먼저 실행해 주세요.' : failMsg(e)); }
+      try { await q(sb.from('push_prefs').upsert({ user_id: me.id, events: prefs.events !== false, anniv: prefs.anniv !== false, partner: prefs.partner !== false, comments: prefs.comments !== false }, { onConflict: 'user_id' })); }
+      catch (e) { toast(isMissing(e) ? 'Supabase에서 푸시_추가.sql을 먼저 실행해 주세요.' : failMsg(e)); }
     });
     const t = $('pTest'); if (t) t.onclick = async () => {
       t.disabled = true; t.textContent = '보내는 중…';

@@ -815,17 +815,17 @@ async function openBell(){
     if (sup === 'ios-browser') h += '<p class="warn">아이폰은 홈 화면 앱에서만 알림을 받을 수 있어요. 사파리 공유 버튼 → \'홈 화면에 추가\' → 홈 화면의 게부장 타임 아이콘으로 열고, 여기서 알림을 켜 주셔! (iOS 16.4 이상)</p>';
     else if (sup === 'no') h += '<p class="warn">이 브라우저에서는 알림을 받을 수 없어요.</p>';
     else if (perm === 'denied') h += '<p class="warn">알림이 막혀 있어요. 아이폰 설정 → 알림 → 게부장 타임에서 알림 허용을 켜 주셔. (PC는 주소창 왼쪽 자물쇠 → 알림 허용)</p>';
-    else h += '<p style="margin:0;font-size:12.5px;line-height:1.6">' + (on ? '<span style="color:var(--mint)">이 기기로 알림이 와요.</span> 일정 페이지와 같이 쓰는 설정이에요.' : '이 기기는 아직 알림을 받지 않아요.') + '</p><button type="button" class="btn ' + (on ? '' : 'yel') + '" id="pOn" style="min-height:48px">' + (on ? '이 기기 알림 끄기' : '이 기기에서 알림 받기') + '</button>';
+    else h += '<p style="margin:0;font-size:12.5px;line-height:1.6">' + (on ? '<span style="color:var(--mint)">이 기기로 알림이 와요.</span>' : '이 기기는 아직 알림을 받지 않아요.') + '</p><button type="button" class="btn ' + (on ? '' : 'yel') + '" id="pOn" style="min-height:48px">' + (on ? '이 기기 알림 끄기' : '이 기기에서 알림 받기') + '</button>';
     if (msg) h += '<p style="margin:0;font-size:12px;color:var(--mint)">' + esc(msg) + '</p>';
     const ck = (k, t, s2) => '<label class="ck"><input class="sr" type="checkbox" data-pref="' + k + '"' + (prefs[k] !== false ? ' checked' : '') + '><span class="box">✓</span><span><b>' + t + '</b>' + (s2 ? '<small>' + s2 + '</small>' : '') + '</span></label>';
-    h += '<div>' + ck('quests', '퀘스트 로그', '상대가 퀘스트를 등록 · 클리어하거나 \'나도!\' · 한마디를 남겼을 때') + ck('events', '일정 알림', '일정마다 정한 시간에') + ck('anniv', '기념일 · 특별한 날', '아침 9시, 큰 날은 일주일 전에도') + ck('partner', '상대가 일정을 적었을 때', '') + ck('comments', '상대가 일정 댓글을 달았을 때', '') + '</div>';
-    h += '<p style="margin:-4px 0 0;font-size:10.5px;color:var(--sub)">이 체크는 내 모든 기기에 똑같이 적용돼요.</p>';
+    h += '<div>' + ck('quests', '퀘스트 로그 알림', '상대가 새 퀘스트를 등록했을 때 · 클리어했을 때 · \'나도 하고 싶어!\'를 눌렀을 때 · 한마디를 남겼을 때') + '</div>';
+    h += '<p style="margin:-4px 0 0;font-size:10.5px;line-height:1.6;color:var(--sub)">이 체크는 내 모든 기기에 똑같이 적용돼요. 일정 알림은 출동 일지의 [알림]에서 따로 켜고 꺼요.</p>';
     h += '<div class="dbtns">' + (on ? '<button type="button" class="btn" id="pTest">시험 알림 보내기</button>' : '') + '<button type="button" class="btn yel" id="pClose">닫기</button></div></div></section>';
     el.innerHTML = h;
     $('pClose').onclick = close;
     el.querySelectorAll('[data-pref]').forEach(c => c.onchange = async () => {
       prefs[c.dataset.pref] = c.checked;
-      const row = { user_id: me.id }; ['events', 'anniv', 'partner', 'comments', 'quests'].forEach(k => row[k] = prefs[k] !== false);
+      const row = { user_id: me.id, quests: prefs.quests !== false };   // 퀘스트 칸만 바꿔요 (일정 알림 설정은 그대로)
       try { await q(sb.from('push_prefs').upsert(row, { onConflict: 'user_id' })); }
       catch (e) { c.checked = !c.checked; prefs[c.dataset.pref] = c.checked; toast(/quests/.test(((e && e.message) || '') + '') ? 'Supabase에서 퀘스트_추가.sql을 한 번 더 실행해 주세요.' : esc(failMsg(e))); }
     });
