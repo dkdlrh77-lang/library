@@ -720,8 +720,173 @@ body[data-theme="night"] .login .wob:focus-within::before{border-color:var(--gol
 @media (max-width:767px){
   .login-side{padding:26px 48px 46px}
 }
+
+/* ===== '< 책상으로' 버튼: 서재 맨 위 왼쪽 ===== */
+.desk-btn{margin-right:auto;height:34px;padding:0 14px 0 9px;display:inline-flex;align-items:center;gap:2px;border:1.8px solid var(--accent);border-radius:17px;background:var(--surface);color:var(--text);font:400 15px/1 "Jua","Noto Sans KR",sans-serif;letter-spacing:.02em;text-decoration:none;white-space:nowrap;transition:background .15s,border-color .15s}
+.desk-btn svg.i{width:16px;height:16px}
+.desk-btn:hover{background:var(--hover);border-color:var(--heart)}
+body[data-theme="night"] .desk-btn{border-color:var(--gold)}
+body[data-theme="night"] .desk-btn:hover{border-color:var(--heart)}
+@media (max-width:767px){.desk-btn{height:32px;font-size:14px;padding:0 12px 0 7px}}
+
+/* =====================================================================
+   해결사 사무소 서재 (2026-11-15): 나무 벽 + 간판 + 서류함 + 의뢰서
+   ===================================================================== */
+body[data-theme="berry"]{--ink:#191513;--paper:#fffafb;--paper2:#fde9ee;--ymuted:#8a6a74;--red:#c8463a;--red-d:#9e3128;
+ --wall1:#f8d3dc;--wall2:#f2c0cd;--wallline:#e4a3b4;--yt:#9db27a;--yt-l:#b9c994;--ygold:#e0b04f;--ytext:#3a2329;--ytab:#fbd9e2;--ysh:#191513;
+ --ydot:rgba(255,255,255,.55);--ydot2:rgba(226,70,106,.10);--wood-a:#f6a6bd;--wood-b:#ec8eaa;--wood-line:#fff3f6;--sign-text:#fffafb;--tape:rgba(255,255,255,.75)}
+/* 낮 = 딸기우유 간판 (흰 물방울) + 분홍 밧줄 */
+body[data-theme="berry"] .yz-sign{background:radial-gradient(circle at 14px 14px,rgba(255,255,255,.35) 2px,transparent 2.6px) 0 0/22px 22px,linear-gradient(180deg,var(--wood-a),var(--wood-b))}
+body[data-theme="berry"] .yz-rope{background:repeating-linear-gradient(180deg,#c8607d 0 5px,#e889a4 5px 10px)}
+body[data-theme="night"]{--ink:#0b0c10;--paper:#272833;--paper2:#20212a;--ymuted:#a19c90;--red:#b8463d;--red-d:#7d2b25;
+ --wall1:#2c2a33;--wall2:#25232b;--wallline:#3a3741;--yt:#3e4a3a;--yt-l:#4c5a47;--ygold:#c9a75a;--ytext:#e4dfd2;--ytab:#33343f;--ysh:#000;
+ --ydot:rgba(232,201,127,.12);--ydot2:transparent;--wood-a:#3a2f28;--wood-b:#2d241f;--wood-line:#c9a75a;--sign-text:#efd99c;--tape:rgba(201,167,90,.5)}
+body.deco{background:
+  radial-gradient(circle at 20px 20px,var(--ydot) 2.2px,transparent 2.8px) 0 0/48px 48px,
+  radial-gradient(circle at 44px 44px,var(--ydot2) 2px,transparent 2.6px) 0 0/48px 48px,
+  repeating-linear-gradient(180deg,transparent 0 58px,var(--wallline) 58px 60px),
+  linear-gradient(var(--wall1),var(--wall2));color:var(--ytext);min-height:100vh}
+body.deco .top .icon-btn,body.deco .top .acct-btn{color:var(--ytext)}
+body.deco .top .icon-btn:hover,body.deco .top .acct-btn:hover{background:rgba(255,255,255,.18)}
+body.deco .top-in{height:60px}
+body.deco .desk-btn{height:36px;border:2.5px solid var(--ink);background:var(--paper);color:var(--ytext);box-shadow:3px 3px 0 var(--ysh)}
+body.deco .desk-btn:hover{background:var(--paper2);border-color:var(--ink)}
+.shell.yz{width:min(1080px,calc(100% - 64px));padding-bottom:0}
+/* 간판 */
+.yz-signzone{position:relative;display:flex;justify-content:center;padding-top:78px}
+.yz-rope{position:absolute;top:0;width:3px;height:96px;background:repeating-linear-gradient(180deg,#6b4a2a 0 5px,#8a6237 5px 10px)}
+.yz-rope.l{left:calc(50% - 230px)}.yz-rope.r{left:calc(50% + 228px)}
+.yz-sign{position:relative;width:min(600px,100%);padding:22px 34px 18px;text-align:center;border:3.5px solid var(--ink);border-radius:8px;box-shadow:6px 7px 0 var(--ysh);
+ background:repeating-linear-gradient(90deg,rgba(0,0,0,.05) 0 2px,transparent 2px 9px),linear-gradient(180deg,var(--wood-a),var(--wood-b))}
+.yz-sign:before{content:"";position:absolute;inset:7px;border:2px solid var(--wood-line);border-radius:4px;pointer-events:none}
+.yz-name{position:relative;display:inline-block;margin:0;padding:0;border:0;background:none;font:400 76px/1.05 var(--f-logo);color:var(--sign-text);-webkit-text-stroke:2px var(--ink);paint-order:stroke fill;text-shadow:4px 4px 0 var(--ink);letter-spacing:.04em;word-break:keep-all}
+.yz-name.editable{cursor:pointer}
+.yz-name.editable:hover{transform:rotate(-1deg)}
+.yz-sum{position:relative;margin-top:6px;font:400 15px/1.4 "Jua",var(--f-ui);color:var(--sign-text);text-shadow:1.5px 1.5px 0 var(--ink)}
+.yz-seal{position:absolute;right:-18px;bottom:-16px;width:58px;height:58px;display:grid;place-items:center;background:var(--red);color:#fff6e6;border:3px solid var(--ink);border-radius:8px;transform:rotate(9deg);font:700 16px/1.05 var(--f-title);text-align:center;box-shadow:3px 3px 0 var(--ysh)}
+.yz-pair{position:absolute;left:50%;bottom:calc(100% - 16px);transform:translateX(-50%);display:flex;align-items:flex-end;gap:10px;pointer-events:none}
+.yz-pair img{display:block;width:120px;height:104px;object-fit:contain;object-position:bottom;filter:drop-shadow(0 4px 3px rgba(40,24,12,.25))}
+.yz-gin{transform:scaleX(-1)}
+.yz-hrt{color:#ed698d;font-size:24px;margin-bottom:30px;text-shadow:2px 2px 0 var(--ink);animation:library-heartbeat 1.65s ease-in-out infinite}
+body[data-theme="night"] .yz-hrt{color:#f4b6cc}
+/* 서류함 탭 + 파일 올리기 */
+.yz-bar{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-top:44px;position:relative;z-index:2}
+.yz .tabs{margin:0;display:flex;gap:4px;align-items:flex-end;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding:12px 6px 0 0}
+.yz .tabs::-webkit-scrollbar{display:none}
+.yz .tab{position:relative;top:3px;height:42px;padding:0 18px;border:2.5px solid var(--ink);border-bottom:none;border-radius:12px 12px 0 0;background:var(--ytab);color:var(--ytext);font:400 15px/1 "Jua",var(--f-ui);box-shadow:none;gap:6px;flex-shrink:0}
+.yz .tab:hover{border-color:var(--ink);color:var(--ytext);filter:brightness(1.04)}
+.yz .tab .n{font-size:12px;color:var(--ymuted);opacity:1}
+.yz .tab.on{height:48px;background:var(--red);color:#fff6e6;font-weight:400;box-shadow:none}
+.yz .tab.on .n{color:#ffd9cf}
+.yz .tab.on:after{content:"♥";position:absolute;top:-11px;right:-5px;font-size:16px;color:#f6a6bd;text-shadow:1.5px 1.5px 0 var(--ink)}
+.yz .tab.add{background:transparent;border-style:dashed;color:var(--ymuted)}
+.yz .tab.drop-on{background:var(--paper)}
+.yz-up{position:relative;flex-shrink:0;height:46px;margin-bottom:12px;padding:0 20px;border:3px solid var(--ink);border-radius:12px;background:var(--red);color:#fff6e6;font:400 19px/1 "Jua",var(--f-ui);text-shadow:1.5px 1.5px 0 var(--ink);box-shadow:4px 4px 0 var(--ysh);overflow:hidden;white-space:nowrap;transition:transform .12s,box-shadow .12s}
+.yz-up:before{content:"";position:absolute;inset:0;background:radial-gradient(var(--red-d) 1.5px,transparent 1.9px) 0 0/7px 7px;-webkit-mask:linear-gradient(90deg,#000,transparent 35%,transparent 65%,#000);mask:linear-gradient(90deg,#000,transparent 35%,transparent 65%,#000)}
+.yz-up span{position:relative}
+.yz-up:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--ysh)}
+.yz-up:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ysh)}
+/* 서류함 */
+.yz-drawer{position:relative;z-index:1;margin-top:0;border:3px solid var(--ink);border-radius:0 12px 12px 12px;background:var(--paper2);box-shadow:6px 6px 0 var(--ysh);padding:16px 18px 22px}
+.yz .fbar{border-bottom:2.5px dashed rgba(25,21,19,.3);padding:0 4px 12px}
+body[data-theme="night"] .yz .fbar{border-color:rgba(255,255,255,.16)}
+.yz .board-title,.yz .fbar-name{font:700 18px/1.4 var(--f-title);color:var(--ytext)}
+.yz .fbar-n{color:var(--ymuted)}
+.yz .fbar-priv{background:var(--paper);border-color:var(--ink);color:var(--ytext)}
+.yz .fbar .btn:not(.text){background:var(--paper);border:2.2px solid var(--ink);color:var(--ytext)}
+.yz .sort select{height:34px;border:2.3px solid var(--ink);border-radius:17px;background:var(--paper);color:var(--ytext)}
+.yz .sort svg{color:var(--ytext)}
+/* 의뢰서 작품 칸 */
+.yz .list{gap:14px;margin-top:18px}
+.yz .row{position:relative;background:var(--paper);border:2.6px solid var(--ink);border-radius:6px;box-shadow:4px 4px 0 var(--ysh);padding:14px 12px 14px 16px;opacity:1}
+.yz .row:nth-child(odd){transform:rotate(-.25deg)}.yz .row:nth-child(even){transform:rotate(.25deg)}
+.yz .row:hover{transform:translateY(-2px);box-shadow:5px 6px 0 var(--ysh);border-color:var(--ink)}
+.yz .row:before{content:"";position:absolute;left:50%;top:-9px;width:46px;height:16px;margin-left:-23px;background:var(--tape);border:1.5px solid rgba(25,21,19,.25);transform:rotate(-3deg);pointer-events:none}
+.yz .row:nth-child(even):before{left:auto;right:60px;transform:rotate(4deg)}
+.yz .row.read{background:var(--paper2);border-color:var(--ink)}
+.yz .r-title{color:var(--ytext)}
+.yz .row.read .r-title{color:var(--ymuted)}
+.yz .r-meta,.yz .r-status{color:var(--ymuted)}
+.yz .prog{height:9px;border:2px solid var(--ink);border-radius:5px;background:var(--paper)}
+.yz .prog i{background:repeating-linear-gradient(45deg,#f6a6bd 0 4px,#ef8aa7 4px 8px);border-radius:0}
+.yz-stamp{display:inline-grid;place-items:center;width:62px;height:62px;border:3px double var(--red);border-radius:50%;color:var(--red);font:700 15px/1.05 var(--f-title);text-align:center;transform:rotate(-14deg);opacity:.9}
+body[data-theme="night"] .yz-stamp{color:#d9675b;border-color:#d9675b}
+.yz .r-more{color:var(--ymuted)}
+/* 이름은 끝까지 보이게 */
+.yz .row .rate .who{max-width:none;width:auto;min-width:0;white-space:nowrap;overflow:visible;text-overflow:clip;color:var(--ytext)}
+.yz .row .rate.mine .who{color:var(--ytext)}
+/* 페이지 */
+.yz-pager{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:22px;flex-wrap:wrap}
+.yz-pager .pg{min-width:38px;height:38px;padding:0 10px;border:2.4px solid var(--ink);border-radius:10px;background:var(--paper);color:var(--ytext);font:400 15px/1 "Jua",var(--f-ui);box-shadow:3px 3px 0 var(--ysh);transition:transform .1s}
+.yz-pager .pg:hover:not(:disabled):not(.on){transform:translateY(-1px)}
+.yz-pager .pg.on{background:var(--red);color:#fff6e6;text-shadow:1px 1px 0 var(--ink);cursor:default}
+.yz-pager .pg:disabled{opacity:.4;box-shadow:none;cursor:default}
+.yz-pager .pg.nav{padding:0 14px}
+.yz-pager .pg.dots{border:none;box-shadow:none;background:none;min-width:18px;padding:0;display:inline-grid;place-items:center}
+/* 검색창 */
+.yz-search{display:flex;align-items:center;gap:10px;width:min(460px,100%);margin:28px auto 0;height:48px;padding:0 7px 0 18px;border:2.6px solid var(--ink);border-radius:24px;background:var(--paper);box-shadow:4px 4px 0 var(--ysh)}
+.yz-search .mg{display:flex;color:var(--ytext)}
+.yz-search input{flex:1;min-width:0;height:100%;border:0;outline:0;background:transparent;font:400 16px/1 "Jua",var(--f-ui);color:var(--ytext)}
+.yz-search input::placeholder{color:var(--ymuted);opacity:1}
+.yz-search input::-webkit-search-cancel-button{-webkit-appearance:none}
+.yz-search .go{height:34px;padding:0 16px;border:2.2px solid var(--ink);border-radius:17px;background:var(--red);color:#fff6e6;font:400 14px/1 "Jua",var(--f-ui);text-shadow:1px 1px 0 var(--ink);flex-shrink:0}
+.yz-search:focus-within{box-shadow:5px 5px 0 var(--ysh)}
+/* 바닥 다다미 + 딸기우유·마요 */
+.yz-floor{position:relative;height:46px;margin-top:84px;background:
+ linear-gradient(var(--ink),var(--ink)) 0 0/100% 3px no-repeat,
+ linear-gradient(var(--ygold),var(--ygold)) 0 3px/100% 4px no-repeat,
+ linear-gradient(var(--ink),var(--ink)) 0 7px/100% 2px no-repeat,
+ repeating-linear-gradient(90deg,var(--yt) 0 2px,var(--yt-l) 2px 4px) 0 9px/100% 37px no-repeat}
+.yz-pals{position:absolute;bottom:34px;right:max(9%,calc(50% - 470px));display:flex;align-items:flex-end;gap:2px}
+.yz-pals svg{display:block;width:100%;height:auto}
+.yz-pals .a{width:50px}.yz-pals .b{width:32px}
+.yz-pals .a,.yz-pals .b{animation:bob 1.5s ease-in-out infinite alternate}.yz-pals .b{animation-delay:-.75s}
+.yz-pals i{font-style:normal;color:#ed698d;font-size:18px;margin:0 2px 40px;text-shadow:1.5px 1.5px 0 var(--ink)}
+.yz .state b{color:var(--ytext)}.yz .state p{color:var(--ymuted)}
+@media (max-width:767px){
+ .shell.yz{width:calc(100% - 40px)}
+ body.deco .top-in{height:52px;width:calc(100% - 40px)}
+ body.deco .desk-btn{height:32px}
+ .yz-signzone{padding-top:66px}
+ .yz-rope{height:80px}.yz-rope.l{left:calc(50% - 120px)}.yz-rope.r{left:calc(50% + 118px)}
+ .yz-sign{padding:16px 18px 13px}
+ .yz-name{font-size:50px;-webkit-text-stroke:1.6px var(--ink);text-shadow:3px 3px 0 var(--ink)}
+ .yz-sum{font-size:12.5px}
+ .yz-seal{width:44px;height:44px;font-size:12px;right:-10px;bottom:-14px}
+ .yz-pair{gap:6px;bottom:calc(100% - 12px)}
+ .yz-pair img{width:86px;height:76px}
+ .yz-hrt{font-size:18px;margin-bottom:22px}
+ .yz-bar{flex-direction:column;align-items:stretch;gap:10px;margin-top:32px}
+ .yz-up{order:-1;align-self:flex-end;height:32px;padding:0 13px;font-size:14px;border-width:2.4px;border-radius:9px;box-shadow:3px 3px 0 var(--ysh);text-shadow:1px 1px 0 var(--ink);margin:0}
+ .yz .tabs{margin:0 -20px 0 0;padding:12px 20px 0 0}
+ .yz .tab{height:38px;padding:0 13px;font-size:13.5px;border-radius:11px 11px 0 0}
+ .yz .tab.on{height:43px}
+ .yz-drawer{padding:12px 10px 16px;border-radius:0 10px 10px 10px}
+ .yz .board-title,.yz .fbar-name{font-size:15px}
+ .yz .sort select{height:30px}
+ .yz .list{gap:12px;margin-top:14px}
+ .yz .row{padding:10px 6px 9px 10px}
+ .yz .row:before{width:34px;height:12px;top:-7px;margin-left:-17px}
+ .yz .row:nth-child(even):before{right:44px}
+ .yz .r-title{font-size:14.5px}
+ .yz .r-status{position:static}
+ .yz-stamp{position:absolute;right:38px;top:6px;width:46px;height:46px;font-size:11px;border-width:2.6px}
+ .yz .row .rate .who{font-size:10.5px}
+ .yz-pager{gap:4px;margin-top:18px}
+ .yz-pager .pg{min-width:32px;height:32px;font-size:13px;padding:0 7px;box-shadow:2px 2px 0 var(--ysh)}
+ .yz-pager .pg.nav{padding:0 9px}
+ .yz-search{height:44px;margin-top:22px;padding-left:14px}
+ .yz-search input{font-size:16px}
+ .yz-search .go{height:31px;font-size:13px;padding:0 12px}
+ .yz-floor{margin-top:70px}
+ .yz-pals{right:12%;bottom:32px}
+ .yz-pals .a{width:38px}.yz-pals .b{width:25px}
+ .yz-pals i{font-size:15px;margin-bottom:30px}
+}
+@media (max-width:390px){.yz-name{font-size:44px}.yz-pair img{width:76px;height:68px}}
+@media (prefers-reduced-motion:reduce){.yz-hrt,.yz-pals .a,.yz-pals .b{animation:none}}
 </style>
-<style id="desk-home-link-css">.desk-home-link{position:fixed;right:16px;bottom:16px;z-index:9999;border-radius:999px;background:#442c20e8;color:white;padding:11px 17px;font:600 13px system-ui,sans-serif;text-decoration:none;box-shadow:0 4px 20px #0005;border:1px solid #fff7}.desk-home-link:hover,.desk-home-link:focus-visible{background:#66432e;outline:2px solid white}@media(max-width:700px){.desk-home-link{right:10px;bottom:calc(10px + env(safe-area-inset-bottom));font-size:12px;padding:9px 12px}}</style></head>
+</head>
 <body data-theme="berry">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><filter id="wobble" x="-5%" y="-20%" width="110%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="9" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
 <div id="app"></div>
@@ -756,7 +921,8 @@ const P = {
   pen:'<path d="M4 20h4L19 9l-4-4L4 16z"/>',
   minus:'<path d="M6 12h12"/>', plus:'<path d="M12 6v12M6 12h12"/>',
   user:'<circle cx="12" cy="8" r="3.6"/><path d="M5 20c1.2-3.6 4-5.2 7-5.2s5.8 1.6 7 5.2"/>',
-  chat:'<path d="M4 5h16v11H9l-5 4z"/>'
+  chat:'<path d="M4 5h16v11H9l-5 4z"/>',
+  search:'<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>'
 };
 
 /* ---------- 직접 그린 장식 (글자 없음) ---------- */
@@ -817,6 +983,8 @@ let progress = {}, ratings = {}, members = {};
 let cmtMeta = {}, cmtSeen = {}, cmtOK = true;   // novelId -> [{user_id, created_at}] / novelId -> seen time
 const textCache = {};
 let curFolder = 'all', sortMode = 'new', view = 'library', readerId = null;
+let curPage = 1, searchQ = '';            // 한 페이지 5편 + 제목 검색
+const PAGE = 5;
 
 const isMobile = () => matchMedia('(max-width:767px)').matches;
 const defaults = { theme:'berry', font:'ridi', size:18, lh:1.9, width:720, pgap:0.8 };
@@ -923,7 +1091,19 @@ function bindHearts(root, after){
     el.onmouseleave = () => { el.classList.remove('pv'); items.forEach(x => x.classList.remove('pv')); };
   });
 }
-function visibleNovels(){ return sorted(curFolder === 'all' ? lib.novels : lib.novels.filter(n => n.folderId === curFolder)); }
+const normQ = t => String(t || '').toLowerCase().replace(/\s+/g, '');
+function visibleNovels(){
+  if (searchQ) { const k = normQ(searchQ); return sorted(lib.novels.filter(n => normQ(n.title).includes(k))); }   // 검색은 서재 전체에서
+  return sorted(curFolder === 'all' ? lib.novels : lib.novels.filter(n => n.folderId === curFolder));
+}
+function pageList(cur, total, small){
+  if (small) { let a = Math.max(1, Math.min(cur - 1, total - 2)); const out = []; for (let i = a; i <= Math.min(total, a + 2); i++) out.push(i); return out; }
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  let a = Math.max(2, cur - 1), b = Math.min(total - 1, cur + 1);
+  if (cur <= 3) { a = 2; b = 4; } if (cur >= total - 2) { a = total - 3; b = total - 1; }
+  const out = [1]; if (a > 2) out.push('…'); for (let i = a; i <= b; i++) out.push(i); if (b < total - 1) out.push('…'); out.push(total);
+  return out;
+}
 async function q(p){ const { data, error } = await p; if (error) throw error; return data; }
 function failMsg(e){
   const m = (e && (e.message || '')) + '';
@@ -1245,7 +1425,7 @@ async function uploadFiles(files, forceFolder){
       lib.novels.push(mapNovel(row)); textCache[row.id] = text; done++;
     } catch(e) { failed++; lastErr = e; }
   }
-  curFolder = target; saveUi(); render();
+  curFolder = target; searchQ = ''; curPage = 1; saveUi(); render();
   toast(failed ? done + '개 저장, ' + failed + '개 실패 — ' + failMsg(lastErr) : done + '개 작품을 서재에 담았어요', failed ? 5000 : 3000);
 }
 async function deleteNovel(id){
@@ -1260,12 +1440,13 @@ async function deleteNovel(id){
 const upBtn = cls => '<button class="btn primary brush ' + (cls || '') + '" data-up>' + ic('up') + '파일 올리기</button>';
 function topBar(){
   return '<header class="top"><div class="top-in">' +
+    '<a class="desk-btn" href="index.html" aria-label="책상으로 돌아가기">' + ic('back') + '책상으로</a>' +
     themeBtnHTML() +
     '<button class="acct-btn" id="acctBtn" aria-haspopup="menu">' + ic('user') + '<span>' + esc(members[me.id] || '계정') + '</span>' + ic('down','sm') + '</button>' +
     '</div></header>';
 }
 function rowHTML(n){
-  const p = progress[n.id] || 0, rd = p >= 0.95, isAll = curFolder === 'all';
+  const p = progress[n.id] || 0, rd = p >= 0.95, isAll = curFolder === 'all' || !!searchQ;
   const parts = [];
   if (isAll) parts.push('<span class="fold">' + (isPrivFolder(n.folderId) ? ic('lock','sm') + '<span class="sr">비공개 폴더</span>' : '') + esc(folderName(n.folderId)) + '</span>');
   parts.push('<span>' + fmtN(n.chars) + '자</span>', '<span>' + fmtD(n.added) + '</span>');
@@ -1273,7 +1454,7 @@ function rowHTML(n){
   if (cc) parts.push('<span class="r-cmt' + (cmtNew(n.id) ? ' new' : '') + '">' + ic('chat','sm') + cc + (cmtNew(n.id) ? '<span class="newdot"></span><span class="sr">새 댓글 있음</span>' : '') + '</span>');
   const meta = parts.join('<span aria-hidden="true">·</span>');
   let status = '';
-  if (rd) status = '<span class="badge">' + ic('check','sm') + '읽음</span>';
+  if (rd) status = '<span class="yz-stamp">다<br>읽음</span><span class="sr">읽음</span>';
   else if (p > 0.01) status = '읽는 중 ' + Math.round(p*100) + '%<span class="prog"><i style="width:' + Math.round(p*100) + '%"></i></span>';
   return '<div class="row' + (rd ? ' read' : '') + '" data-n="' + n.id + '">' +
     '<div class="r-main"><span class="r-ico' + (rd ? ' mayo' : '') + '" aria-hidden="true">' + (rd ? MAYO_SM : MILK_SM) + '</span><div class="r-txt"><a class="r-title" href="#r-' + n.id + '">' + esc(n.title) + '</a><div class="r-meta">' + meta + '</div></div></div>' +
@@ -1294,29 +1475,35 @@ function renderLibrary(){
   const isFolder = curFolder !== 'all';
   const cf = isFolder ? getFolder(curFolder) : null;
 
-  let h = topBar() + '<main class="shell"><div class="library-top-pair" aria-label="긴토키와 히지카타">' +
-    '<img class="library-top-gin" src="img/gintoki-top.webp" alt="딸기우유를 둔 긴토키">' +
-    '<span class="library-top-heart" aria-hidden="true">♥</span>' +
-    '<img class="library-top-hiji" src="img/hijikata-top.webp" alt="마요네즈를 둔 히지카타">' +
-    '</div>';
-  h += '<div class="lib-head"><div class="title-wrap"><span class="stamp" aria-hidden="true">書<br>齋</span><div>' +
-       (isOwner ? '<button class="lib-name editable" id="libName" aria-label="서재 이름 바꾸기, 지금: ' + esc(lib.name) + '">' + esc(lib.name) + '<span class="edit-hint">' + ic('pen') + '</span></button>'
-                : '<h1 class="lib-name">' + esc(lib.name) + '</h1>') +
-       '<div class="lib-sum">' + (ready ? '작품 ' + lib.novels.length + '편 · 읽음 ' + readCount + '편' + (isOwner ? ' · 폴더 ' + lib.folders.length + '개' : '') : '&nbsp;') + '</div></div></div>' +
-       '</div><div class="tatami" aria-hidden="true"></div>';
-  if (isOwner) h += '<div class="up-mobile">' + upBtn() + '</div>';
+  const pages = Math.max(1, Math.ceil(novels.length / PAGE));
+  curPage = Math.min(Math.max(1, curPage), pages);
+  const shown = novels.slice((curPage - 1) * PAGE, curPage * PAGE);
 
-  h += '<nav class="tabs" aria-label="폴더"><button class="tab' + (!isFolder ? ' on' : '') + '" data-f="all" aria-pressed="' + !isFolder + '">' + MARK + '전체 <span class="n">' + lib.novels.length + '</span></button>';
+  // 해결사 사무소 간판
+  let h = topBar() + '<main class="shell yz">' +
+    '<div class="yz-signzone"><span class="yz-rope l" aria-hidden="true"></span><span class="yz-rope r" aria-hidden="true"></span>' +
+    '<div class="yz-sign"><div class="yz-pair" aria-label="긴토키와 히지카타">' +
+      '<img class="yz-gin" src="img/gintoki-top.webp" alt="딸기우유를 둔 긴토키">' +
+      '<span class="yz-hrt" aria-hidden="true">♥</span>' +
+      '<img class="yz-hiji" src="img/hijikata-top.webp" alt="마요네즈를 둔 히지카타"></div>' +
+    (isOwner ? '<button class="yz-name editable" id="libName" aria-label="서재 이름 바꾸기, 지금: ' + esc(lib.name) + '">' + esc(lib.name) + '</button>'
+             : '<h1 class="yz-name">' + esc(lib.name) + '</h1>') +
+    '<div class="yz-sum">' + (ready ? '작품 ' + lib.novels.length + '편 · 읽음 ' + readCount + '편' + (isOwner ? ' · 폴더 ' + lib.folders.length + '개' : '') : '&nbsp;') + '</div>' +
+    '<span class="yz-seal" aria-hidden="true">書<br>齋</span></div></div>';
+
+  // 서류함 탭 + 파일 올리기
+  h += '<div class="yz-bar' + (isOwner ? ' owner' : '') + '"><nav class="tabs" aria-label="폴더"><button class="tab' + (!isFolder && !searchQ ? ' on' : '') + '" data-f="all" aria-pressed="' + (!isFolder && !searchQ) + '">전체 <span class="n">' + lib.novels.length + '</span></button>';
   lib.folders.forEach(f => {
-    h += '<button class="tab' + (curFolder === f.id ? ' on' : '') + '" data-f="' + f.id + '" aria-pressed="' + (curFolder === f.id) + '">' + MARK + (f.private ? ic('lock','sm') + '<span class="sr">비공개</span>' : '') + esc(f.name) + ' <span class="n">' + (counts[f.id] || 0) + '</span></button>';
+    const on = curFolder === f.id && !searchQ;
+    h += '<button class="tab' + (on ? ' on' : '') + '" data-f="' + f.id + '" aria-pressed="' + on + '">' + (f.private ? ic('lock','sm') + '<span class="sr">비공개</span>' : '') + esc(f.name) + ' <span class="n">' + (counts[f.id] || 0) + '</span></button>';
   });
   if (isOwner) h += '<button class="tab add" id="addFolder">' + ic('plus','sm') + '새 폴더</button>';
-  h += '</nav>';
+  h += '</nav>' + (isOwner ? '<button class="yz-up" data-up><span>↑ 파일 올리기</span></button>' : '') + '</div>';
 
-  h += '<section class="board"><div class="fbar"><div class="fbar-left">';
-  if (!cf) h += '<span class="board-title">' + MARK + '모든 작품</span>';
-  if (cf) {
-    h += MARK;
+  h += '<section class="board yz-drawer"><div class="fbar"><div class="fbar-left">';
+  if (searchQ) h += '<span class="board-title">「' + esc(searchQ) + '」 검색 결과</span><span class="fbar-n">' + novels.length + '편</span><button class="btn text" id="clearSearch">검색 지우기</button>';
+  else if (!cf) h += '<span class="board-title">모든 작품</span><span class="fbar-n">' + lib.novels.length + '편</span>';
+  else {
     h += '<span class="fbar-name">' + esc(cf.name) + '</span><span class="fbar-n">' + (counts[cf.id] || 0) + '편</span>';
     if (cf.private) h += '<span class="fbar-priv">' + ic('lock','sm') + '나만 보는 폴더</span>';
     if (isOwner) h += '<button class="btn" id="folderMenu" aria-haspopup="menu">폴더 설정' + ic('down','sm') + '</button>';
@@ -1331,12 +1518,29 @@ function renderLibrary(){
   } else {
     if (loadFailed) h += '<div class="notice">최신 내용을 불러오지 못했어요. 인터넷 연결을 확인해 주세요.</div>';
     if (!novels.length) {
-      h += '<div class="list"><div class="state">' + pair('bare') + (isOwner
+      h += '<div class="list"><div class="state">' + pair('bare') + (searchQ
+        ? '<b>찾는 작품이 없어요</b><p>제목의 다른 글자로 찾아봐 주셔!</p>'
+        : isOwner
         ? '<b>' + (isFolder ? '이 폴더는 비어 있어요' : '아직 서재가 비어 있어요') + '</b><p>txt 또는 md 파일을 여기에 끌어다 놓거나 버튼으로 올려 주세요.</p>' + upBtn()
         : '<b>아직 올라온 작품이 없어요.</b>') + '</div></div>';
-    } else h += '<div class="list">' + novels.map(rowHTML).join('') + '</div>';
+    } else {
+      h += '<div class="list">' + shown.map(rowHTML).join('') + '</div>';
+      if (pages > 1) {
+        h += '<nav class="yz-pager" aria-label="페이지"><button class="pg nav" data-pg="' + (curPage - 1) + '"' + (curPage <= 1 ? ' disabled' : '') + '>‹ 이전</button>';
+        pageList(curPage, pages, isMobile()).forEach(x => {
+          h += x === '…' ? '<span class="pg dots" aria-hidden="true">…</span>'
+                         : '<button class="pg' + (x === curPage ? ' on' : '') + '" data-pg="' + x + '"' + (x === curPage ? ' aria-current="page"' : '') + ' aria-label="' + x + '페이지">' + x + '</button>';
+        });
+        h += '<button class="pg nav" data-pg="' + (curPage + 1) + '"' + (curPage >= pages ? ' disabled' : '') + '>다음 ›</button></nav>';
+      }
+    }
   }
-  h += '</section>' + FLOOR + '</main>';
+  h += '</section>';
+  // 맨 아래 검색창
+  h += '<form class="yz-search" id="srchForm" role="search"><span class="mg" aria-hidden="true">' + ic('search') + '</span><label class="sr" for="srch">작품 제목 검색</label>' +
+       '<input id="srch" type="search" placeholder="찾는 작품 제목을 입력해 주셔!" value="' + esc(searchQ) + '" autocomplete="off" enterkeyhint="search">' +
+       '<button class="go" type="submit">찾기</button></form>';
+  h += '</main><div class="yz-floor" aria-hidden="true"><span class="yz-pals"><span class="a">' + MILK + '</span><i>♥</i><span class="b">' + MAYO + '</span></span></div>';
   $app.innerHTML = h;
 
   const on = (sel, fn) => { const el = $app.querySelector(sel); if (el) el.onclick = fn; };
@@ -1351,9 +1555,19 @@ function renderLibrary(){
       catch(e) { toast(failMsg(e)); }
     }
   });
-  $app.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { curFolder = b.dataset.f; saveUi(); render(); });
-  on('#addFolder', async () => { const id = await createFolder(); if (id) { curFolder = id; saveUi(); render(); } });
-  $app.querySelector('#sortSel').onchange = e => { sortMode = e.target.value; saveUi(); render(); };
+  $app.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { curFolder = b.dataset.f; searchQ = ''; curPage = 1; saveUi(); render(); });
+  $app.querySelectorAll('[data-pg]').forEach(b => b.onclick = () => {
+    curPage = +b.dataset.pg; render();
+    const bd = $app.querySelector('.yz-drawer'); if (bd) bd.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  });
+  const sf = $app.querySelector('#srchForm');
+  if (sf) sf.onsubmit = e => {
+    e.preventDefault(); searchQ = sf.querySelector('input').value.trim(); curPage = 1; render();
+    const bd = $app.querySelector('.yz-drawer'); if (bd) bd.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  };
+  on('#clearSearch', () => { searchQ = ''; curPage = 1; render(); });
+  on('#addFolder', async () => { const id = await createFolder(); if (id) { curFolder = id; searchQ = ''; curPage = 1; saveUi(); render(); } });
+  $app.querySelector('#sortSel').onchange = e => { sortMode = e.target.value; curPage = 1; saveUi(); render(); };
   on('#folderMenu', e => folderMenu(e.currentTarget));
   const afterRate = id => {
     const row = $app.querySelector('.row[data-n="' + id + '"]');
@@ -1843,6 +2057,5 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 }
 })();
 </script>
-<a class="desk-home-link" href="index.html" aria-label="책상 홈으로 돌아가기">⌂ 책상으로</a>
 </body>
 </html>
