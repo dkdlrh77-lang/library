@@ -304,9 +304,11 @@ const CATS = { play: [['mobile', '모바일'], ['pc', 'PC게임'], ['etc', '기�
 const CATN = { mobile: '모바일', pc: 'PC게임', etc: '기타', movie: '영화', drama: '드라마', anime: '애니' };
 const XP_ADD = 10, XP_SAY = 5;
 const xpClear = q => q.kind === 'roman' ? 50 : 20;
-// 레벨: 누적 경험치 (Lv.10 이후 500씩)
-const CUM = [0, 80, 200, 380, 630, 930, 1280, 1680, 2130, 2630];
-const cum = n => n <= 10 ? CUM[n - 1] : 2630 + 500 * (n - 10);
+// 레벨: 누적 경험치 (Lv.10 이후 300씩) — 2026-11-16 줄임
+const CUM = [0, 40, 110, 210, 340, 500, 690, 910, 1160, 1440];
+const cum = n => n <= 10 ? CUM[n - 1] : 1440 + 300 * (n - 10);
+const XP_EP = 15;   // 도감: 5화 볼 때마다 둘 다 +15
+const epXP = r => r.kind === 'watch' ? Math.floor((r.ep_cur || 0) / 5) * XP_EP : 0;
 function lvInfo(x){ let n = 1; while (x >= cum(n + 1)) n++; return { lv: n, cur: x - cum(n), need: cum(n + 1) - cum(n) }; }
 // 보상 [이름, 열리는 레벨]
 const POSES = { gin: [['gin-1', '허리에 손', 1], ['gin-2', '손 흔들기', 2], ['gin-3', '파르페', 4], ['gin-4', '목도 휘두르기', 6]],
@@ -364,7 +366,7 @@ const partnerName = () => partnerId ? nameOf(partnerId) : WHO[myKind === 'gin' ?
 function xpOf(uid){
   if (!uid) return 0;
   let x = 0; const said = new Set(), ids = new Set(quests.map(r => r.id));
-  quests.forEach(r => { if (r.created_by === uid) x += XP_ADD; if (r.status === 'done') x += xpClear(r); });
+  quests.forEach(r => { if (r.created_by === uid) x += XP_ADD; if (r.status === 'done') x += xpClear(r); x += epXP(r); });
   comments.forEach(c => { if (c.user_id === uid && ids.has(c.quest_id)) said.add(c.quest_id); });
   return x + said.size * XP_SAY;
 }
@@ -428,7 +430,7 @@ function renderParty(){
   const st = [[quests.length - act.length, '클리어'], [act.filter(r => r.status === 'doing').length, '하는 중'], [act.filter(r => r.status === 'want').length, '대기']];
   $('party').innerHTML = '<section class="win" aria-label="파티 상태"><div class="wt">PARTY STATUS<span>각자 레벨</span></div><div class="in" style="display:flex;flex-direction:column;gap:12px">' +
     '<div class="party">' + memCard(me.id, true) + memCard(partnerId, false) + '</div>' +
-    '<p class="rule">퀘스트 등록 +10 (등록한 사람) · 클리어 둘 다 +20 (로망 +50) · 한마디 +5 (남긴 사람, 퀘스트마다 한 번)</p>' +
+    '<p class="rule">퀘스트 등록 +10 (등록한 사람) · 클리어 둘 다 +20 (로망 +50) · 도감 5화마다 둘 다 +15 · 한마디 +5 (남긴 사람, 퀘스트마다 한 번)</p>' +
     '<div class="stats">' + st.map(s => '<div><b>' + s[0] + '</b>' + s[1] + '</div>').join('') + '</div>' +
     '<a class="btn" href="#char" style="width:100%">캐릭터 꾸미기 ▶</a></div></section>';
 }
@@ -467,7 +469,7 @@ function itemHTML(r){
 function renderList(){
   const t = TABS.find(x => x[0] === tab);
   $('listT').textContent = tab === 'clear' ? 'CLEAR · 다 한 것' : KIND[tab];
-  $('listS').textContent = tab === 'clear' ? '클리어한 날 순서' : KSUB[tab] + (tab === 'roman' ? ' · 둘 다 +50 EXP' : ' · 둘 다 +20 EXP');
+  $('listS').textContent = tab === 'clear' ? '클리어한 날 순서' : KSUB[tab] + (tab === 'roman' ? ' · 둘 다 +50 EXP' : tab === 'watch' ? ' · 5화마다 +15 · 클리어 +20' : ' · 둘 다 +20 EXP');
   const chipList = tab === 'clear' ? [['play', '메인'], ['roman', '서브'], ['watch', '도감']] : CATS[tab];
   $('chips').innerHTML = chipList.length ? ['', ...chipList].map(c => {
     const k = c ? c[0] : '', nm = c ? c[1] : '전체';
@@ -508,7 +510,7 @@ function renderDetail(){
     '<div class="dhead"><span class="ic">' + SV[r.kind] + '</span><div><h2>' + esc(r.title) + '</h2><p>' + KSUB[r.kind] + (r.cat ? ' · ' + CATN[r.cat] : '') + '</p></div></div>' +
     '<div><p class="lbl">상태</p><div class="seg" role="group" aria-label="상태">' +
       [['want', r.kind === 'watch' ? '볼래' : '하고 싶어'], ['doing', r.kind === 'watch' ? '보는 중' : '하는 중'], ['done', '완료']].map(s => '<button type="button" class="' + s[0] + '" data-st="' + s[0] + '" aria-pressed="' + (r.status === s[0]) + '">' + s[1] + '</button>').join('') + '</div></div>';
-  if (r.kind === 'watch') h += '<div><p class="lbl">본 화수<span>전체 화수는 몰라도 돼요</span></p><div class="ep"><button type="button" id="epM" aria-label="1화 빼기">−</button><span class="n" id="epN">' + r.ep_cur + '</span><span style="color:var(--sub)">/</span><label class="sr" for="epT">전체 화수</label><input id="epT" type="number" min="1" max="9999" inputmode="numeric" placeholder="?" value="' + (r.ep_total || '') + '"><span style="color:var(--sub)">화</span><button type="button" id="epP" aria-label="1화 더하기">+</button></div></div>';
+  if (r.kind === 'watch') h += '<div><p class="lbl">본 화수<span>5화마다 둘 다 +15 EXP' + (epXP(r) ? ' · 지금까지 +' + epXP(r) : '') + '</span></p><div class="ep"><button type="button" id="epM" aria-label="1화 빼기">−</button><span class="n" id="epN">' + r.ep_cur + '</span><span style="color:var(--sub)">/</span><label class="sr" for="epT">전체 화수</label><input id="epT" type="number" min="1" max="9999" inputmode="numeric" placeholder="?" value="' + (r.ep_total || '') + '"><span style="color:var(--sub)">화</span><button type="button" id="epP" aria-label="1화 더하기">+</button></div></div>';
   h += '<div class="dl"><div><span>등록</span><b>' + esc(nameOf(r.created_by)) + ' · ' + fmtD(r.created_at) + '</b></div>' +
     (r.started_at ? '<div><span>시작한 날</span><b>' + fmtD(r.started_at) + '</b></div>' : '') +
     (r.done_at && r.status === 'done' ? '<div><span>클리어한 날</span><b>' + fmtD(r.done_at) + '</b></div>' : '') +
