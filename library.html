@@ -24,6 +24,7 @@
 @font-face{font-family:'ShillaCulture';src:url('fonts/shilla-culture-bold.otf') format('opentype');font-weight:700;font-display:swap}
 @font-face{font-family:'DongpaKkeujeogim';src:url('fonts/dongpa-regular.woff2') format('woff2');font-weight:400;font-display:swap}
 @font-face{font-family:'DongpaKkeujeogim';src:url('fonts/dongpa-bold.woff2') format('woff2');font-weight:700;font-display:swap}
+@font-face{font-family:'OwnglyphParkDaHyun';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/2411-3@1.0/Ownglyph_ParkDaHyun.woff2') format('woff2');font-display:swap}
 @font-face{font-family:'Galmuri9';src:url('fonts/galmuri9.woff2') format('woff2');font-display:swap}
 /* =========================================================
    게부장 타임 — 낮: 은빛 딸기우유 / 밤: 먹색 금장
@@ -910,6 +911,16 @@ body[data-theme="night"] .yz-stamp{color:#d9675b;border-color:#d9675b}
  .c-body{font-size:16.5px}
 }
 @media (max-width:390px){.yz-name{font-size:47px}}
+/* ===== 파일 올리기 · 검색창 = 온글잎 박다현체 (2026-11-15) ===== */
+.yz-up{height:38px;padding:0 15px;font:400 22px/1 'OwnglyphParkDaHyun','Jua',var(--f-ui);border-width:2.6px;border-radius:10px;box-shadow:3px 3px 0 var(--ysh);margin-bottom:14px}
+.yz-up span{top:1px}
+.yz-search input{font:400 20px/1 'OwnglyphParkDaHyun','Jua',var(--f-ui)}
+.yz-search .go{font:400 18px/1 'OwnglyphParkDaHyun','Jua',var(--f-ui);padding:0 15px}
+@media (max-width:767px){
+ .yz-up{height:30px;padding:0 11px;font-size:18px;border-width:2.2px;border-radius:8px;box-shadow:2.5px 2.5px 0 var(--ysh);margin:0}
+ .yz-search input{font-size:19px}
+ .yz-search .go{font-size:17px;padding:0 12px}
+}
 </style>
 </head>
 <body data-theme="berry">
@@ -1522,7 +1533,7 @@ function renderLibrary(){
     h += '<button class="tab' + (on ? ' on' : '') + '" data-f="' + f.id + '" aria-pressed="' + on + '">' + (f.private ? ic('lock','sm') + '<span class="sr">비공개</span>' : '') + esc(f.name) + ' <span class="n">' + (counts[f.id] || 0) + '</span></button>';
   });
   if (isOwner) h += '<button class="tab add" id="addFolder">' + ic('plus','sm') + '새 폴더</button>';
-  h += '</nav>' + (isOwner ? '<button class="yz-up" data-up><span>↑ 파일 올리기</span></button>' : '') + '</div>';
+  h += '</nav>' + (isOwner ? '<button class="yz-up" data-up><span>파일 올리기</span></button>' : '') + '</div>';
 
   h += '<section class="board yz-drawer"><div class="fbar"><div class="fbar-left">';
   if (searchQ) h += '<span class="board-title">「' + esc(searchQ) + '」 검색 결과</span><span class="fbar-n">' + novels.length + '편</span><button class="btn text" id="clearSearch">검색 지우기</button>';
