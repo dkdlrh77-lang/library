@@ -155,6 +155,17 @@ img{image-rendering:pixelated}
 .dacts{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .dacts .lnk{border:0;background:none;color:var(--sub);font:400 11.5px/1 var(--f);padding:8px 4px;text-decoration:underline;text-underline-offset:3px}
 .mback{display:none}
+/* 알림 */
+.topl{display:flex;gap:12px;align-items:center}
+.btn.bell svg{width:16px;height:16px}
+.btn.bell.on{background:var(--yel);color:#2A1A00;box-shadow:inset -3px -3px 0 var(--yel2),0 0 0 3px var(--ink),4px 4px 0 3px var(--ink)}
+.ck{display:flex;gap:10px;align-items:flex-start;cursor:pointer;padding:3px 0}
+.ck .box{width:22px;height:22px;flex-shrink:0;background:var(--ink);box-shadow:inset 0 0 0 2px var(--line2);display:grid;place-items:center;color:#2A1A00;font-size:13px}
+.ck input:checked + .box{background:var(--yel);box-shadow:0 0 0 2px var(--ink)}
+.ck input:focus-visible + .box{outline:3px solid var(--yel);outline-offset:2px}
+.ck b{display:block;font-weight:400;font-size:12.5px;color:#fff}
+.ck small{display:block;font-size:10.5px;color:var(--sub);margin-top:3px;line-height:1.5}
+.warn{margin:0;padding:10px 12px;border:2px solid var(--yel);background:var(--ink);color:var(--yel);font-size:12px;line-height:1.7}
 
 /* 창 (등록·확인·레벨업) */
 .dimbg{position:fixed;inset:0;z-index:80;background:rgba(10,7,22,.8);display:grid;place-items:center;padding:18px;overflow-y:auto}
@@ -254,7 +265,7 @@ textarea.fin{height:90px;padding:9px 11px;line-height:1.6;resize:vertical}
  <div id="notice"></div>
  <!-- 퀘스트 화면 -->
  <section id="vQuests" aria-label="퀘스트 로그">
-  <div class="top"><a class="btn" href="index.html">◀ 책상으로</a><span class="crumb">마요보로 · QUEST LOG</span></div>
+  <div class="top"><div class="topl"><a class="btn" href="index.html">◀ 책상으로</a><button type="button" class="btn bell" id="bellBtn" aria-haspopup="dialog"><svg viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M7 1h2v1h1v1h1v1h1v5h1v2h1v1H2v-1h1V9h1V4h1V3h1V2h1zM6 13h4v1H9v1H7v-1H6z"/></svg>알림</button></div><span class="crumb">마요보로 · QUEST LOG</span></div>
   <div class="hero"><img src="img/quest/bg-game.webp" alt="코타츠에서 같이 폰 게임을 하는 두 사람"><div class="logo"><b>QUEST LOG</b><small>둘이서 하고 싶은 것들</small></div></div>
   <div class="qgrid">
    <aside id="party"></aside>
@@ -524,7 +535,7 @@ function renderDetail(){
     $('epP').onclick = () => setEp(r, r.ep_cur + 1);
     $('epT').onchange = e => { const v = parseInt(e.target.value, 10); saveQuest(r, { ep_total: v > 0 ? Math.min(v, 9999) : null }); };
   }
-  const mt = $('meToo'); if (mt) mt.onclick = () => saveQuest(r, { metoo: !r.metoo }, r.metoo ? '' : '♥ 둘 다 하고 싶은 퀘스트가 됐어요!');
+  const mt = $('meToo'); if (mt) mt.onclick = async () => { const on = !r.metoo; await saveQuest(r, { metoo: on }, on ? '♥ 둘 다 하고 싶은 퀘스트가 됐어요!' : ''); if (on && r.metoo) notify({ type: 'quest', id: r.id, action: 'metoo' }); };
   const dc = $('doClear'); if (dc) dc.onclick = () => setStatus(r, 'done');
   $('dEdit').onclick = () => openForm(r);
   $('dDel').onclick = () => deleteQuest(r);
@@ -535,7 +546,7 @@ function renderDetail(){
     const before = xpOf(me.id);
     try {
       const row = await q(sb.from('quest_comments').insert({ quest_id: r.id, body }).select('id,quest_id,user_id,body,created_at,updated_at').single());
-      comments.push(row); afterChange(before);
+      comments.push(row); notify({ type: 'qcomment', quest_id: r.id, text: body }); afterChange(before);
     } catch (err) { btn.disabled = false; toast(esc(failMsg(err))); }
   };
   box.querySelectorAll('[data-cd]').forEach(b => b.onclick = async () => {
@@ -576,7 +587,9 @@ async function setStatus(r, st){
     const patch = { status: 'done', done_at: new Date().toISOString() };
     if (!r.started_at) patch.started_at = patch.done_at;
     if (r.kind === 'watch' && r.ep_total) patch.ep_cur = r.ep_total;
-    return saveQuest(r, patch);
+    await saveQuest(r, patch);
+    if (r.status === 'done') notify({ type: 'quest', id: r.id, action: 'clear' });
+    return;
   }
   if (r.status === 'done') {
     const ok = await confirmBox('클리어 취소', '클리어를 취소하면 둘 다 받은 +' + xpClear(r) + ' EXP가 빠져요. 취소할까요?', '취소하기', true);
@@ -654,7 +667,7 @@ function openForm(r){
       const before = xpOf(me.id);
       try {
         if (editing) { row.updated_at = new Date().toISOString(); if (r.kind !== row.kind || (row.kind !== 'watch')) row.ep_cur = row.kind === 'watch' ? r.ep_cur : 0; await q(sb.from('quests').update(row).eq('id', r.id)); Object.assign(r, row); }
-        else { const saved = await q(sb.from('quests').insert(row).select('*').single()); quests.push(saved); selId = saved.id; tab = saved.kind; cat = ''; }
+        else { const saved = await q(sb.from('quests').insert(row).select('*').single()); quests.push(saved); selId = saved.id; tab = saved.kind; cat = ''; notify({ type: 'quest', id: saved.id, action: 'add' }); }
         close(); afterChange(before, editing ? '퀘스트를 고쳤어요' : '퀘스트 등록!');
         if (!editing && isMobile()) document.body.classList.remove('m-detail');
       } catch (err) { go.disabled = false; go.textContent = editing ? '고치기 완료' : '퀘스트 등록!'; $('fErr').textContent = failMsg(err); }
@@ -769,9 +782,95 @@ function renderChar(){
   };
 }
 
+/* ---------- 푸시 알림 (일정 페이지와 같은 구독을 같이 써요) ---------- */
+const VAPID_PUBLIC = 'BNUrPWrLC-Xsmb-KnbPEdW6W0X8otnznKntCG_9VK7B1QUmsQclBohAQHg1I248GFIYtlpttqQH2KZuMjAwVQ7Y';
+const b64uToU8 = s => { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; const b = atob(s), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; };
+const isIOS = () => /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+function pushSupport(){
+  if (isIOS() && !isStandalone()) return 'ios-browser';
+  if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) return 'no';
+  return 'ok';
+}
+let swReady = null;
+if ('serviceWorker' in navigator && location.protocol === 'https:') swReady = navigator.serviceWorker.register('sw.js').then(() => navigator.serviceWorker.ready).catch(() => null);
+async function currentSub(){ try { const r = await swReady; return r ? await r.pushManager.getSubscription() : null; } catch (e) { return null; } }
+async function saveSub(sub){ const j = sub.toJSON(); await q(sb.from('push_subs').upsert({ endpoint: j.endpoint, user_id: me.id, p256dh: j.keys.p256dh, auth: j.keys.auth }, { onConflict: 'endpoint' })); }
+function notify(body){ try { if (sb && sb.functions) sb.functions.invoke('send-push', { body }).catch(() => {}); } catch (e) {} }
+async function refreshBell(){ const s = await currentSub(); $('bellBtn').classList.toggle('on', !!s && 'Notification' in window && Notification.permission === 'granted'); return s; }
+async function openBell(){
+  const prev = document.activeElement;
+  const el = document.createElement('div'); el.className = 'dimbg';
+  $('layer').appendChild(el);
+  const close = () => { el.remove(); removeEventListener('keydown', onKey); try { prev && prev.focus(); } catch (e) {} };
+  const onKey = e => { if (e.key === 'Escape') close(); };
+  addEventListener('keydown', onKey);
+  el.addEventListener('mousedown', e => { if (e.target === el) close(); });
+  let prefs = { events: true, anniv: true, partner: true, comments: true, quests: true };
+  try { const p = await q(sb.from('push_prefs').select('*').eq('user_id', me.id).maybeSingle()); if (p) prefs = Object.assign(prefs, p); } catch (e) {}
+  const draw = async msg => {
+    const sup = pushSupport(), sub = sup === 'ok' ? await currentSub() : null, perm = 'Notification' in window ? Notification.permission : 'default';
+    const on = !!sub && perm === 'granted';
+    let h = '<section class="win dlg" role="dialog" aria-modal="true" aria-labelledby="bT"><div class="wt"><span id="bT" style="color:var(--yel);font-size:13px">알림 설정</span><span>이 기기</span></div><div class="in" style="display:flex;flex-direction:column;gap:14px">';
+    if (sup === 'ios-browser') h += '<p class="warn">아이폰은 홈 화면 앱에서만 알림을 받을 수 있어요. 사파리 공유 버튼 → \'홈 화면에 추가\' → 홈 화면의 게부장 타임 아이콘으로 열고, 여기서 알림을 켜 주셔! (iOS 16.4 이상)</p>';
+    else if (sup === 'no') h += '<p class="warn">이 브라우저에서는 알림을 받을 수 없어요.</p>';
+    else if (perm === 'denied') h += '<p class="warn">알림이 막혀 있어요. 아이폰 설정 → 알림 → 게부장 타임에서 알림 허용을 켜 주셔. (PC는 주소창 왼쪽 자물쇠 → 알림 허용)</p>';
+    else h += '<p style="margin:0;font-size:12.5px;line-height:1.6">' + (on ? '<span style="color:var(--mint)">이 기기로 알림이 와요.</span> 일정 페이지와 같이 쓰는 설정이에요.' : '이 기기는 아직 알림을 받지 않아요.') + '</p><button type="button" class="btn ' + (on ? '' : 'yel') + '" id="pOn" style="min-height:48px">' + (on ? '이 기기 알림 끄기' : '이 기기에서 알림 받기') + '</button>';
+    if (msg) h += '<p style="margin:0;font-size:12px;color:var(--mint)">' + esc(msg) + '</p>';
+    const ck = (k, t, s2) => '<label class="ck"><input class="sr" type="checkbox" data-pref="' + k + '"' + (prefs[k] !== false ? ' checked' : '') + '><span class="box">✓</span><span><b>' + t + '</b>' + (s2 ? '<small>' + s2 + '</small>' : '') + '</span></label>';
+    h += '<div>' + ck('quests', '퀘스트 로그', '상대가 퀘스트를 등록 · 클리어하거나 \'나도!\' · 한마디를 남겼을 때') + ck('events', '일정 알림', '일정마다 정한 시간에') + ck('anniv', '기념일 · 특별한 날', '아침 9시, 큰 날은 일주일 전에도') + ck('partner', '상대가 일정을 적었을 때', '') + ck('comments', '상대가 일정 댓글을 달았을 때', '') + '</div>';
+    h += '<p style="margin:-4px 0 0;font-size:10.5px;color:var(--sub)">이 체크는 내 모든 기기에 똑같이 적용돼요.</p>';
+    h += '<div class="dbtns">' + (on ? '<button type="button" class="btn" id="pTest">시험 알림 보내기</button>' : '') + '<button type="button" class="btn yel" id="pClose">닫기</button></div></div></section>';
+    el.innerHTML = h;
+    $('pClose').onclick = close;
+    el.querySelectorAll('[data-pref]').forEach(c => c.onchange = async () => {
+      prefs[c.dataset.pref] = c.checked;
+      const row = { user_id: me.id }; ['events', 'anniv', 'partner', 'comments', 'quests'].forEach(k => row[k] = prefs[k] !== false);
+      try { await q(sb.from('push_prefs').upsert(row, { onConflict: 'user_id' })); }
+      catch (e) { c.checked = !c.checked; prefs[c.dataset.pref] = c.checked; toast(/quests/.test(((e && e.message) || '') + '') ? 'Supabase에서 퀘스트_추가.sql을 한 번 더 실행해 주세요.' : esc(failMsg(e))); }
+    });
+    const t = $('pTest'); if (t) t.onclick = async () => {
+      t.disabled = true; t.textContent = '보내는 중…';
+      try { const { data, error } = await sb.functions.invoke('send-push', { body: { type: 'test', from: 'quest' } }); if (error) throw error; toast(data && data.result && data.result.some(x => x === 201 || x === 200) ? '시험 알림을 보냈어요. 곧 도착해요!' : '보내지 못했어요. 알림을 껐다가 다시 켜 봐 주셔.'); }
+      catch (e) { toast('알림 보내는 기능(send-push)이 아직 준비되지 않았어요.'); }
+      t.disabled = false; t.textContent = '시험 알림 보내기';
+    };
+    const b = $('pOn'); if (b) b.onclick = () => {
+      if (on) {
+        b.disabled = true;
+        (async () => { try { await q(sb.from('push_subs').delete().eq('endpoint', sub.endpoint)); await sub.unsubscribe(); } catch (e) {} await refreshBell(); draw('이 기기 알림을 껐어요.'); })();
+        return;
+      }
+      const ask = Notification.requestPermission();   // 누른 순간 바로 물어봐야 해요 (아이폰)
+      b.disabled = true; b.textContent = '켜는 중…';
+      (async () => {
+        try {
+          if (await ask !== 'granted') { draw(); return; }
+          const r = await swReady; if (!r) throw new Error('sw');
+          const s2 = (await r.pushManager.getSubscription()) || await r.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64uToU8(VAPID_PUBLIC) });
+          await saveSub(s2); await refreshBell(); draw('알림을 켰어요! 시험 알림을 보내 봐 주셔.');
+        } catch (e) { draw('알림을 켜지 못했어요. 잠시 후 다시 시도해 주세요.'); }
+      })();
+    };
+    const f = el.querySelector('button'); if (f) f.focus();
+  };
+  el.innerHTML = '<section class="win dlg"><div class="in"><p style="margin:0">불러오는 중…</p></div></section>';
+  draw();
+}
+$('bellBtn').onclick = () => { if (sb && me) openBell(); };
+
 /* ---------- 화면 전환 ---------- */
 function route(){
   const h = location.hash;
+  const qm = h.match(/^#q=([\w-]+)/);
+  if (qm) {   // 알림을 눌러 들어온 경우: 그 퀘스트를 바로 열기
+    const r = quests.find(x => x.id === qm[1]);
+    history.replaceState(null, '', location.pathname + location.search);
+    $('vQuests').hidden = false; $('vChar').hidden = true; document.body.classList.remove('cw-partner');
+    if (r) { tab = r.status === 'done' ? 'clear' : r.kind; cat = ''; selId = r.id; renderQuests(); if (isMobile()) openDetail(r.id); }
+    else { renderQuests(); toast('그 퀘스트는 지워졌어요'); }
+    return;
+  }
   const charView = h === '#char' || h === '#char-partner';
   $('vQuests').hidden = charView; $('vChar').hidden = !charView;
   document.body.classList.remove('m-detail');
@@ -806,6 +905,8 @@ renderTabs(); renderList();
   await ensureMyChar();
   route();
   checkLevelUp();
+  // 이미 알림을 켠 기기는 정보를 새로 맞춰 둬요
+  if (pushSupport() === 'ok' && 'Notification' in window && Notification.permission === 'granted') { const s = await refreshBell(); if (s) saveSub(s).catch(() => {}); }
 })();
 })();
 </script>
