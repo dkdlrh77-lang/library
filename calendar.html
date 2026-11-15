@@ -346,6 +346,29 @@ input[type=date].in::-webkit-date-and-time-value,input[type=time].in::-webkit-da
  body.m-form .rcol{margin-top:30px}
 }
 .mcute{display:none;font-size:20px!important}
+/* 고정: 우리가 사귄 날 */
+.sp.pin{background:var(--g);color:#4A2030}
+.cell.pin-cell{background:radial-gradient(circle,rgba(244,169,190,.38) 1.4px,transparent 1.9px) 0 0/11px 11px,rgba(244,169,190,.16)}
+.cell.pin-cell.sel{background:radial-gradient(circle,rgba(244,169,190,.45) 1.4px,transparent 1.9px) 0 0/11px 11px,var(--selbg)}
+.cell.pin-cell .num::after{content:"♥";margin-left:3px;font-size:11px;color:#E2465A;vertical-align:1px}
+.tk.pin{background:var(--g)}.tk.pin b,.tk.pin .d{color:#4A2030}
+.pin-card{position:relative;margin:16px 4px 18px;padding:20px 20px 16px;border:3px solid var(--ink);border-radius:10px;box-shadow:5px 5px 0 #000;transform:rotate(-1deg);color:#4A2030;
+ background:radial-gradient(circle,rgba(244,169,190,.5) 1.6px,transparent 2.2px) 0 0/14px 14px,#FFF4F6}
+.pin-card::before{content:"";position:absolute;inset:6px;border:2px dashed rgba(200,70,58,.35);border-radius:6px;pointer-events:none}
+.pin-tack{position:absolute;top:-17px;left:50%;width:34px;margin-left:-17px;transform:rotate(12deg);filter:drop-shadow(2px 3px 0 rgba(0,0,0,.45))}
+.pin-tack svg{display:block;width:100%;height:auto}
+.pc-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-right:70px;position:relative}
+.pc-chip{display:inline-flex;align-items:center;gap:4px;font:400 12px/1 var(--f-ui);padding:4px 8px 3px;border:1.8px solid var(--ink);border-radius:10px;background:var(--ink);color:var(--cream)}
+.pc-k{font:400 21px/1.15 var(--f-ui);color:#3A1A24}
+.pc-k i{font-style:normal;color:#E2465A}
+.pc-when{margin:12px 0 0;display:flex;flex-direction:column;gap:2px;position:relative}
+.pc-date{font:700 14px/1.2 var(--f-body);color:#8A4A5C;letter-spacing:.02em}
+.pc-time{font:400 50px/1 'East Sea Dokdo',cursive;color:#C8463A;-webkit-text-stroke:1px #191513;paint-order:stroke fill;text-shadow:2px 2px 0 rgba(0,0,0,.18)}
+.pc-sub{margin:8px 0 0;font:400 14px/1.45 var(--f-ui);color:#6A3A48;position:relative}
+.pc-seal{position:absolute;right:14px;top:16px;width:64px;height:64px;border:3px double #E2465A;border-radius:50%;display:grid;place-items:center;transform:rotate(14deg);color:#E2465A;font:400 24px/1 'East Sea Dokdo',cursive;background:rgba(255,244,246,.7);pointer-events:none}
+.pc-seal small{display:block;font:400 10px/1 var(--f-ui);margin-top:-2px;text-align:center}
+.pc-foot{margin:10px 0 0;font:400 11.5px/1.4 var(--f-body);color:#9A7A84;position:relative}
+@media (max-width:959px){.pin-card{padding:18px 16px 14px;margin:16px 2px 16px}.pc-k{font-size:19px}.pc-time{font-size:42px}.pc-seal{width:56px;height:56px;font-size:21px;right:10px}.cell.pin-cell .num::after{display:none}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -457,9 +480,23 @@ function autoSpecials(k){
   const out = [], n = dayNum(k), p = pk(k), mmdd = pad(p.m) + '-' + pad(p.d);
   if (n === 30 || n === 50) out.push({ label: n + '일', short: n + '일', big: false, love: true });
   if (n >= 100 && n % 100 === 0) out.push({ label: n + '일', short: n + '일', big: true, love: true });
-  if (mmdd === '10-31' && p.y > 2026) out.push({ label: (p.y - 2026) + '주년', short: (p.y - 2026) + '주년', big: true, love: true });
+  if (k === START_KEY) out.push({ label: '사귄 날', short: '사귄 날', big: true, love: true, pin: true });
+  if (mmdd === '10-31' && p.y > 2026) out.push({ label: (p.y - 2026) + '주년', short: (p.y - 2026) + '주년', big: true, love: true, pin: true });
   if (FIXED[mmdd]) out.push({ label: FIXED[mmdd][0], short: FIXED[mmdd][1], big: false });
   return out;
+}
+
+/* ---------- 고정 카드: 우리가 사귄 날 (고칠 수 없음) ---------- */
+const SVG_TACK = '<svg viewBox="0 0 40 52" aria-hidden="true"><path d="M20 30 L20 50" stroke="#8A8F98" stroke-width="3" stroke-linecap="round"/><path d="M9 26 h22 l-3 -6 h-16z" fill="#B23A30" stroke="#191513" stroke-width="2.4" stroke-linejoin="round"/><rect x="14" y="10" width="12" height="11" fill="#C8463A" stroke="#191513" stroke-width="2.4"/><ellipse cx="20" cy="9" rx="12" ry="7.5" fill="#E2465A" stroke="#191513" stroke-width="2.6"/><ellipse cx="16" cy="7" rx="4" ry="2.2" fill="#fff" opacity=".75"/></svg>';
+function pinCardHTML(k){
+  const p = pk(k), yrs = p.y - 2026, first = k === START_KEY;
+  const date = p.y + '. ' + p.m + '. ' + p.d + ' ' + WD[dow(k)] + '요일';
+  return '<article class="pin-card" aria-label="' + (first ? '우리가 사귄 날, 2026년 10월 31일 새벽 2시 18분' : yrs + '주년') + '"><span class="pin-tack">' + SVG_TACK + '</span>' +
+    '<div class="pc-top"><span class="pc-chip">고정</span><span class="pc-k"><i>♥</i> ' + (first ? '우리가 사귄 날' : '우리 ' + yrs + '주년') + '</span></div>' +
+    '<p class="pc-when"><span class="pc-date">' + date + '</span><b class="pc-time">' + (first ? '새벽 2:18' : yrs + '주년') + '</b></p>' +
+    '<p class="pc-sub">' + (first ? '우리 이야기 1일째 — 여기서부터 시작!' : '2026. 10. 31 새벽 2:18에 시작해서 사귄 지 ' + dayNum(k).toLocaleString('ko-KR') + '일째') + '</p>' +
+    '<span class="pc-seal" aria-hidden="true">' + (first ? '시작' : yrs + '년') + '</span>' +
+    '<p class="pc-foot">고정된 날이라 고치거나 지울 수 없어요</p></article>';
 }
 
 /* ---------- 상태 ---------- */
@@ -533,11 +570,11 @@ function renderCal(){
   for (let i = 0; i < rows * 7; i++) {
     const k = addDays(start, i), p = pk(k), other = p.m !== viewM;
     const evs = eventsOn(k), sp = autoSpecials(k), dw = i % 7;
-    let cls = 'cell' + (other ? ' other' : '') + (dw === 0 ? ' sun' : '') + (dw === 6 ? ' sat' : '') + (k === tk ? ' today-cell' : '') + (k === selKey ? ' sel' : '') + (k === selKey && adding ? ' adding' : '');
+    let cls = 'cell' + (other ? ' other' : '') + (dw === 0 ? ' sun' : '') + (dw === 6 ? ' sat' : '') + (k === tk ? ' today-cell' : '') + (k === selKey ? ' sel' : '') + (k === selKey && adding ? ' adding' : '') + (sp.some(s => s.pin) ? ' pin-cell' : '');
     const aria = p.m + '월 ' + p.d + '일 ' + WD[dw] + '요일' + (k === tk ? ', 오늘' : '') + (sp.length ? ', ' + sp.map(s => s.label).join(', ') : '') + (evs.length ? ', 일정 ' + evs.length + '개' : ', 일정 없음');
     h += '<button type="button" class="' + cls + '" data-k="' + k + '" aria-label="' + esc(aria) + '"' + (k === selKey ? ' aria-current="date"' : '') + '><span class="num">' + p.d + '</span>' +
       (k === tk ? '<span class="today">오늘</span>' : '') +
-      sp.slice(0, 1).map(s => '<span class="sp"><span class="l">' + (s.love ? '♥ ' : '★ ') + esc(s.label) + '</span><span class="s">' + esc(s.short) + '</span></span>').join('') +
+      sp.slice(0, 1).map(s => '<span class="sp' + (s.pin ? ' pin' : '') + '"><span class="l">' + (s.love ? '♥ ' : '★ ') + esc(s.label) + '</span><span class="s">' + esc(s.short) + '</span></span>').join('') +
       '<span class="chips">' + evs.slice(0, 3).map(e => '<span class="chip ' + e.who + (e.is_anniv ? ' star' : '') + '">' + esc(e.title) + '</span>').join('') + (evs.length > 3 ? '<span class="more">+' + (evs.length - 3) + '</span>' : '') + '</span>' +
       '<span class="dots">' + evs.slice(0, 4).map(e => '<span class="dot ' + e.who + '"></span>').join('') + '</span></button>';
   }
@@ -549,7 +586,7 @@ function pickDay(k){
   if (p.m !== viewM || p.y !== viewY) { viewY = p.y; viewM = p.m; }
   selKey = k; selEv = null;
   if (!ready) { renderCal(); return; }
-  if (!eventsOn(k).length && !setupMissing) { openForm(null, k); return; }
+  if (!eventsOn(k).length && !setupMissing && !autoSpecials(k).some(s => s.pin)) { openForm(null, k); return; }
   mode = 'day'; adding = false; renderAll();
   if (isMobile()) $('panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -559,12 +596,12 @@ function renderUp(){
   const tk = todayKey(), out = [];
   for (let i = 0; i < 800 && out.length < 6; i++) {
     const k = addDays(tk, i);
-    autoSpecials(k).forEach(s => out.push({ k, label: s.label, big: s.big }));
+    autoSpecials(k).forEach(s => out.push({ k, label: s.label, big: s.big, pin: s.pin }));
     events.filter(e => e.is_anniv && occurs(e, k)).forEach(e => out.push({ k, label: e.title, big: false, star: true }));
   }
   $('upList').innerHTML = out.slice(0, 6).map(s => {
     const d = diffDays(s.k, tk);
-    return '<li class="tk' + (s.big ? ' big' : '') + '"><b title="' + esc(s.label) + '">' + (s.star ? '★ ' : '') + esc(s.label) + '</b><span class="d">' + dotK(s.k) + '</span><span class="dd">' + (d === 0 ? 'D-DAY' : 'D-' + d) + '</span></li>';
+    return '<li class="tk' + (s.pin ? ' pin' : s.big ? ' big' : '') + '"><b title="' + esc(s.label) + '">' + (s.star ? '★ ' : '') + esc(s.label) + '</b><span class="d">' + dotK(s.k) + '</span><span class="dd">' + (d === 0 ? 'D-DAY' : 'D-' + d) + '</span></li>';
   }).join('');
 }
 
@@ -579,8 +616,10 @@ function renderPanel(){
   if (selEv && !evs.some(e => e.id === selEv)) selEv = null;
   if (!selEv && evs.length) selEv = evs[0].id;
   let h = '<h3 class="day-t"><span class="n">' + md(selKey) + '</span> ' + WD[dow(selKey)] + '요일' + (n >= 1 ? '<span class="dcount">사귄 지 ' + n.toLocaleString('ko-KR') + '일째</span>' : '') + '</h3>';
-  if (sp.length) h += '<div class="sptags">' + sp.map(s => '<span class="sp">' + (s.love ? '♥ ' : '★ ') + esc(s.label) + '</span>').join('') + '</div>';
-  if (!evs.length) h += '<p class="empty">아직 적힌 일정이 없달까?</p>';
+  const pinned = sp.some(s => s.pin), spRest = sp.filter(s => !s.pin);
+  if (pinned) h += pinCardHTML(selKey);
+  if (spRest.length) h += '<div class="sptags">' + spRest.map(s => '<span class="sp">' + (s.love ? '♥ ' : '★ ') + esc(s.label) + '</span>').join('') + '</div>';
+  if (!evs.length && !pinned) h += '<p class="empty">아직 적힌 일정이 없달까?</p>';
   h += '<ul class="day-list">' + evs.map(e => '<li><button type="button" class="it' + (e.id === selEv ? ' on' : '') + '" data-ev="' + e.id + '" aria-pressed="' + (e.id === selEv) + '"><span class="tm">' + (e.all_day || !e.start_time ? '종일' : hm(e.start_time)) + '</span><span class="tt">' + (e.is_anniv ? '★ ' : '') + esc(e.title) + '</span><span class="who ' + e.who + '">' + WHO[e.who] + '</span></button></li>').join('') +
        '<li><button type="button" class="it new" id="newHere" aria-label="' + md(selKey) + '에 새 일정 적기">새 일정 적기</button></li></ul>';
   const ev = evs.find(e => e.id === selEv);
