@@ -62,7 +62,7 @@ dl,dd,figure{margin:0}
 .lg svg{height:26px;width:auto}
 .lg.hiji{background:var(--h-t)}.lg.gin{background:var(--g-t)}.lg.both{background:var(--b-t)}
 .lg.both svg{height:18px}
-.lg[aria-pressed=false]{opacity:.45;filter:grayscale(.7);box-shadow:none}
+.lg[data-who][aria-pressed=false]{opacity:.45;filter:grayscale(.7);box-shadow:none}
 
 /* 몸통 */
 .main{display:flex;gap:56px;align-items:flex-start;margin-top:40px}
@@ -261,6 +261,23 @@ input[type=date].in::-webkit-date-and-time-value,input[type=time].in::-webkit-da
 .lb img{max-width:min(92vw,1100px);max-height:86vh;border:6px solid #fff;box-shadow:0 10px 40px #000}
 .lb button{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));right:16px;width:46px;height:46px;border-radius:50%;border:2.5px solid var(--ink);background:var(--paper);font:400 20px/1 var(--f-ui);color:var(--text)}
 
+/* 알림 설정 */
+.hdl{justify-self:start;display:flex;gap:10px;align-items:center}
+.lg.bell{background:var(--paper);padding:0 14px 0 10px;height:38px;box-shadow:3px 3px 0 #000}
+.lg.bell svg{height:20px;width:20px}
+.lg.bell.on{background:var(--mayo)}
+.dlg{position:fixed;inset:0;z-index:80;background:rgba(10,10,14,.6);display:grid;place-items:center;padding:20px;overflow-y:auto}
+.dlg-card{width:min(420px,100%);background:var(--paper);color:var(--text);border:3px solid var(--ink);border-radius:12px;box-shadow:8px 9px 0 #000;overflow:hidden}
+.dlg-card .rep-h{margin:0;border-radius:0}
+.dlg-in{padding:18px 20px 20px;display:flex;flex-direction:column;gap:14px}
+.dlg-in .st{margin:0;font:400 14.5px/1.6 var(--f-body)}
+.dlg-in .st b{font-family:var(--f-ui);font-weight:400}
+.dlg-in .ck{padding:4px 0}
+.dlg-btns{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;border-top:2.5px dashed var(--line2);padding-top:16px}
+.dlg .go,.dlg .ghost{height:44px;font-size:15.5px}
+.dlg .big{width:100%;height:50px}
+.dlg .warn{margin:0;padding:10px 12px;border:2px solid var(--ink);border-radius:8px;background:var(--mayo);color:#3A2A00;font:400 14px/1.55 var(--f-body)}
+
 /* 노트북처럼 조금 좁은 화면 */
 @media (max-width:1279px){.sign .ash{display:none}.main{gap:40px}.rcol{width:420px}}
 @media (max-width:1099px){.up-list{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:14px}}
@@ -278,7 +295,8 @@ input[type=date].in::-webkit-date-and-time-value,input[type=time].in::-webkit-da
  .sign .flag{left:auto;right:-6px;top:-60px;width:34px;transform:rotate(16deg)}
  .legend{justify-self:center;justify-content:center;gap:6px;padding-top:18px}
  .lg{height:30px;font-size:13px;padding:0 9px 0 5px;gap:4px;border-width:2px;border-radius:15px;box-shadow:1.5px 1.5px 0 #000}
- .lg svg{height:18px}.lg.both svg{height:12px}
+ .lg svg{height:18px}.lg.both svg{height:12px}.lg.bell svg{height:16px;width:16px}.lg.bell{padding:0 12px 0 9px;height:34px;font-size:15px;border-width:2.5px;border-radius:17px;box-shadow:3px 3px 0 #000}
+ .hdl{gap:8px}
  .main{flex-direction:column;gap:0;margin-top:22px;align-items:stretch}
  .rcol{width:auto;margin:34px 8px 0}
  .roll{margin:0 -18px}
@@ -337,7 +355,7 @@ input[type=date].in::-webkit-date-and-time-value,input[type=time].in::-webkit-da
  <div class="mbar" id="mbar"><button class="desk" type="button" id="mBack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="16" height="16"><path d="M15 5l-7 7 7 7"></path></svg>달력으로</button><h2 id="mTitle">새 일정</h2><span></span></div>
  <p class="cute mcute" id="mCute"></p>
  <header class="hd">
-  <a class="desk" href="index.html" aria-label="책상으로 돌아가기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="16" height="16"><path d="M15 5l-7 7 7 7"></path></svg>책상으로</a>
+  <div class="hdl"><a class="desk" href="index.html" aria-label="책상으로 돌아가기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="16" height="16"><path d="M15 5l-7 7 7 7"></path></svg>책상으로</a><button class="lg bell" type="button" id="bellBtn" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"></path><path d="M10 20.5a2 2 0 0 0 4 0"></path></svg>알림</button></div>
   <div class="sign">
    <span class="deco flag" aria-hidden="true"><svg viewBox="0 0 90 170" aria-hidden="true"><rect x="4" y="0" width="7" height="170" rx="3" fill="#6B4A2A" stroke="#191513" stroke-width="2.5"></rect><rect x="8" y="10" width="72" height="5" fill="#6B4A2A" stroke="#191513" stroke-width="2"></rect><rect x="12" y="15" width="64" height="130" fill="#C8463A" stroke="#191513" stroke-width="3"></rect><polygon points="13.5,143.5 18.5,131.5 23.5,143.5 28.5,131.5 33.5,143.5 38.5,131.5 43.5,143.5 48.5,131.5 53.5,143.5 58.5,131.5 63.5,143.5 68.5,131.5 73.5,143.5 74.5,131.5 74.5,143.5" fill="#FFF6E6"></polygon><text x="44" y="96" text-anchor="middle" font-family="Song Myung, serif" font-size="50" fill="#FFF6E6" stroke="#191513" stroke-width="1.5" paint-order="stroke">誠</text></svg></span>
    <div class="plaque"><h1 class="ttl"><small>게부장의</small>출동 일지</h1></div>
@@ -647,7 +665,7 @@ function drawComments(){
       const btn = f.querySelector('button'); btn.disabled = true;
       try {
         const row = await q(sb.from('event_comments').insert({ event_id: cm.ev, body }).select('id,user_id,body,created_at,updated_at').single());
-        cm.list.push(row); inp.value = ''; drawComments(); const n = $('cmIn'); if (n) n.focus({ preventScroll: true });
+        cm.list.push(row); inp.value = ''; notify({ type: 'comment', event_id: cm.ev, text: body }); drawComments(); const n = $('cmIn'); if (n) n.focus({ preventScroll: true });
       } catch (err) { btn.disabled = false; toast(failMsg(err)); }
     };
   }
@@ -714,7 +732,7 @@ function renderForm(){
     '<div><label class="fl" for="fPlace">장소 <small>안 적어도 돼요</small></label><input class="in" id="fPlace" type="text" maxlength="200" placeholder="어디서?" value="' + esc(fd.place) + '"></div>' +
     '<div><span class="fl">알림</span><div class="chips2" role="group" aria-label="알림 시간">' + ALARMS.map(a => chip('alarm', a[0], a[1], fd.alarm_min === a[0])).join('') + '</div>' +
       '<div class="sub2' + (fd.alarm_min == null ? ' hidden' : '') + '">받을 사람<div class="chips2" role="group" aria-label="받을 사람">' + chip('to', 'both', '둘 다', fd.alarm_to === 'both') + chip('to', 'me', '나만', fd.alarm_to === 'me') + '</div></div>' +
-      '<p class="note">휴대폰 알림은 푸시 알림을 연결한 뒤부터 와요.</p></div>' +
+      '<p class="note">알림은 위쪽 \'알림\' 버튼에서 \'이 기기에서 알림 받기\'를 켠 기기로 와요.</p></div>' +
     '<div><span class="fl">사진 <small>' + (isMobile() ? '여러 장 고를 수 있어요' : '여러 장 · 끌어다 놓아도 돼요') + '</small></span><div class="ups" id="fUps">' +
       fd.keep.map((ph, i) => '<span class="th"><img alt="올린 사진" data-path="' + esc(ph.path) + '"' + (signed[ph.path] ? ' src="' + esc(signed[ph.path].url) + '"' : '') + '><button type="button" class="x" data-rk="' + i + '" aria-label="사진 빼기">✕</button></span>').join('') +
       fd.add.map((a, i) => '<span class="th"><img alt="새로 올릴 사진" src="' + a.url + '"><button type="button" class="x" data-ra="' + i + '" aria-label="사진 빼기">✕</button></span>').join('') +
@@ -811,6 +829,7 @@ async function saveForm(){
     err.textContent = isMissing(e) ? 'Supabase에서 일정_추가.sql을 먼저 실행해 주세요.' : failMsg(e); return;
   }
   const day = fd.day, wasEdit = !!fd.id;
+  notify({ type: 'event', id, edit: wasEdit });
   closeForm(); selKey = day; selEv = id; const p = pk(day); viewY = p.y; viewM = p.m;
   await loadData(); renderAll();
   toast(failedPh ? '일정은 저장했는데 사진 ' + failedPh + '장을 올리지 못했어요' : (wasEdit ? '일정을 고쳤어요' : '출동 일지에 적었어요!'), failedPh ? 4500 : 2600);
@@ -845,8 +864,95 @@ async function loadData(){
 }
 function renderAll(){ renderCal(); renderUp(); renderPanel(); }
 
+/* ---------- 푸시 알림 ---------- */
+const VAPID_PUBLIC = 'BNUrPWrLC-Xsmb-KnbPEdW6W0X8otnznKntCG_9VK7B1QUmsQclBohAQHg1I248GFIYtlpttqQH2KZuMjAwVQ7Y';
+const SVG_BELL2 = SVG_BELL;
+const b64uToU8 = s => { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; const b = atob(s), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; };
+const isIOS = () => /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+function pushSupport(){
+  if (isIOS() && !isStandalone()) return 'ios-browser';
+  if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) return 'no';
+  return 'ok';
+}
+let swReady = null;
+if ('serviceWorker' in navigator && location.protocol === 'https:') swReady = navigator.serviceWorker.register('sw.js').then(() => navigator.serviceWorker.ready).catch(() => null);
+async function currentSub(){ try { const r = await swReady; return r ? await r.pushManager.getSubscription() : null; } catch (e) { return null; } }
+async function saveSub(sub){
+  const j = sub.toJSON();
+  await q(sb.from('push_subs').upsert({ endpoint: j.endpoint, user_id: me.id, p256dh: j.keys.p256dh, auth: j.keys.auth }, { onConflict: 'endpoint' }));
+}
+function notify(body){ try { if (sb) sb.functions.invoke('send-push', { body }).catch(() => {}); } catch (e) {} }
+async function refreshBell(){ const s = await currentSub(); $('bellBtn').classList.toggle('on', !!s && Notification.permission === 'granted'); return s; }
+async function openBell(){
+  const prev = document.activeElement;
+  const el = document.createElement('div'); el.className = 'dlg'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-labelledby', 'dlgT');
+  document.body.appendChild(el);
+  const close = () => { el.remove(); removeEventListener('keydown', onKey); try { prev && prev.focus(); } catch (e) {} };
+  const onKey = e => { if (e.key === 'Escape') close(); };
+  addEventListener('keydown', onKey);
+  el.addEventListener('mousedown', e => { if (e.target === el) close(); });
+  let prefs = { events: true, anniv: true, partner: true, comments: true };
+  try { const p = await q(sb.from('push_prefs').select('*').eq('user_id', me.id).maybeSingle()); if (p) prefs = p; } catch (e) {}
+  const draw = async (msg) => {
+    const sup = pushSupport(), sub = sup === 'ok' ? await currentSub() : null, perm = 'Notification' in window ? Notification.permission : 'default';
+    const on = !!sub && perm === 'granted';
+    let h = '<div class="dlg-card"><div class="rep-h"><span id="dlgT">알림 설정</span><span>이 기기</span></div><div class="dlg-in">';
+    if (sup === 'ios-browser') h += '<p class="warn">아이폰은 <b>홈 화면 앱</b>에서만 알림을 받을 수 있어요.<br>사파리 아래 공유 버튼 → \'홈 화면에 추가\' → 홈 화면의 게부장 타임 아이콘으로 열고, 여기서 알림을 켜 주셔! (iOS 16.4 이상)</p>';
+    else if (sup === 'no') h += '<p class="warn">이 브라우저에서는 알림을 받을 수 없어요.</p>';
+    else if (perm === 'denied') h += '<p class="warn">알림이 막혀 있어요. 아이폰 <b>설정 → 알림 → 게부장 타임</b>에서 알림 허용을 켜 주셔. (PC는 주소창 왼쪽 자물쇠 → 알림 허용)</p>';
+    else h += '<p class="st">' + (on ? '<b>이 기기로 알림이 와요.</b>' : '이 기기는 아직 알림을 받지 않아요.') + '</p><button type="button" class="' + (on ? 'ghost' : 'go') + ' big" id="pOn">' + (on ? '이 기기 알림 끄기' : '이 기기에서 알림 받기') + '</button>';
+    if (msg) h += '<p class="st">' + esc(msg) + '</p>';
+    const ck = (k, t, s) => '<label class="ck"><input class="sr" type="checkbox" data-pref="' + k + '"' + (prefs[k] !== false ? ' checked' : '') + '><span class="box">' + SVG_CHECK + '</span><span><b>' + t + '</b><small>' + s + '</small></span></label>';
+    h += '<div>' + ck('events', '일정 알림', '일정마다 정한 시간(30분 전 등)에 와요') + ck('anniv', '기념일 · 특별한 날', '아침 9시에 와요. 100일 같은 큰 날은 일주일 전에도') + ck('partner', '상대가 일정을 적었을 때', '') + ck('comments', '상대가 댓글을 달았을 때', '') + '</div>';
+    h += '<p class="st" style="font-size:12.5px;color:var(--muted);margin-top:-6px">이 체크는 내 모든 기기에 똑같이 적용돼요.</p>';
+    h += '<div class="dlg-btns">' + (on ? '<button type="button" class="ghost" id="pTest">시험 알림 보내기</button>' : '') + '<button type="button" class="go" id="pClose">닫기</button></div></div></div>';
+    el.innerHTML = h;
+    $('pClose').onclick = close;
+    el.querySelectorAll('[data-pref]').forEach(c => c.onchange = async () => {
+      prefs[c.dataset.pref] = c.checked;
+      try { await q(sb.from('push_prefs').upsert({ user_id: me.id, events: prefs.events !== false, anniv: prefs.anniv !== false, partner: prefs.partner !== false, comments: prefs.comments !== false }, { onConflict: 'user_id' })); }
+      catch (e) { toast(isMissing(e) ? 'Supabase에서 푸시_추가.sql을 먼저 실행해 주세요.' : failMsg(e)); }
+    });
+    const t = $('pTest'); if (t) t.onclick = async () => {
+      t.disabled = true; t.textContent = '보내는 중…';
+      try { const { data, error } = await sb.functions.invoke('send-push', { body: { type: 'test' } }); if (error) throw error; toast(data && data.result && data.result.some(x => x === 201 || x === 200) ? '시험 알림을 보냈어요. 곧 도착해요!' : '보내지 못했어요. 알림을 껐다가 다시 켜 봐 주셔.'); }
+      catch (e) { toast('알림 보내는 기능(send-push)이 아직 준비되지 않았어요.'); }
+      t.disabled = false; t.textContent = '시험 알림 보내기';
+    };
+    const b = $('pOn'); if (b) b.onclick = () => {
+      if (on) {
+        b.disabled = true;
+        (async () => { try { await q(sb.from('push_subs').delete().eq('endpoint', sub.endpoint)); await sub.unsubscribe(); } catch (e) {} await refreshBell(); draw('이 기기 알림을 껐어요.'); })();
+        return;
+      }
+      const ask = Notification.requestPermission();   // 누른 순간 바로 물어봐야 해요 (아이폰)
+      b.disabled = true; b.textContent = '켜는 중…';
+      (async () => {
+        try {
+          if (await ask !== 'granted') { draw(); return; }
+          const r = await swReady; if (!r) throw new Error('sw');
+          const s2 = (await r.pushManager.getSubscription()) || await r.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64uToU8(VAPID_PUBLIC) });
+          await saveSub(s2); await refreshBell(); draw('알림을 켰어요! 시험 알림을 보내 봐 주셔.');
+        } catch (e) { draw(isMissing(e) ? 'Supabase에서 푸시_추가.sql을 먼저 실행해 주세요.' : '알림을 켜지 못했어요. 잠시 후 다시 시도해 주세요.'); }
+      })();
+    };
+    const f = el.querySelector('button'); if (f) f.focus();
+  };
+  el.innerHTML = '<div class="dlg-card"><div class="dlg-in"><p class="st">불러오는 중…</p></div></div>';
+  draw();
+}
+function readHash(){
+  const m = location.hash.match(/d=(\d{4}-\d\d-\d\d)/), e = location.hash.match(/e=([\w-]+)/);
+  if (!m) return false;
+  selKey = m[1]; selEv = e ? e[1] : null; const p = pk(selKey); viewY = p.y; viewM = p.m; mode = 'day'; adding = false;
+  return true;
+}
+addEventListener('hashchange', () => { if (readHash() && ready && mode !== 'form') { renderAll(); if (isMobile()) $('panel').scrollIntoView({ block: 'start' }); } });
+
 /* ---------- 버튼 연결 ---------- */
-document.querySelectorAll('.lg').forEach(b => {
+$('bellBtn').onclick = openBell;
+document.querySelectorAll('.lg[data-who]').forEach(b => {
   b.setAttribute('aria-pressed', filters[b.dataset.who]);
   b.onclick = () => { filters[b.dataset.who] = !filters[b.dataset.who]; b.setAttribute('aria-pressed', filters[b.dataset.who]); try { localStorage.setItem('cal-filters', JSON.stringify(filters)); } catch (e) {} if (mode === 'form') renderCal(); else renderAll(); };
 });
@@ -870,7 +976,11 @@ tick(); setInterval(tick, 1000); renderCal(); renderUp(); renderPanel();
   const { data } = await sb.auth.getSession();
   if (!data || !data.session) { location.replace('index.html'); return; }
   me = data.session.user;
+  readHash();
   await loadData(); renderAll();
+  if (location.hash && isMobile()) $('panel').scrollIntoView({ block: 'start' });
+  // 이미 알림을 켠 기기는 정보를 새로 맞춰 둬요
+  if (pushSupport() === 'ok' && 'Notification' in window && Notification.permission === 'granted') { const s = await refreshBell(); if (s) saveSub(s).catch(() => {}); }
 })();
 })();
 </script>
