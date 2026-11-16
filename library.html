@@ -992,6 +992,12 @@ input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=submit])
 .btn:disabled,.login-submit:disabled,.go:disabled,.ghost:disabled,body.busy,body.busy *{cursor:url(img/cursor/wait.png) 5 4,wait!important}
 [draggable=true]{cursor:url(img/cursor/move.png) 16 16,move!important}
 }
+
+/* ===== 본문 양쪽 정렬 (2026-11-17): txt · md 모두. 구분선(* * *)은 가운데 그대로
+   단어 중간에서도 줄을 바꿔서(전자책처럼) 띄어쓰기가 넓게 벌어지지 않게 ===== */
+.body{text-align:justify;word-break:normal;line-break:normal}
+.body.txt p.brk{text-align:center}
+.body.md pre{text-align:left}
 </style>
 </head>
 <body data-theme="berry">
