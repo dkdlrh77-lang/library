@@ -922,6 +922,66 @@ body[data-theme="night"] .yz-stamp{color:#d9675b;border-color:#d9675b}
  .yz-search .go{font-size:17px;padding:0 12px}
 }
 
+/* ===== 형광펜 + 댓글 미리 보기 (2026-11-16) — 긴토키 분홍 / 히지카타 노랑 ===== */
+:root,body[data-theme="berry"]{--hl-g:#F9C3D2;--hl-h:#FFE48A;--hl-g-s:#F6A6BD;--hl-h-s:#FFD95A}
+body[data-theme="night"]{--hl-g:rgba(237,105,141,.38);--hl-h:rgba(240,200,80,.32);--hl-g-s:#E58AA6;--hl-h-s:#E9C35A}
+mark.hl{color:inherit;background:var(--hl-g);border-radius:2px;padding:.06em 0;-webkit-box-decoration-break:clone;box-decoration-break:clone;cursor:pointer}
+mark.hl-h{background:var(--hl-h)}
+mark.hl-gh{background:linear-gradient(var(--hl-g) 0 50%,var(--hl-h) 50% 100%)}
+mark.hl.flash{outline:2px solid var(--gold);outline-offset:1px}
+.rb-cm{position:relative;height:34px;padding:0 12px;border:1.5px solid var(--line);border-radius:17px;background:var(--surface);color:var(--text);display:inline-flex;align-items:center;gap:5px;font-size:13px;white-space:nowrap}
+.rb-cm:hover{background:var(--hover)}
+.rb-cm[aria-expanded="true"]{background:var(--primary);border-color:var(--gold);color:var(--on-primary)}
+.rb-cm .dot{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--heart);border:2px solid var(--page)}
+.hlbar{position:fixed;z-index:45;display:flex;align-items:center;gap:2px;padding:5px;background:#191513;border-radius:12px;box-shadow:0 8px 20px rgba(25,21,19,.28);animation:fade .12s}
+.hlbar button{height:36px;padding:0 12px;border:0;border-radius:8px;background:transparent;color:#fff;display:inline-flex;align-items:center;justify-content:center;gap:7px;font-size:13px;white-space:nowrap}
+.hlbar button:hover{background:rgba(255,255,255,.1)}
+.hlbar .sw{width:14px;height:14px;border-radius:4px;background:var(--hl-g-s)}
+.hlbar .go.hiji .sw{background:var(--hl-h-s)}
+.hlbar .sep{width:1px;height:20px;background:#5a5050}
+.hlpop{position:fixed;z-index:45;display:flex;flex-direction:column;align-items:flex-start;gap:4px;max-width:min(300px,calc(100vw - 16px));padding:9px 10px 9px 12px;background:var(--surface);border:1.5px solid var(--line);border-radius:12px;box-shadow:var(--pop-shadow);font-size:12.5px;color:var(--muted);animation:fade .12s}
+.hlpop span{display:flex;align-items:center;gap:6px}
+.hlpop b{color:var(--text);font-weight:600}
+.hlpop .btn.text{padding:4px 0;color:var(--danger)}
+i.sw{display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--hl-g-s)}
+i.sw.hiji{background:var(--hl-h-s)}
+.cpv{position:fixed;top:52px;right:0;bottom:0;width:380px;z-index:25;background:var(--surface);border-left:1.5px solid var(--line);box-shadow:-8px 0 24px rgba(59,55,64,.08);display:flex;flex-direction:column;animation:fade .12s}
+.cpv-head{display:flex;align-items:center;padding:12px 8px 0 20px}
+.cpv-head h2{flex:1;margin:0;font:600 18px/1.4 var(--f-title)}
+.cpv-tabs{display:flex;gap:6px;padding:6px 20px 0}
+.cpv-tabs button{height:34px;padding:0 14px;border:1.5px solid var(--line);border-radius:17px;background:var(--surface);color:var(--muted);font-size:13px}
+.cpv-tabs button[aria-selected="true"]{background:var(--tab-on);border-color:var(--gold);color:var(--tab-on-text)}
+.cpv-note{margin:12px 20px 0;padding:8px 12px;border-radius:10px;background:var(--hover);color:var(--muted);font-size:12px;line-height:1.6}
+.cpv-list{flex:1;min-height:0;overflow:auto;padding:16px 20px;display:flex;flex-direction:column;gap:10px}
+.cpv-list .cmt-list{gap:12px}
+.cpv-list .cmt{max-width:92%}
+.cpv-list .c-body{font-size:16px}
+.c-new{color:var(--heart);font-size:11px}
+.cpv-foot{padding:12px 20px calc(16px + var(--safe-b));border-top:1px dashed var(--line)}
+.cpv-foot .btn{width:100%;height:44px}
+.hli{display:flex;gap:10px;width:100%;text-align:left;padding:10px 12px;border:1.5px solid var(--line);border-radius:12px;background:var(--page);color:var(--text)}
+.hli:hover{border-color:var(--accent)}
+.hli>i{flex-shrink:0;width:6px;border-radius:3px;background:var(--hl-g-s)}
+.hli.hiji>i{background:var(--hl-h-s)}
+.hli small{display:block;font-size:11.5px;color:var(--muted);margin-bottom:3px}
+.hli .qt{font:15px/1.6 var(--rfont);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;word-break:keep-all}
+@media (min-width:768px){body.cpv-open main{padding-right:380px}}
+@media (max-width:767px){
+ .rb-cm{height:34px;padding:0 10px}
+ .rb-cm .lb{display:none}
+ .rbar-right .rpct{display:none}
+ .hlbar{left:12px!important;right:12px;top:auto!important;bottom:calc(16px + var(--safe-b));padding:8px;gap:8px;border-radius:16px}
+ .hlbar button{flex:1;height:46px;font-size:15px;border-radius:12px}
+ .hlbar .go{background:var(--hl-g-s);color:#3a2329;font-weight:700}
+ .hlbar .go.hiji{background:var(--hl-h-s)}
+ .hlbar .go .sw{display:none}
+ .hlbar .sep{display:none}
+ .hlbar [data-hdel]{border:1.5px solid #5a5050}
+ .cpv-scrim{position:fixed;inset:0;z-index:61;background:var(--scrim);animation:fade .14s}
+ .cpv{top:auto;left:0;width:auto;height:min(78dvh,640px);z-index:62;border-left:0;border-top:3px solid var(--gold);border-radius:18px 18px 0 0;box-shadow:none;animation:slideup .18s ease-out}
+ .cpv::before{content:"";display:block;width:36px;height:4px;border-radius:2px;background:var(--line);margin:8px auto 0;flex-shrink:0}
+}
+
 /* 고양이 마우스 커서 (PC만) 2026-11-16 */
 @media (hover:hover) and (pointer:fine){
 html,body{cursor:url(img/cursor/default.png) 0 0,auto}
@@ -1771,7 +1831,9 @@ async function renderReader(id){
     '<div class="rprog" id="rprog"></div>' +
     '<header class="rbar"><button class="back" id="backBtn" aria-label="서재로">' + ic('back') + '<span>서재로</span></button>' +
     '<div class="rbar-title">' + esc(n.title) + '</div>' +
-    '<div class="rbar-right"><span class="rpct" id="rpct" aria-label="읽은 정도">0%</span><button class="btn ghost" id="setBtn" aria-haspopup="dialog">보기 설정</button></div></header>' +
+    '<div class="rbar-right"><span class="rpct" id="rpct" aria-label="읽은 정도">0%</span>' +
+    '<button class="rb-cm" id="cmBtn" aria-haspopup="dialog" aria-expanded="false">' + ic('chat','sm') + '<span class="lb">댓글</span> <span id="cmN">' + (cmtCount(n.id) || '') + '</span><span class="dot hidden" id="cmDot"></span><span class="sr" id="cmSr"></span></button>' +
+    '<button class="btn ghost" id="setBtn" aria-haspopup="dialog">보기 설정</button></div></header>' +
     '<main><article class="article"><div class="a-folder">' + (isPrivFolder(n.folderId) ? ic('lock','sm') : '') + esc(folderName(n.folderId)) + '</div>' +
     '<h1 class="a-title">' + esc(n.title) + '</h1>' +
     '<div class="a-meta" id="aMeta"></div>' +
@@ -1781,6 +1843,10 @@ async function renderReader(id){
   drawMeta();
   $app.querySelector('#backBtn').onclick = () => { location.hash = ''; };
   $app.querySelector('#setBtn').onclick = toggleSettings;
+  $app.querySelector('#cmBtn').onclick = () => togglePreview(n);
+  closeReaderLayers();
+  hlList = []; hlFor = n.id; hlText = null;
+  updateCmBtn(n);
   window.scrollTo(0, 0);
 
   let text;
@@ -1788,6 +1854,7 @@ async function renderReader(id){
   catch(e) { const h = $app.querySelector('#bodyHost'); if (h) h.innerHTML = '<div class="state"><b>본문을 불러오지 못했어요.</b><p>인터넷 연결을 확인해 주세요.</p><button class="btn" id="rRetry">다시 시도</button></div>'; const b = $app.querySelector('#rRetry'); if (b) b.onclick = () => renderReader(id); return; }
   if (readerId !== id) return;
   $app.querySelector('#bodyHost').innerHTML = renderBody(n, text);
+  hlText = text; loadHighlights(n);
 
   const sib = sorted(lib.novels.filter(x => x.folderId === n.folderId));
   const i = sib.findIndex(x => x.id === n.id);
@@ -1812,6 +1879,11 @@ async function renderReader(id){
   drawEnd();
   end._redraw = () => { drawEnd(); drawMeta(); };
   loadComments(n);
+  // 작품 끝(댓글 칸)까지 오면 댓글을 본 걸로 쳐요
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(es => { if (es.some(x => x.isIntersecting) && cmtFor === n.id && cmtState === 'ok') { markSeen(n.id); updateCmBtn(n); } }, { rootMargin: '0px 0px -30% 0px' });
+    io.observe(end); end._io = io;
+  }
 
   const p = progress[n.id];
   if (p && p > 0.01 && p < 0.95) {
@@ -1853,9 +1925,9 @@ async function loadComments(n){
     if (cmtFor !== n.id) return;
     cmtList = rows; cmtState = 'ok';
     cmtMeta[n.id] = rows.map(r => ({ user_id: r.user_id, created_at: r.created_at }));
-    markSeen(n.id);
+    // 본 걸로 치는 건 미리 보기를 열었을 때 / 작품 끝 댓글 칸까지 왔을 때 (2026-11-16)
   } catch(e) { if (cmtFor !== n.id) return; cmtState = /relation|does not exist|schema cache|42P01|PGRST/i.test((e && (e.message || e.code)) + '') ? 'nosetup' : 'fail'; }
-  drawComments(n);
+  drawComments(n); updateCmBtn(n); drawPreview(n);
 }
 function drawComments(n){
   const box = document.getElementById('cmts'); if (!box || cmtFor !== n.id) return;
@@ -1893,7 +1965,7 @@ function drawComments(n){
         const row = await q(sb.from('comments').insert({ novel_id: n.id, body }).select('id,user_id,body,created_at,updated_at').single());
         cmtList.push(row); cmtDraft = '';
         (cmtMeta[n.id] = cmtMeta[n.id] || []).push({ user_id: row.user_id, created_at: row.created_at });
-        markSeen(n.id); drawComments(n);
+        markSeen(n.id); drawComments(n); updateCmBtn(n); drawPreview(n);
         const t = document.querySelector('#cmts textarea'); if (t) t.focus({ preventScroll: true });
       } catch(err) { btn.disabled = false; toast(failMsg(err)); }
     };
@@ -1904,7 +1976,7 @@ function drawComments(n){
       await q(sb.from('comments').delete().eq('id', b.dataset.cdel));
       cmtList = cmtList.filter(c => c.id !== b.dataset.cdel);
       cmtMeta[n.id] = cmtList.map(r => ({ user_id: r.user_id, created_at: r.created_at }));
-      drawComments(n);
+      drawComments(n); updateCmBtn(n); drawPreview(n);
     } catch(err) { toast(failMsg(err)); }
   });
   box.querySelectorAll('[data-cedit]').forEach(b => b.onclick = () => {
@@ -1920,11 +1992,207 @@ function drawComments(n){
       try {
         const now = new Date().toISOString();
         await q(sb.from('comments').update({ body, updated_at: now }).eq('id', c.id));
-        c.body = body; c.updated_at = now; drawComments(n);
+        c.body = body; c.updated_at = now; drawComments(n); drawPreview(n);
       } catch(err) { toast(failMsg(err)); }
     };
   });
 }
+
+/* ---------- 미리 보기 (댓글 · 형광펜) — 끝까지 안 읽어도 볼 수 있어요 (2026-11-16) ---------- */
+let cpvTab = 'c';
+function updateCmBtn(n){
+  const b = document.getElementById('cmBtn'); if (!b || !n || readerId !== n.id) return;
+  const cnt = cmtState === 'ok' && cmtFor === n.id ? cmtList.length : cmtCount(n.id), nw = cmtNew(n.id);
+  document.getElementById('cmN').textContent = cnt || '';
+  document.getElementById('cmDot').classList.toggle('hidden', !nw);
+  document.getElementById('cmSr').textContent = nw ? '새 댓글 있음' : '';
+  b.setAttribute('aria-label', '댓글 ' + cnt + '개 · 형광펜 미리 보기' + (nw ? ', 새 댓글 있음' : ''));
+}
+function closePreview(){
+  const p = document.querySelector('.cpv'); if (!p) return;
+  p.remove(); document.querySelectorAll('.cpv-scrim').forEach(x => x.remove());
+  document.body.classList.remove('cpv-open');
+  document.removeEventListener('keydown', p._key);
+  const b = document.getElementById('cmBtn'); if (b) { b.setAttribute('aria-expanded', 'false'); if (p._focus) b.focus(); }
+}
+function togglePreview(n){
+  if (document.querySelector('.cpv')) { closePreview(); return; }
+  hideHlBar(); hideHlPop();
+  const p = document.createElement('aside'); p.className = 'cpv'; p.setAttribute('role', 'dialog'); p.setAttribute('aria-label', '댓글 · 형광펜 미리 보기');
+  if (isMobile()) { const sc = document.createElement('div'); sc.className = 'cpv-scrim'; sc.onclick = closePreview; document.body.appendChild(sc); }
+  document.body.appendChild(p); document.body.classList.add('cpv-open');
+  p._key = e => { if (e.key === 'Escape') { p._focus = true; closePreview(); } };
+  document.addEventListener('keydown', p._key);
+  document.getElementById('cmBtn').setAttribute('aria-expanded', 'true');
+  drawPreview(n);
+  setTimeout(() => { const x = p.querySelector('[data-cx]'); if (x) x.focus(); }, 20);
+}
+function drawPreview(n){
+  const p = document.querySelector('.cpv'); if (!p || !n || readerId !== n.id) return;
+  const cc = cmtState === 'ok' ? cmtList.length : cmtCount(n.id);
+  let h = '<div class="cpv-head"><h2>미리 보기</h2><button class="icon-btn" data-cx aria-label="닫기">' + ic('x') + '</button></div>' +
+    '<div class="cpv-tabs" role="tablist"><button role="tab" data-t="c" aria-selected="' + (cpvTab === 'c') + '">댓글 ' + cc + '</button><button role="tab" data-t="h" aria-selected="' + (cpvTab === 'h') + '">형광펜 ' + hlList.length + '</button></div>';
+  if (cpvTab === 'c') {
+    h += '<p class="cpv-note">끝까지 안 읽어도 볼 수 있어요. 결말 이야기가 있을 수 있으니 조심!</p><div class="cpv-list">';
+    if (cmtState === 'loading') h += '<div class="c-empty">댓글을 불러오는 중…</div>';
+    else if (cmtState !== 'ok') h += '<div class="c-empty">댓글을 불러오지 못했어요.</div>';
+    else if (!cmtList.length) h += '<div class="c-empty">아직 댓글이 없어요.</div>';
+    else h += '<ul class="cmt-list">' + cmtList.map(c => {
+      const mine = c.user_id === me.id, fresh = !mine && Date.parse(c.created_at) > (cmtSeen[n.id] || 0);
+      return '<li class="cmt' + (mine ? ' mine' : '') + '"><div class="c-head"><b>' + esc(mine ? (members[me.id] || '나') : (members[c.user_id] || '동행')) + '</b><time datetime="' + c.created_at + '">' + fmtD(c.created_at) + '</time>' + (fresh ? '<span class="c-new">새 댓글</span>' : '') + '</div><div class="c-body">' + esc(c.body) + '</div></li>';
+    }).join('') + '</ul>';
+    h += '</div><div class="cpv-foot"><button class="btn primary" data-goend>끝으로 가서 댓글 쓰기 ↓</button></div>';
+  } else {
+    h += '<p class="cpv-note">누르면 그 줄로 가요. 내 형광펜은 그은 곳을 눌러서 지울 수 있어요.</p><div class="cpv-list">';
+    if (!hlOK) h += '<div class="c-empty">형광펜을 쓰려면 Supabase에서 형광펜_퀘스트날짜_추가.sql을 실행해 주세요.</div>';
+    else if (!hlList.length) h += '<div class="c-empty">아직 그은 형광펜이 없어요.<br>본문 글자를 길게 눌러 골라 보세요.</div>';
+    else h += hlList.slice().sort((a, b) => a.start_pos - b.start_pos).map(x =>
+      '<button class="hli ' + hlKind(x.user_id) + '" data-hgo="' + x.id + '"><i aria-hidden="true"></i><span><small>' + esc(hlName(x.user_id)) + ' · ' + fmtD(x.created_at) + '</small><span class="qt">' + esc(x.quote) + '</span></span></button>').join('');
+    h += '</div>';
+  }
+  p.innerHTML = h;
+  p.querySelector('[data-cx]').onclick = () => { p._focus = true; closePreview(); };
+  p.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { cpvTab = b.dataset.t; drawPreview(n); if (cpvTab === 'c' && cmtState === 'ok') { markSeen(n.id); updateCmBtn(n); } });
+  const ge = p.querySelector('[data-goend]');
+  if (ge) ge.onclick = () => { closePreview(); const c = document.getElementById('cmts'); if (c) { c.scrollIntoView({ behavior: 'smooth', block: 'start' }); setTimeout(() => { const t = c.querySelector('textarea'); if (t) t.focus({ preventScroll: true }); }, 500); } };
+  p.querySelectorAll('[data-hgo]').forEach(b => b.onclick = () => {
+    const m = document.querySelector('.body mark[data-hl~="' + b.dataset.hgo + '"]'); if (!m) return;
+    if (isMobile()) closePreview();
+    m.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.querySelectorAll('.body mark[data-hl~="' + b.dataset.hgo + '"]').forEach(x => { x.classList.add('flash'); setTimeout(() => x.classList.remove('flash'), 1800); });
+  });
+  if (cpvTab === 'c' && cmtState === 'ok') { markSeen(n.id); updateCmBtn(n); }
+}
+
+/* ---------- 형광펜 — 긴토키 분홍 / 히지카타 노랑 고정 (2026-11-16) ---------- */
+let hlList = [], hlFor = null, hlOK = true, hlText = null, hlSel = null;
+// 주인 계정 = 긴토키, 다른 계정 = 히지카타
+const hlKind = uid => ((uid === me.id) === isOwner) ? 'gin' : 'hiji';
+const hlName = uid => members[uid] || (hlKind(uid) === 'gin' ? '긴토키' : '히지카타');
+async function loadHighlights(n){
+  try {
+    const rows = await q(sb.from('highlights').select('id,user_id,start_pos,end_pos,quote,created_at').eq('novel_id', n.id));
+    if (hlFor !== n.id) return;
+    hlList = rows; hlOK = true; paintHighlights(n);
+  } catch(e) { if (hlFor !== n.id) return; hlOK = false; hlList = []; }
+  drawPreview(n);
+}
+function bodyEl(){ return document.querySelector('#bodyHost .body'); }
+function paintHighlights(n){
+  const host = document.getElementById('bodyHost'); if (!host || hlText == null || readerId !== n.id) return;
+  host.innerHTML = renderBody(n, hlText);
+  const body = bodyEl(); if (!body || !hlList.length) return;
+  const walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT), nodes = [];
+  let pos = 0;
+  while (walker.nextNode()) { const t = walker.currentNode; nodes.push([t, pos]); pos += t.nodeValue.length; }
+  nodes.forEach(([t, s]) => {
+    const e = s + t.nodeValue.length;
+    const hits = hlList.filter(h => h.start_pos < e && h.end_pos > s);
+    if (!hits.length) return;
+    const cuts = new Set([s, e]); hits.forEach(h => { cuts.add(Math.max(s, h.start_pos)); cuts.add(Math.min(e, h.end_pos)); });
+    const pts = [...cuts].sort((a, b) => a - b), frag = document.createDocumentFragment();
+    for (let i = 0; i < pts.length - 1; i++) {
+      const a = pts[i], b = pts[i + 1], txt = t.nodeValue.slice(a - s, b - s);
+      const cov = hits.filter(h => h.start_pos <= a && h.end_pos >= b);
+      if (!cov.length || !txt) { frag.appendChild(document.createTextNode(txt)); continue; }
+      const g = cov.some(h => hlKind(h.user_id) === 'gin'), hj = cov.some(h => hlKind(h.user_id) === 'hiji');
+      const m = document.createElement('mark'); m.className = 'hl ' + (g && hj ? 'hl-gh' : g ? 'hl-g' : 'hl-h');
+      m.dataset.hl = cov.map(h => h.id).join(' '); m.textContent = txt; frag.appendChild(m);
+    }
+    t.parentNode.replaceChild(frag, t);
+  });
+}
+// 고른 글자의 위치 (본문 처음부터 몇 번째 글자인지)
+function selInBody(){
+  const body = bodyEl(), s = window.getSelection();
+  if (!body || !s || !s.rangeCount || s.isCollapsed) return null;
+  const r = s.getRangeAt(0);
+  if (!body.contains(r.commonAncestorContainer) && !r.intersectsNode(body)) return null;
+  const all = document.createRange(); all.selectNodeContents(body);
+  const a = document.createRange();
+  if (r.compareBoundaryPoints(Range.START_TO_START, all) < 0) a.setStart(all.startContainer, all.startOffset); else a.setStart(r.startContainer, r.startOffset);
+  if (r.compareBoundaryPoints(Range.END_TO_END, all) > 0) a.setEnd(all.endContainer, all.endOffset); else a.setEnd(r.endContainer, r.endOffset);
+  const pre = document.createRange(); pre.setStart(body, 0); pre.setEnd(a.startContainer, a.startOffset);
+  const start = pre.toString().length, txt = a.toString(), end = start + txt.length;
+  if (!txt.trim()) return null;
+  return { start, end, rect: a.getBoundingClientRect() };
+}
+function hideHlBar(){ document.querySelectorAll('.hlbar').forEach(x => x.remove()); }
+function hideHlPop(){ document.querySelectorAll('.hlpop').forEach(x => x.remove()); }
+function closeReaderLayers(){ hideHlBar(); hideHlPop(); closePreview(); hlSel = null; }
+function showHlBar(sel){
+  const n = getNovel(readerId); if (!n) return;
+  hideHlPop();
+  let bar = document.querySelector('.hlbar');
+  if (!bar) {
+    bar = document.createElement('div'); bar.className = 'hlbar'; bar.setAttribute('role', 'toolbar'); bar.setAttribute('aria-label', '형광펜');
+    bar.addEventListener('mousedown', e => e.preventDefault());   // 버튼 눌러도 고른 글자가 풀리지 않게
+    document.body.appendChild(bar);
+  }
+  const mineOv = hlList.some(h => h.user_id === me.id && h.start_pos < sel.end && h.end_pos > sel.start);
+  bar.innerHTML = '<button class="go ' + hlKind(me.id) + '" data-hadd><span class="sw" aria-hidden="true"></span>형광펜 긋기</button>' +
+    (mineOv ? '<span class="sep" aria-hidden="true"></span><button data-hdel>내 형광펜 지우기</button>' : '');
+  bar.querySelector('[data-hadd]').onclick = () => addHighlight(n, hlSel);
+  const d = bar.querySelector('[data-hdel]'); if (d) d.onclick = () => removeMine(n, hlSel);
+  if (isMobile()) { bar.style.left = ''; bar.style.top = ''; return; }
+  const w = bar.offsetWidth, r = sel.rect;
+  let left = r.left + r.width / 2 - w / 2; left = Math.max(8, Math.min(left, innerWidth - w - 8));
+  let top = r.top - bar.offsetHeight - 10; if (top < 60) top = r.bottom + 10;
+  bar.style.left = left + 'px'; bar.style.top = top + 'px';
+}
+let selT = null;
+document.addEventListener('selectionchange', () => {
+  if (view !== 'reader' || !bodyEl()) return;
+  clearTimeout(selT);
+  selT = setTimeout(() => { const s = selInBody(); hlSel = s; if (s) showHlBar(s); else hideHlBar(); }, 180);
+});
+window.addEventListener('scroll', () => { if (view === 'reader') { hideHlPop(); if (hlSel && !isMobile()) { const s = selInBody(); if (s) showHlBar(s); } } }, { passive: true });
+function clearSel(){ try { window.getSelection().removeAllRanges(); } catch(e){} hlSel = null; hideHlBar(); }
+async function addHighlight(n, sel){
+  if (!sel) return;
+  if (!hlOK) { toast('형광펜을 쓰려면 Supabase에서 형광펜_퀘스트날짜_추가.sql을 실행해 주세요.', 4500); return; }
+  // 내 형광펜과 겹치면 하나로 합쳐요
+  const ov = hlList.filter(h => h.user_id === me.id && h.start_pos <= sel.end && h.end_pos >= sel.start);
+  const s = Math.min(sel.start, ...ov.map(h => h.start_pos)), e = Math.max(sel.end, ...ov.map(h => h.end_pos));
+  const body = bodyEl(), quote = body ? body.textContent.slice(s, e).replace(/\s+/g, ' ').trim().slice(0, 1000) : '';
+  clearSel();
+  try {
+    const row = await q(sb.from('highlights').insert({ novel_id: n.id, start_pos: s, end_pos: e, quote }).select('id,user_id,start_pos,end_pos,quote,created_at').single());
+    if (ov.length) await q(sb.from('highlights').delete().in('id', ov.map(h => h.id)));
+    hlList = hlList.filter(h => ov.indexOf(h) < 0); hlList.push(row);
+    paintHighlights(n); drawPreview(n);
+  } catch(err) { toast(/relation|does not exist|schema cache|42P01|PGRST/i.test((err && (err.message || err.code)) + '') ? '형광펜을 쓰려면 Supabase에서 형광펜_퀘스트날짜_추가.sql을 실행해 주세요.' : failMsg(err), 4500); }
+}
+async function removeMine(n, sel, ids){
+  const del = ids ? hlList.filter(h => ids.indexOf(h.id) >= 0 && h.user_id === me.id) : hlList.filter(h => h.user_id === me.id && sel && h.start_pos < sel.end && h.end_pos > sel.start);
+  clearSel(); hideHlPop();
+  if (!del.length) return;
+  try {
+    await q(sb.from('highlights').delete().in('id', del.map(h => h.id)));
+    hlList = hlList.filter(h => del.indexOf(h) < 0); paintHighlights(n); drawPreview(n); toast('형광펜을 지웠어요');
+  } catch(err) { toast(failMsg(err)); }
+}
+// 그은 곳을 누르면: 누가 그었는지 + 내 것이면 지우기
+document.addEventListener('click', e => {
+  if (view !== 'reader') return;
+  if (e.target.closest && e.target.closest('.hlpop')) return;
+  const m = e.target.closest && e.target.closest('.body mark.hl');
+  hideHlPop();
+  if (!m) return;
+  const s = window.getSelection(); if (s && !s.isCollapsed) return;
+  const n = getNovel(readerId); if (!n) return;
+  const ids = (m.dataset.hl || '').split(' '), hs = hlList.filter(h => ids.indexOf(h.id) >= 0);
+  if (!hs.length) return;
+  const mine = hs.filter(h => h.user_id === me.id);
+  const pop = document.createElement('div'); pop.className = 'hlpop';
+  pop.innerHTML = hs.map(h => '<span><i class="sw ' + hlKind(h.user_id) + '" aria-hidden="true"></i><b>' + esc(hlName(h.user_id)) + '</b>가 그음 · ' + fmtD(h.created_at) + '</span>').join('') +
+    (mine.length ? '<button class="btn text" data-hx>지우기</button>' : '');
+  document.body.appendChild(pop);
+  const r = m.getBoundingClientRect(), w = pop.offsetWidth;
+  pop.style.left = Math.max(8, Math.min(r.left + r.width / 2 - w / 2, innerWidth - w - 8)) + 'px';
+  pop.style.top = (r.bottom + 8 + pop.offsetHeight > innerHeight ? r.top - pop.offsetHeight - 8 : r.bottom + 8) + 'px';
+  const x = pop.querySelector('[data-hx]'); if (x) x.onclick = () => removeMine(n, null, mine.map(h => h.id));
+});
 
 /* ---------- view settings ---------- */
 const STEPS = {
@@ -1981,6 +2249,7 @@ function route(){
   if (!me) return;
   const m = location.hash.match(/^#r-([A-Za-z0-9-]+)$/);
   document.querySelectorAll('.vset').forEach(s => s._close ? s._close() : s.remove());
+  if (!m || readerId !== m[1]) closeReaderLayers();
   if (m) {
     if (view === 'reader' && readerId === m[1] && document.querySelector('.body')) return;
     view = 'reader'; readerId = m[1]; renderReader(readerId);
