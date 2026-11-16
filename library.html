@@ -942,7 +942,21 @@ mark.hl.flash{outline:2px solid var(--gold);outline-offset:1px}
 .hlpop{position:fixed;z-index:45;display:flex;flex-direction:column;align-items:flex-start;gap:4px;max-width:min(300px,calc(100vw - 16px));padding:9px 10px 9px 12px;background:var(--surface);border:1.5px solid var(--line);border-radius:12px;box-shadow:var(--pop-shadow);font-size:12.5px;color:var(--muted);animation:fade .12s}
 .hlpop span{display:flex;align-items:center;gap:6px}
 .hlpop b{color:var(--text);font-weight:600}
-.hlpop .btn.text{padding:4px 0;color:var(--danger)}
+.hlpop .btn.text{padding:4px 0;color:var(--text)}
+.hlpop .btn.text.del{color:var(--danger)}
+/* 형광펜 첨언 (2026-11-17) */
+.hlpop{max-height:min(70dvh,460px);overflow:auto}
+.hlpop .hp-it{display:flex;flex-direction:column;gap:3px;width:100%}
+.hlpop .hp-note,.hli .hn{margin:0;padding:6px 9px;border-radius:8px;background:var(--hover);color:var(--text);font:400 15px/1.55 'DongpaKkeujeogim',var(--f-ui);white-space:pre-wrap;overflow-wrap:anywhere}
+.hlpop .hp-acts{display:flex;gap:14px;margin-top:2px}
+.hli .hn{display:block;margin-top:6px;font-size:14.5px}
+mark.hl.nt{text-decoration:underline dotted 1.5px;text-decoration-color:var(--muted);text-underline-offset:.28em}
+.hlbar .nt{border:1px solid #5a5050}
+.nt-quote{margin:12px 0 0;padding:8px 12px;border-left:4px solid var(--hl-g-s);border-radius:4px;background:var(--hover);font:14px/1.6 var(--rfont);color:var(--text);display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.nt-quote.hiji{border-left-color:var(--hl-h-s)}
+.modal textarea.nt-in{width:100%;min-height:96px;max-height:40dvh;resize:none;padding:12px 16px;border:1.5px solid var(--line);border-radius:16px;background:var(--page);font:400 17px/1.6 'DongpaKkeujeogim',var(--f-ui);color:var(--text)}
+.modal textarea.nt-in:focus{border-color:var(--focus);outline:none}
+.nt-cnt{font-size:12px;color:var(--muted);text-align:right;margin-top:4px;min-height:18px}
 i.sw{display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--hl-g-s)}
 i.sw.hiji{background:var(--hl-h-s)}
 .cpv{position:fixed;top:52px;right:0;bottom:0;width:380px;z-index:25;background:var(--surface);border-left:1.5px solid var(--line);box-shadow:-8px 0 24px rgba(59,55,64,.08);display:flex;flex-direction:column;animation:fade .12s}
@@ -976,7 +990,7 @@ i.sw.hiji{background:var(--hl-h-s)}
  .hlbar .go.hiji{background:var(--hl-h-s)}
  .hlbar .go .sw{display:none}
  .hlbar .sep{display:none}
- .hlbar [data-hdel]{border:1.5px solid #5a5050}
+ .hlbar [data-hdel],.hlbar .nt{border:1.5px solid #5a5050;font-size:14px}
  .cpv-scrim{position:fixed;inset:0;z-index:61;background:var(--scrim);animation:fade .14s}
  .cpv{top:auto;left:0;width:auto;height:min(78dvh,640px);z-index:62;border-left:0;border-top:3px solid var(--gold);border-radius:18px 18px 0 0;box-shadow:none;animation:slideup .18s ease-out}
  .cpv::before{content:"";display:block;width:36px;height:4px;border-radius:2px;background:var(--line);margin:8px auto 0;flex-shrink:0}
@@ -992,6 +1006,10 @@ input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=submit])
 .btn:disabled,.login-submit:disabled,.go:disabled,.ghost:disabled,body.busy,body.busy *{cursor:url(img/cursor/wait.png) 5 4,wait!important}
 [draggable=true]{cursor:url(img/cursor/move.png) 16 16,move!important}
 }
+
+/* 상대 최근 하트순일 때 메타에 '히지카타 ♥5 · 11.16' (2026-11-17) */
+.yz .r-meta .r-pt{color:var(--heart);font-weight:700}
+body[data-theme="night"] .yz .r-meta .r-pt{color:#f4b6cc}
 
 /* ===== 본문 양쪽 정렬 (2026-11-17): txt · md 모두. 구분선(* * *)은 가운데 그대로
    단어 중간에서도 줄을 바꿔서(전자책처럼) 띄어쓰기가 넓게 벌어지지 않게 ===== */
@@ -1095,7 +1113,7 @@ const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3 4.6
 let sb = null, me = null, isOwner = false, ready = false, loadFailed = false;
 // 간판 이름: 지난번에 불러온 이름을 기억해 두었다가 처음부터 보여 줘요
 let lib = { name: (() => { try { const n = localStorage.getItem('lib-name'); return n && OLD_NAMES.indexOf(n) < 0 ? n : DEFAULT_NAME; } catch(e) { return DEFAULT_NAME; } })(), folders: [], novels: [] };
-let progress = {}, ratings = {}, members = {};
+let progress = {}, ratings = {}, members = {}, rateAt = {};   // rateAt: novelId -> {userId: 하트 찍은 시각}
 let cmtMeta = {}, cmtSeen = {}, cmtOK = true;   // novelId -> [{user_id, created_at}] / novelId -> seen time
 const textCache = {};
 let curFolder = 'all', sortMode = 'new', view = 'library', readerId = null;
@@ -1166,6 +1184,10 @@ function sorted(list){
   if (sortMode === 'new') a.sort((x,y) => y.added - x.added);
   else if (sortMode === 'old') a.sort((x,y) => x.added - y.added);
   else if (sortMode === 'mine') a.sort((x,y) => (myScore(y.id) - myScore(x.id)) || byTitle(x,y));
+  else if (sortMode === 'pt') {   // 상대가 최근에 하트 찍은 순 (하트 없는 작품은 뒤로, 최근 올린 순)
+    const t = id => { const p = partnerId(); return (p && partnerScore(id) && rateAt[id] && rateAt[id][p]) || 0; };
+    a.sort((x,y) => (t(y.id) - t(x.id)) || (y.added - x.added));
+  }
   else if (sortMode === 'avg') a.sort((x,y) => (avgScore(y.id) - avgScore(x.id)) || (rateCount(y.id) - rateCount(x.id)) || byTitle(x,y));
   else a.sort(byTitle);
   return a;
@@ -1362,7 +1384,7 @@ async function loadAll(){
     q(sb.from('novels').select('id,folder_id,title,type,chars,created_at')),
     q(sb.from('progress').select('novel_id,pct')),
     q(sb.rpc('is_owner')),
-    q(sb.from('ratings').select('user_id,novel_id,score')),
+    q(sb.from('ratings').select('user_id,novel_id,score,updated_at')),
     q(sb.from('members').select('user_id,name'))
   ]);
   isOwner = !!owner;
@@ -1371,7 +1393,7 @@ async function loadAll(){
   // 예전 기본 이름이 저장돼 있으면 주인 계정에서 한 번 새 이름으로 바꿔 둬요
   if (isOwner && storedName && OLD_NAMES.indexOf(storedName) >= 0) sb.from('meta').upsert({ key: 'name', value: DEFAULT_NAME }).then(() => {}, () => {});
   progress = {}; prog.forEach(p => progress[p.novel_id] = p.pct);
-  ratings = {}; rates.forEach(r => { (ratings[r.novel_id] = ratings[r.novel_id] || {})[r.user_id] = r.score; });
+  ratings = {}; rateAt = {}; rates.forEach(r => { (ratings[r.novel_id] = ratings[r.novel_id] || {})[r.user_id] = r.score; (rateAt[r.novel_id] = rateAt[r.novel_id] || {})[r.user_id] = Date.parse(r.updated_at) || 0; });
   members = {}; mems.forEach(m => members[m.user_id] = m.name);
   if (!members[me.id]) {
     const nm = ((me.email || '').split('@')[0] || '독자').slice(0, 20);
@@ -1420,6 +1442,7 @@ function setRating(id, score){
   const next = myScore(id) === score ? 0 : score;
   const r = ratings[id] = ratings[id] || {};
   if (next) r[me.id] = next; else delete r[me.id];
+  const ra = rateAt[id] = rateAt[id] || {}; if (next) ra[me.id] = Date.now(); else delete ra[me.id];
   rateQ[id] = (rateQ[id] || Promise.resolve()).then(() => next
     ? q(sb.from('ratings').upsert({ user_id: me.id, novel_id: id, score: next, updated_at: new Date().toISOString() }, { onConflict: 'user_id,novel_id' }))
     : q(sb.from('ratings').delete().eq('novel_id', id).eq('user_id', me.id))
@@ -1566,6 +1589,7 @@ function rowHTML(n){
   const parts = [];
   if (isAll) parts.push('<span class="fold">' + (isPrivFolder(n.folderId) ? ic('lock','sm') + '<span class="sr">비공개 폴더</span>' : '') + esc(folderName(n.folderId)) + '</span>');
   parts.push('<span>' + fmtN(n.chars) + '자</span>', '<span>' + fmtD(n.added) + '</span>');
+  if (sortMode === 'pt') { const pid = partnerId(), ps = partnerScore(n.id), pt = pid && rateAt[n.id] && rateAt[n.id][pid]; if (ps && pt) parts.push('<span class="r-pt">' + esc(partnerName()) + ' ♥' + ps + ' · ' + fmtD(pt).slice(5) + '</span>'); }
   const cc = cmtCount(n.id);
   if (cc) parts.push('<span class="r-cmt' + (cmtNew(n.id) ? ' new' : '') + '">' + ic('chat','sm') + cc + (cmtNew(n.id) ? '<span class="newdot"></span><span class="sr">새 댓글 있음</span>' : '') + '</span>');
   const meta = parts.join('<span aria-hidden="true">·</span>');
@@ -1624,7 +1648,7 @@ function renderLibrary(){
     if (isOwner) h += '<button class="btn" id="folderMenu" aria-haspopup="menu">폴더 설정' + ic('down','sm') + '</button>';
   }
   h += '</div><label class="sort"><span class="sr">정렬</span><select id="sortSel">' +
-       [['new','최근 올린 순'],['name','제목순'],['old','올린 순서'],['mine','내 하트순'],['avg','평균 하트순']].map(o => '<option value="' + o[0] + '"' + (sortMode === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') +
+       [['new','최근 올린 순'],['name','제목순'],['old','올린 순서'],['mine','내 하트순'],['avg','평균 하트순'],['pt', partnerName() + ' 최근 하트순']].map(o => '<option value="' + o[0] + '"' + (sortMode === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') +
        '</select>' + ic('down','sm') + '</label></div>';
 
   if (!ready) h += skeleton();
@@ -1969,7 +1993,7 @@ function drawComments(n){
       const btn = form.querySelector('button[type=submit]'); btn.disabled = true;
       try {
         const row = await q(sb.from('comments').insert({ novel_id: n.id, body }).select('id,user_id,body,created_at,updated_at').single());
-        cmtList.push(row); cmtDraft = '';
+        cmtList.push(row); cmtDraft = ''; ta.value = '';   // 칸을 먼저 비워야 다시 그릴 때 쓰던 글로 안 읽혀요
         (cmtMeta[n.id] = cmtMeta[n.id] || []).push({ user_id: row.user_id, created_at: row.created_at });
         markSeen(n.id); drawComments(n); updateCmBtn(n); drawPreview(n);
         const t = document.querySelector('#cmts textarea'); if (t) t.focus({ preventScroll: true });
@@ -2049,11 +2073,11 @@ function drawPreview(n){
     }).join('') + '</ul>';
     h += '</div><div class="cpv-foot"><button class="btn primary" data-goend>끝으로 가서 댓글 쓰기 ↓</button></div>';
   } else {
-    h += '<p class="cpv-note">누르면 그 줄로 가요. 내 형광펜은 그은 곳을 눌러서 지울 수 있어요.</p><div class="cpv-list">';
+    h += '<p class="cpv-note">누르면 그 줄로 가요. 내 형광펜은 그은 곳을 눌러서 첨언을 쓰거나 지울 수 있어요. 점선 밑줄 = 첨언 있음</p><div class="cpv-list">';
     if (!hlOK) h += '<div class="c-empty">형광펜을 쓰려면 Supabase에서 형광펜_퀘스트날짜_추가.sql을 실행해 주세요.</div>';
     else if (!hlList.length) h += '<div class="c-empty">아직 그은 형광펜이 없어요.<br>본문 글자를 길게 눌러 골라 보세요.</div>';
     else h += hlList.slice().sort((a, b) => a.start_pos - b.start_pos).map(x =>
-      '<button class="hli ' + hlKind(x.user_id) + '" data-hgo="' + x.id + '"><i aria-hidden="true"></i><span><small>' + esc(hlName(x.user_id)) + ' · ' + fmtD(x.created_at) + '</small><span class="qt">' + esc(x.quote) + '</span></span></button>').join('');
+      '<button class="hli ' + hlKind(x.user_id) + '" data-hgo="' + x.id + '"><i aria-hidden="true"></i><span><small>' + esc(hlName(x.user_id)) + ' · ' + fmtD(x.created_at) + '</small><span class="qt">' + esc(x.quote) + '</span>' + (x.note ? '<span class="hn">✎ ' + esc(x.note) + '</span>' : '') + '</span></button>').join('');
     h += '</div>';
   }
   p.innerHTML = h;
@@ -2071,13 +2095,17 @@ function drawPreview(n){
 }
 
 /* ---------- 형광펜 — 긴토키 분홍 / 히지카타 노랑 고정 (2026-11-16) ---------- */
-let hlList = [], hlFor = null, hlOK = true, hlText = null, hlSel = null;
+let hlList = [], hlFor = null, hlOK = true, hlText = null, hlSel = null, noteOK = true;
+const HL_COLS = () => 'id,user_id,start_pos,end_pos,quote,created_at' + (noteOK ? ',note' : '');
+const NOTE_SQL = '첨언을 쓰려면 Supabase에서 형광펜_첨언_추가.sql을 실행해 주세요.';
 // 주인 계정 = 긴토키, 다른 계정 = 히지카타
 const hlKind = uid => ((uid === me.id) === isOwner) ? 'gin' : 'hiji';
 const hlName = uid => members[uid] || (hlKind(uid) === 'gin' ? '긴토키' : '히지카타');
 async function loadHighlights(n){
   try {
-    const rows = await q(sb.from('highlights').select('id,user_id,start_pos,end_pos,quote,created_at').eq('novel_id', n.id));
+    let rows;
+    try { noteOK = true; rows = await q(sb.from('highlights').select(HL_COLS()).eq('novel_id', n.id)); }
+    catch(e1) { noteOK = false; rows = await q(sb.from('highlights').select(HL_COLS()).eq('novel_id', n.id)); }   // 첨언 칸이 아직 없을 때
     if (hlFor !== n.id) return;
     hlList = rows; hlOK = true; paintHighlights(n);
   } catch(e) { if (hlFor !== n.id) return; hlOK = false; hlList = []; }
@@ -2102,7 +2130,7 @@ function paintHighlights(n){
       const cov = hits.filter(h => h.start_pos <= a && h.end_pos >= b);
       if (!cov.length || !txt) { frag.appendChild(document.createTextNode(txt)); continue; }
       const g = cov.some(h => hlKind(h.user_id) === 'gin'), hj = cov.some(h => hlKind(h.user_id) === 'hiji');
-      const m = document.createElement('mark'); m.className = 'hl ' + (g && hj ? 'hl-gh' : g ? 'hl-g' : 'hl-h');
+      const m = document.createElement('mark'); m.className = 'hl ' + (g && hj ? 'hl-gh' : g ? 'hl-g' : 'hl-h') + (cov.some(h => h.note) ? ' nt' : '');
       m.dataset.hl = cov.map(h => h.id).join(' '); m.textContent = txt; frag.appendChild(m);
     }
     t.parentNode.replaceChild(frag, t);
@@ -2137,8 +2165,18 @@ function showHlBar(sel){
   }
   const mineOv = hlList.some(h => h.user_id === me.id && h.start_pos < sel.end && h.end_pos > sel.start);
   bar.innerHTML = '<button class="go ' + hlKind(me.id) + '" data-hadd><span class="sw" aria-hidden="true"></span>형광펜 긋기</button>' +
+    '<button class="nt" data-hnote>✎ 첨언 달고 긋기</button>' +
     (mineOv ? '<span class="sep" aria-hidden="true"></span><button data-hdel>내 형광펜 지우기</button>' : '');
   bar.querySelector('[data-hadd]').onclick = () => addHighlight(n, hlSel);
+  bar.querySelector('[data-hnote]').onclick = async () => {
+    const s = hlSel; if (!s) return;
+    if (!hlOK) { addHighlight(n, s); return; }
+    if (!noteOK) { toast(NOTE_SQL, 4500); return; }
+    const b = bodyEl(), quote = b ? b.textContent.slice(s.start, s.end).replace(/\s+/g, ' ').trim() : '';
+    clearSel();
+    const v = await noteDialog(quote, '', hlKind(me.id));
+    if (v !== null) addHighlight(n, s, v);
+  };
   const d = bar.querySelector('[data-hdel]'); if (d) d.onclick = () => removeMine(n, hlSel);
   if (isMobile()) { bar.style.left = ''; bar.style.top = ''; return; }
   const w = bar.offsetWidth, r = sel.rect;
@@ -2154,20 +2192,48 @@ document.addEventListener('selectionchange', () => {
 });
 window.addEventListener('scroll', () => { if (view === 'reader') { hideHlPop(); if (hlSel && !isMobile()) { const s = selInBody(); if (s) showHlBar(s); } } }, { passive: true });
 function clearSel(){ try { window.getSelection().removeAllRanges(); } catch(e){} hlSel = null; hideHlBar(); }
-async function addHighlight(n, sel){
+async function addHighlight(n, sel, note){
   if (!sel) return;
   if (!hlOK) { toast('형광펜을 쓰려면 Supabase에서 형광펜_퀘스트날짜_추가.sql을 실행해 주세요.', 4500); return; }
   // 내 형광펜과 겹치면 하나로 합쳐요
   const ov = hlList.filter(h => h.user_id === me.id && h.start_pos <= sel.end && h.end_pos >= sel.start);
   const s = Math.min(sel.start, ...ov.map(h => h.start_pos)), e = Math.max(sel.end, ...ov.map(h => h.end_pos));
   const body = bodyEl(), quote = body ? body.textContent.slice(s, e).replace(/\s+/g, ' ').trim().slice(0, 1000) : '';
+  // 합쳐지는 형광펜의 첨언은 이어 붙여요
+  const nt = ov.map(h => h.note || '').concat([note || '']).map(x => x.trim()).filter(Boolean).join('\n').slice(0, 500);
+  const ins = { novel_id: n.id, start_pos: s, end_pos: e, quote }; if (noteOK) ins.note = nt;
   clearSel();
   try {
-    const row = await q(sb.from('highlights').insert({ novel_id: n.id, start_pos: s, end_pos: e, quote }).select('id,user_id,start_pos,end_pos,quote,created_at').single());
+    const row = await q(sb.from('highlights').insert(ins).select(HL_COLS()).single());
     if (ov.length) await q(sb.from('highlights').delete().in('id', ov.map(h => h.id)));
     hlList = hlList.filter(h => ov.indexOf(h) < 0); hlList.push(row);
     paintHighlights(n); drawPreview(n);
   } catch(err) { toast(/relation|does not exist|schema cache|42P01|PGRST/i.test((err && (err.message || err.code)) + '') ? '형광펜을 쓰려면 Supabase에서 형광펜_퀘스트날짜_추가.sql을 실행해 주세요.' : failMsg(err), 4500); }
+}
+// 첨언 쓰기 · 고치기 창 (비워 두면 첨언 없음)
+function noteDialog(quote, value, kind){
+  return modal((box, close) => {
+    box.innerHTML = '<h3>형광펜 첨언</h3><p class="nt-quote ' + (kind || '') + '"></p>' +
+      '<div class="field"><label class="lb" for="ntIn">첨언 (안 써도 돼요)</label><textarea id="ntIn" class="nt-in" maxlength="500" placeholder="이 줄에 대해 한마디 남겨 주셔!"></textarea><div class="nt-cnt"></div></div>' +
+      '<div class="acts"><button class="btn" data-x>취소</button><button class="btn primary" data-ok>저장</button></div>';
+    box.querySelector('.nt-quote').textContent = quote || '';
+    const ta = box.querySelector('textarea'), cnt = box.querySelector('.nt-cnt'); ta.value = value || '';
+    const grow = () => { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 3 + 'px'; cnt.textContent = ta.value.length ? ta.value.length + ' / 500' : ''; };
+    ta.addEventListener('input', grow); setTimeout(() => { grow(); ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }, 40);
+    ta.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) close(ta.value.trim()); });
+    box.querySelector('[data-ok]').onclick = () => close(ta.value.trim());
+    box.querySelector('[data-x]').onclick = () => close(null);
+  });
+}
+async function editNote(n, h){
+  hideHlPop();
+  if (!noteOK) { toast(NOTE_SQL, 4500); return; }
+  const v = await noteDialog(h.quote, h.note || '', hlKind(h.user_id));
+  if (v === null || v === (h.note || '')) return;
+  try {
+    await q(sb.from('highlights').update({ note: v }).eq('id', h.id));
+    h.note = v; paintHighlights(n); drawPreview(n); toast(v ? '첨언을 남겼어요' : '첨언을 지웠어요');
+  } catch(err) { toast(/column|42703|schema cache/i.test((err && (err.message || err.code)) + '') ? NOTE_SQL : failMsg(err), 4500); }
 }
 async function removeMine(n, sel, ids){
   const del = ids ? hlList.filter(h => ids.indexOf(h.id) >= 0 && h.user_id === me.id) : hlList.filter(h => h.user_id === me.id && sel && h.start_pos < sel.end && h.end_pos > sel.start);
@@ -2191,13 +2257,15 @@ document.addEventListener('click', e => {
   if (!hs.length) return;
   const mine = hs.filter(h => h.user_id === me.id);
   const pop = document.createElement('div'); pop.className = 'hlpop';
-  pop.innerHTML = hs.map(h => '<span><i class="sw ' + hlKind(h.user_id) + '" aria-hidden="true"></i><b>' + esc(hlName(h.user_id)) + '</b>가 그음 · ' + fmtD(h.created_at) + '</span>').join('') +
-    (mine.length ? '<button class="btn text" data-hx>지우기</button>' : '');
+  pop.innerHTML = hs.map(h => '<div class="hp-it"><span><i class="sw ' + hlKind(h.user_id) + '" aria-hidden="true"></i><b>' + esc(hlName(h.user_id)) + '</b>가 그음 · ' + fmtD(h.created_at) + '</span>' +
+      (h.note ? '<p class="hp-note">' + esc(h.note) + '</p>' : '') + '</div>').join('') +
+    (mine.length ? '<div class="hp-acts"><button class="btn text" data-hn>' + (mine[0].note ? '✎ 첨언 고치기' : '✎ 첨언 쓰기') + '</button><button class="btn text del" data-hx>지우기</button></div>' : '');
   document.body.appendChild(pop);
-  const r = m.getBoundingClientRect(), w = pop.offsetWidth;
+  const r = m.getBoundingClientRect(), w = pop.offsetWidth, ph = pop.offsetHeight;
   pop.style.left = Math.max(8, Math.min(r.left + r.width / 2 - w / 2, innerWidth - w - 8)) + 'px';
-  pop.style.top = (r.bottom + 8 + pop.offsetHeight > innerHeight ? r.top - pop.offsetHeight - 8 : r.bottom + 8) + 'px';
+  pop.style.top = Math.max(8, Math.min(r.bottom + 8 + ph > innerHeight ? r.top - ph - 8 : r.bottom + 8, innerHeight - ph - 8)) + 'px';
   const x = pop.querySelector('[data-hx]'); if (x) x.onclick = () => removeMine(n, null, mine.map(h => h.id));
+  const xn = pop.querySelector('[data-hn]'); if (xn) xn.onclick = () => editNote(n, mine[0]);
 });
 
 /* ---------- view settings ---------- */

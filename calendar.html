@@ -179,12 +179,17 @@ dl,dd,figure{margin:0}
 .bub{margin:0;font:400 12px/1.65 'Galmuri9',monospace;white-space:pre-wrap;overflow-wrap:anywhere}
 .c-empty{font:400 13px/1.5 var(--f-body);color:var(--muted);padding:6px 0}
 .cf{display:flex;gap:8px;margin-top:10px;align-items:center;min-height:48px;padding:0 6px 0 16px;border:2.5px solid var(--ink);border-radius:24px;background:var(--paper2)}
-.cf input{flex:1;min-width:0;border:0;background:transparent;font:400 12px/1 'Galmuri9',monospace;outline:0;height:44px}
-.cf input::placeholder{color:var(--muted);opacity:1}
+.cf input,.cf textarea{flex:1;min-width:0;border:0;background:transparent;font:400 12px/1 'Galmuri9',monospace;outline:0;height:44px}
+.cf input::placeholder,.cf textarea::placeholder{color:var(--muted);opacity:1}
+/* 여러 줄 댓글칸 (2026-11-17) */
+.cf{align-items:flex-end;border-radius:22px;padding:4px 6px 4px 16px}
+.cf textarea{display:block;height:auto;min-height:40px;padding:12px 0 10px;font:400 12px/1.6 'Galmuri9',monospace;resize:none;overflow-y:hidden}
+.cf button{margin-bottom:2px}
 .cf button,.cedit button{display:inline-flex;align-items:center;gap:4px;height:36px;padding:0 14px;border:2.2px solid var(--ink);border-radius:18px;background:var(--b);color:#FFF6E6;font:400 15px/1 var(--f-ui);flex-shrink:0}
 .cf button svg{width:16px;height:16px}
-.cedit{display:flex;gap:6px;margin-top:4px}
-.cedit input{flex:1;min-width:0;height:36px;border:2px solid var(--ink);border-radius:8px;padding:0 10px;font:400 12px/1 'Galmuri9',monospace;background:#FFFDF7}
+.cedit{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.cedit input,.cedit textarea{width:100%;min-width:0;min-height:40px;border:2px solid var(--ink);border-radius:8px;padding:8px 10px;font:400 12px/1.6 'Galmuri9',monospace;background:#FFFDF7;color:#1B1D22;resize:none;outline:0}
+.cedit .cbtns{display:flex;gap:6px;justify-content:flex-end}
 .cedit button.no{background:var(--paper2);color:var(--text)}
 
 /* 일정 적기 */
@@ -692,6 +697,17 @@ async function loadComments(ev){
   } catch (e) { if (cm.ev !== ev.id) return; cm.state = 'fail'; }
   drawComments();
 }
+/* 여러 줄 댓글칸: 쓰는 만큼 늘어나요. PC는 Enter = 남기기, Shift+Enter = 줄바꿈 / 폰은 Enter = 줄바꿈 (2026-11-17) */
+function growTA(ta, max){
+  const fit = () => { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight + 2, max || 180) + 'px'; ta.style.overflowY = ta.scrollHeight + 2 > (max || 180) ? 'auto' : 'hidden'; };
+  ta.addEventListener('input', fit); fit();
+  ta.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' || e.isComposing || e.keyCode === 229) return;
+    const pc = matchMedia('(hover:hover) and (pointer:fine)').matches;
+    if (e.metaKey || e.ctrlKey || (pc && !e.shiftKey)) { e.preventDefault(); if (ta.form) ta.form.requestSubmit(); }
+  });
+  return fit;
+}
 function drawComments(){
   const box = $('cmBox'); if (!box) return;
   const draft = box.querySelector('#cmIn') ? box.querySelector('#cmIn').value : '';
@@ -705,18 +721,18 @@ function drawComments(){
       return '<li class="c" data-c="' + c.id + '"><span class="av"><img src="' + FACE[k] + '" alt=""></span><div class="cb"><span class="cn">' + esc(nameOf(c.user_id)) + '<time datetime="' + c.created_at + '">' + fmtTS(c.created_at) + '</time>' + (c.updated_at ? '<span class="ed">수정됨</span>' : '') +
         (mine ? '<span class="acts"><button type="button" data-ce="' + c.id + '">수정</button><button type="button" data-cd="' + c.id + '">삭제</button></span>' : '') + '</span><p class="bub">' + esc(c.body) + '</p></div></li>';
     }).join('') + '</ul>';
-    h += '<form class="cf" id="cmForm"><label class="sr" for="cmIn">댓글 쓰기</label><input id="cmIn" type="text" maxlength="2000" placeholder="한마디 남겨 주셔!" autocomplete="off" enterkeyhint="send"><button type="submit">' + SVG_SEND + '남기기</button></form>';
+    h += '<form class="cf" id="cmForm"><label class="sr" for="cmIn">댓글 쓰기</label><textarea id="cmIn" rows="1" maxlength="2000" placeholder="한마디 남겨 주셔!"></textarea><button type="submit">' + SVG_SEND + '남기기</button></form>';
   }
   box.innerHTML = h;
   const f = $('cmForm');
   if (f) {
-    const inp = $('cmIn'); inp.value = draft;
+    const inp = $('cmIn'); inp.value = draft; const fit = growTA(inp);
     f.onsubmit = async e => {
       e.preventDefault(); const body = inp.value.trim(); if (!body) { inp.focus(); return; }
       const btn = f.querySelector('button'); btn.disabled = true;
       try {
         const row = await q(sb.from('event_comments').insert({ event_id: cm.ev, body }).select('id,user_id,body,created_at,updated_at').single());
-        cm.list.push(row); inp.value = ''; notify({ type: 'comment', event_id: cm.ev, text: body }); drawComments(); const n = $('cmIn'); if (n) n.focus({ preventScroll: true });
+        cm.list.push(row); inp.value = ''; fit(); notify({ type: 'comment', event_id: cm.ev, text: body }); drawComments(); const n = $('cmIn'); if (n) n.focus({ preventScroll: true });
       } catch (err) { btn.disabled = false; toast(failMsg(err)); }
     };
   }
@@ -729,8 +745,8 @@ function drawComments(){
     const c = cm.list.find(x => x.id === b.dataset.ce); if (!c) return;
     const p = box.querySelector('[data-c="' + c.id + '"] .bub');
     const ed = document.createElement('form'); ed.className = 'cedit';
-    ed.innerHTML = '<label class="sr" for="ceIn">댓글 고치기</label><input id="ceIn" type="text" maxlength="2000"><button type="button" class="no">취소</button><button type="submit">저장</button>';
-    p.replaceWith(ed); const inp = ed.querySelector('input'); inp.value = c.body; inp.focus();
+    ed.innerHTML = '<label class="sr" for="ceIn">댓글 고치기</label><textarea id="ceIn" rows="1" maxlength="2000"></textarea><span class="cbtns"><button type="button" class="no">취소</button><button type="submit">저장</button></span>';
+    p.replaceWith(ed); const inp = ed.querySelector('textarea'); inp.value = c.body; growTA(inp, 240); inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length);
     ed.querySelector('.no').onclick = drawComments;
     ed.onsubmit = async e => {
       e.preventDefault(); const body = inp.value.trim(); if (!body) return;

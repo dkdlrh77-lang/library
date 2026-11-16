@@ -189,7 +189,8 @@ img{image-rendering:pixelated}
 .say p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
 .cf{display:flex;gap:8px;align-items:flex-end}
 .cf input,.cf textarea{flex:1;min-width:0;height:42px;padding:0 10px;background:var(--ink);border:2px solid var(--line2);color:#fff;font:400 12px/1 var(--f)}
-.cf textarea{height:76px;padding:9px 10px;line-height:1.6;resize:vertical}
+.cf textarea{height:auto;min-height:42px;padding:11px 10px 9px;line-height:1.6;resize:none;overflow-y:hidden;display:block}
+.cf textarea.tall{min-height:76px}
 .cf input::placeholder,.cf textarea::placeholder,.fin::placeholder{color:#8C82B8;opacity:1}
 .dacts{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .dacts .lnk{border:0;background:none;color:var(--sub);font:400 11.5px/1 var(--f);padding:8px 4px;text-decoration:underline;text-underline-offset:3px}
@@ -629,6 +630,17 @@ function openDetail(id){
   else { renderList(); renderDetail(); }
 }
 function closeDetail(){ document.body.classList.remove('m-detail'); renderList(); }
+/* 여러 줄 한마디칸: 쓰는 만큼 늘어나요. PC는 Enter = 남기기, Shift+Enter = 줄바꿈 / 폰은 Enter = 줄바꿈 (2026-11-17) */
+function growTA(ta, max){
+  const fit = () => { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight + 4, max || 180) + 'px'; ta.style.overflowY = ta.scrollHeight + 4 > (max || 180) ? 'auto' : 'hidden'; };
+  ta.addEventListener('input', fit); fit();
+  ta.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' || e.isComposing || e.keyCode === 229) return;
+    const pc = matchMedia('(hover:hover) and (pointer:fine)').matches;
+    if (e.metaKey || e.ctrlKey || (pc && !e.shiftKey)) { e.preventDefault(); if (ta.form) ta.form.requestSubmit(); }
+  });
+  return fit;
+}
 function renderDetail(){
   const box = $('detail'), r = quests.find(x => x.id === selId);
   if (!r) { box.innerHTML = '<div class="wt">퀘스트 상세<span></span></div><div class="in"><p class="empty">' + (ready && !missing ? '퀘스트를 고르면 여기에 자세히 보여요.' : '') + '</p></div>'; if (isMobile()) closeDetail(); return; }
@@ -669,7 +681,7 @@ function renderDetail(){
         (my ? '<span class="acts"><button type="button" data-ce="' + c.id + '">수정</button><button type="button" data-cd="' + c.id + '">삭제</button></span>' : '') + '</div><p>' + esc(c.body) + '</p></div></div>';
     }).join('') : '<p style="margin:0;font-size:11.5px;color:var(--sub)">아직 ' + sayL + '이 없어요.</p>') +
     '<form class="cf" id="cForm"><label class="sr" for="cIn">' + sayL + ' 쓰기</label>' +
-      (watch ? '<textarea id="cIn" maxlength="500" placeholder="한마디나 감상평을 남겨 주셔!"></textarea>' : '<input id="cIn" type="text" maxlength="500" placeholder="한마디 남겨 주셔!" autocomplete="off" enterkeyhint="send">') +
+      '<textarea id="cIn" rows="1" maxlength="500" class="' + (watch ? 'tall' : '') + '" placeholder="' + (watch ? '한마디나 감상평을 남겨 주셔!' : '한마디 남겨 주셔!') + '"></textarea>' +
       '<button type="submit" class="btn">남기기</button></form></div>';
   h += (r.status !== 'done' ? '<button type="button" class="btn yel" id="doClear" style="min-height:48px;font-size:14px">퀘스트 클리어!</button>' : '') +
     (r.created_by === me.id ? '<div class="dacts"><button type="button" class="lnk" id="dEdit">수정하기</button><button type="button" class="lnk" id="dDel">지우기</button></div>' : '<p style="margin:0;font-size:10.5px;color:var(--sub);text-align:right">수정하기·지우기는 등록한 ' + esc(nameOf(r.created_by)) + '만 할 수 있어요</p>') + '</div>';
@@ -693,6 +705,7 @@ function renderDetail(){
   if ($('dEdit')) $('dEdit').onclick = () => openForm(r);
   if ($('dDel')) $('dDel').onclick = () => deleteQuest(r);
   const f = $('cForm');
+  growTA($('cIn'), watch ? 260 : 180);
   f.onsubmit = async e => {
     e.preventDefault(); const inp = $('cIn'), body = inp.value.trim(); if (!body) { inp.focus(); return; }
     const btn = f.querySelector('button'); btn.disabled = true;
@@ -713,8 +726,8 @@ function renderDetail(){
     const c = comments.find(x => x.id === b.dataset.ce); if (!c) return;
     const p = box.querySelector('[data-c="' + c.id + '"] p');
     const ed = document.createElement('form'); ed.className = 'cf'; ed.style.marginTop = '4px';
-    ed.innerHTML = '<label class="sr" for="ceIn">' + sayL + ' 고치기</label>' + (watch ? '<textarea id="ceIn" maxlength="500"></textarea>' : '<input id="ceIn" type="text" maxlength="500">') + '<button type="submit" class="btn">저장</button>';
-    p.replaceWith(ed); const inp = ed.querySelector('#ceIn'); inp.value = c.body; inp.focus();
+    ed.innerHTML = '<label class="sr" for="ceIn">' + sayL + ' 고치기</label>' + '<textarea id="ceIn" rows="1" maxlength="500"></textarea><button type="submit" class="btn">저장</button>';
+    p.replaceWith(ed); const inp = ed.querySelector('#ceIn'); inp.value = c.body; growTA(inp, 260); inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length);
     ed.onsubmit = async e => {
       e.preventDefault(); const body = inp.value.trim(); if (!body) return;
       try { const now = new Date().toISOString(); await q(sb.from('quest_comments').update({ body, updated_at: now }).eq('id', c.id)); c.body = body; c.updated_at = now; renderDetail(); }
