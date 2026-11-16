@@ -61,8 +61,8 @@ img{image-rendering:pixelated}
 .hero img{display:block;width:100%;height:230px;object-fit:cover;object-position:50% 35%;image-rendering:auto}
 .hbox{position:absolute;left:20px;bottom:20px;display:flex;flex-direction:column;align-items:flex-start;gap:8px}
 .logo{background:rgba(18,14,36,.88);border:2px solid var(--yel);padding:12px 16px 11px}
-/* 로고 밑 작은 개수 */
-.hst{display:flex;gap:10px;background:rgba(18,14,36,.88);border:2px solid var(--line2);padding:5px 10px 4px;font-size:11px;color:var(--sub);white-space:nowrap}
+/* 큰 그림 오른쪽 아래 작은 개수 */
+.hst{position:absolute;right:20px;bottom:20px;margin:0;display:flex;gap:10px;background:rgba(18,14,36,.88);border:2px solid var(--line2);padding:5px 10px 4px;font-size:11px;color:var(--sub);white-space:nowrap}
 .hst b{font-weight:400;margin-left:4px}
 .hst .c b{color:var(--yel)}.hst .d b{color:var(--mint)}.hst .w b{color:#fff}
 .logo b{display:block;font:400 30px/1 var(--f);color:var(--yel);letter-spacing:.02em}
@@ -77,7 +77,10 @@ img{image-rendering:pixelated}
 .mem{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 7px 9px;background:var(--ink);border:2px solid var(--line2);text-decoration:none;color:inherit}
 .mem.me{border-color:var(--yel)}
 .mem .pz{height:92px;display:flex;align-items:flex-end;justify-content:center}
-.mem .pz img{max-height:92px;max-width:100%;display:block}
+.mem .pz .cw{position:relative;display:block;height:92px;max-width:100%}
+.mem .pz .pimg{height:100%;width:auto;max-width:100%;object-fit:contain;object-position:bottom;display:block}
+.mem .pz .cw.wide{height:auto;width:100%}.mem .pz .cw.wide .pimg{width:100%;height:auto}
+.cw .emo,.chara .emo{position:absolute;height:20%;width:auto;transform:translate(-50%,-50%);image-rendering:auto;pointer-events:none}
 .mem b{font-weight:400;font-size:12.5px;color:#fff}
 .mem .tt{font-size:10.5px;color:var(--sub);text-align:center;line-height:1.3}
 .mem .lv{display:flex;justify-content:space-between;width:100%;font-size:11px;color:var(--sub)}
@@ -232,7 +235,9 @@ textarea.fin{height:90px;padding:9px 11px;line-height:1.6;resize:vertical}
 .stage{position:relative;overflow:hidden;height:440px;border:3px solid var(--line);box-shadow:0 0 0 3px var(--ink),6px 6px 0 3px var(--ink);background:#2A2352}
 .stage>.bgimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 60%;filter:saturate(.9) brightness(.82);image-rendering:auto}
 .stage.night{background:radial-gradient(circle,rgba(255,255,255,.5) 1px,transparent 1.6px) 0 0/34px 34px,radial-gradient(circle,rgba(255,226,122,.45) 1.2px,transparent 1.8px) 17px 11px/52px 52px,linear-gradient(#251C45,#3D3270)}
-.chara{position:absolute;left:50%;bottom:46px;transform:translateX(-50%);height:62%;width:auto;max-width:90%;object-fit:contain;filter:drop-shadow(0 4px 0 rgba(18,14,36,.6))}
+.chara{position:absolute;left:50%;bottom:46px;transform:translateX(-50%);height:62%;max-width:90%;display:block}
+.chara .pimg{height:100%;width:auto;max-width:100%;object-fit:contain;object-position:bottom;display:block;filter:drop-shadow(0 4px 0 rgba(18,14,36,.6))}
+.chara.wide{height:auto;width:82%}.chara.wide .pimg{width:100%;height:auto}
 .plate{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);white-space:nowrap;padding:6px 12px 5px;border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);font-size:12px;color:#2A1A00}
 .plate small{font-size:10.5px;opacity:.75;margin-right:6px}
 .bubble{position:absolute;right:12px;top:14px;max-width:min(170px,60%);background:#FFFDF6;color:var(--bg);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);padding:8px 9px;font-size:11.5px;line-height:1.5;overflow-wrap:anywhere}
@@ -270,13 +275,13 @@ textarea.fin{height:90px;padding:9px 11px;line-height:1.6;resize:vertical}
  .top{margin-bottom:16px}
  .hero{margin-bottom:22px}
  .hero img{height:190px;object-position:50% 30%}
- .hbox{left:12px;bottom:12px;gap:6px}.logo{padding:9px 12px 8px}.hst{font-size:10.5px;padding:4px 8px 3px;gap:8px}.logo b{font-size:22px}.logo small{font-size:11px;margin-top:6px}
+ .hbox{left:12px;bottom:12px;gap:6px}.hst{right:12px;bottom:12px}.logo{padding:9px 12px 8px}.hst{font-size:10.5px;padding:4px 8px 3px;gap:8px}.logo b{font-size:22px}.logo small{font-size:11px;margin-top:6px}
  .qgrid{grid-template-columns:minmax(0,1fr);gap:22px}
  .qgrid .detail{grid-column:auto}
  /* 폰: 퀘스트가 위, 파티(캐릭터 꾸미기)는 아래 */
  .qgrid .mid{order:1}
  .qgrid #party{order:2}
- .mem .pz{height:80px}.mem .pz img{max-height:80px}
+ .mem .pz{height:80px}.mem .pz .cw{height:80px}
  .tab{flex:1 1 40%}
  /* 폰: 상세는 화면 전체 */
  .detail{display:none;position:fixed;inset:0;z-index:60;overflow-y:auto;box-shadow:none;border:0;padding-bottom:var(--safe-b)}
@@ -292,6 +297,17 @@ textarea.fin{height:90px;padding:9px 11px;line-height:1.6;resize:vertical}
  .stwrap .cap{display:none}
 }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* 고양이 마우스 커서 (PC만) 2026-11-16 */
+@media (hover:hover) and (pointer:fine){
+html,body{cursor:url(img/cursor/default.png) 0 0,auto}
+a[href],button:not(:disabled),select,summary,label,[role=button],[role=tab],input[type=checkbox],input[type=radio],input[type=file],input[type=submit],input[type=button],.editable,.pol,.phbtn{cursor:url(img/cursor/pointer.png) 1 1,pointer!important}
+input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=submit]):not([type=button]):not([type=range]):not([type=color]),textarea,[contenteditable=true]{cursor:url(img/cursor/text.png) 4 4,text!important}
+:disabled,[aria-disabled=true],.opt.lock,.hearts.ro .h{cursor:url(img/cursor/not-allowed.png) 7 7,not-allowed!important}
+.hearts.ro .h{cursor:url(img/cursor/default.png) 0 0,default!important}
+.btn:disabled,.login-submit:disabled,.go:disabled,.ghost:disabled,body.busy,body.busy *{cursor:url(img/cursor/wait.png) 5 4,wait!important}
+[draggable=true]{cursor:url(img/cursor/move.png) 16 16,move!important}
+}
 </style>
 </head>
 <body>
@@ -300,7 +316,7 @@ textarea.fin{height:90px;padding:9px 11px;line-height:1.6;resize:vertical}
  <!-- 퀘스트 화면 -->
  <section id="vQuests" aria-label="퀘스트 로그">
   <div class="top"><div class="topl"><a class="btn" href="index.html">◀ 책상으로</a><button type="button" class="btn bell" id="bellBtn" aria-haspopup="dialog"><svg viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M7 1h2v1h1v1h1v1h1v5h1v2h1v1H2v-1h1V9h1V4h1V3h1V2h1zM6 13h4v1H9v1H7v-1H6z"/></svg>알림</button></div><span class="crumb">마요보로 · QUEST LOG</span></div>
-  <div class="hero"><img src="img/quest/bg-game.webp" alt="코타츠에서 같이 폰 게임을 하는 두 사람"><div class="hbox"><div class="logo"><b>QUEST LOG</b><small>둘이서 하고 싶은 것들</small></div><p class="hst" id="heroSt" aria-label="퀘스트 개수" style="margin:0"></p></div></div>
+  <div class="hero"><img src="img/quest/bg-game.webp" alt="코타츠에서 같이 폰 게임을 하는 두 사람"><div class="hbox"><div class="logo"><b>QUEST LOG</b><small>둘이서 하고 싶은 것들</small></div></div><p class="hst" id="heroSt" aria-label="퀘스트 개수"></p></div>
   <div class="qgrid">
    <aside id="party"></aside>
    <div class="mid">
@@ -338,27 +354,51 @@ const CATS = { play: [['mobile', '모바일'], ['pc', 'PC게임'], ['etc', '기�
 const CATN = { mobile: '모바일', pc: 'PC게임', etc: '기타', movie: '영화', drama: '드라마', anime: '애니' };
 const XP_ADD = 10, XP_SAY = 5;
 const xpClear = q => q.kind === 'roman' ? 50 : 20;
-// 레벨: 누적 경험치 (Lv.10 이후 300씩) — 2026-11-16 줄임
-const CUM = [0, 40, 110, 210, 340, 500, 690, 910, 1160, 1440];
-const cum = n => n <= 10 ? CUM[n - 1] : 1440 + 300 * (n - 10);
+// 레벨: 누적 경험치 — 2026-11-16 다시 줄임: Lv.2 40 · Lv.3 +70 · Lv.4~7 +80씩 · Lv.8부터 +120씩
+const CUM = [0, 40, 110, 190, 270, 350, 430];
+const cum = n => n <= 7 ? CUM[n - 1] : 430 + 120 * (n - 7);
 // 도감 화수 경험치 (둘 다): 드라마 5화마다 +10 · 애니 10화마다 +10 · 영화는 클리어 경험치만
 const EP_RULE = { drama: [5, 10], anime: [10, 10] };
 const epRule = r => r.kind === 'watch' ? (EP_RULE[r.cat] || null) : null;
 const epXP = r => { const k = epRule(r); return k ? Math.floor((r.ep_cur || 0) / k[0]) * k[1] : 0; };
 const epRuleText = r => { const k = epRule(r); return k ? k[0] + '화마다 둘 다 +' + k[1] + ' EXP' : '영화는 클리어 경험치만'; };
 function lvInfo(x){ let n = 1; while (x >= cum(n + 1)) n++; return { lv: n, cur: x - cum(n), need: cum(n + 1) - cum(n) }; }
-// 보상 [이름, 열리는 레벨]
-const POSES = { gin: [['gin-1', '허리에 손', 1], ['gin-2', '손 흔들기', 2], ['gin-3', '파르페', 4], ['gin-4', '목도 휘두르기', 6]],
-                hiji: [['hiji-1', '팔짱', 1], ['hiji-2', '옆모습 담배', 2], ['hiji-3', '마요네즈 껴안기', 4], ['hiji-4', '칼 짚고 앉기', 6]] };
-const BGS = [['night', '밤하늘 단색', 1], ['game', '코타츠', 3], ['backtoback', '돌담에 등 맞대고', 5], ['sunset', '노을 옥상', 7], ['onsen', '벚꽃 노천 온천', 9]];
-const TITLES = { gin: [['어쩌다 한 팀', 1], ['게으른 해결사', 3], ['오래된 콤비', 5], ['당분 대장', 7], ['서로의 라이벌', 8], ['전설의 콤비', 10]],
-                 hiji: [['어쩌다 한 팀', 1], ['귀신 부장', 3], ['오래된 콤비', 5], ['마요 신도', 7], ['서로의 라이벌', 8], ['전설의 콤비', 10]] };
+// 보상 [이름, 열리는 레벨] — 2026-11-16 포즈 12개 · 투샷 4개 · 감정 마크 8개 추가 (Lv.15까지)
+const POSES = { gin: [['gin-1', '허리에 손', 1], ['gin-2', '손 흔들기', 2], ['gin-7', '귤 까다 잠듦', 3], ['gin-3', '파르페', 4], ['gin-4', '목도 휘두르기', 6], ['gin-6', '난간 딸기우유', 7], ['gin-8', '파칭코 OTL', 8], ['gin-5', '유카타 수건', 9], ['gin-9', '술 취함', 11], ['gin-10', '진지한 눈빛', 14]],
+                hiji: [['hiji-1', '팔짱', 1], ['hiji-2', '옆모습 담배', 2], ['hiji-7', '코타츠 파묻힘', 3], ['hiji-3', '마요네즈 껴안기 (키나가시)', 4], ['hiji-4', '칼 짚고 앉기', 6], ['hiji-6', '검 휘두르기', 7], ['hiji-8', '서류 더미 녹초', 8], ['hiji-5', '유카타 부끄', 9], ['hiji-9', '꾸벅꾸벅 (키나가시)', 11], ['hiji-10', '피식 웃음 (키나가시)', 14]] };
+// 투샷 포즈 (둘 다 같은 그림을 고를 수 있어요)
+// pair-10~13 = 히지카타 키나가시 투샷 (제복 투샷 사이사이에)
+const PAIRP = [['pair-1', '티격태격', 5], ['pair-5', '코타츠에서 귤', 6], ['pair-13', '딸기우유랑 마요 바꿔 들기', 7], ['pair-2', '등 맞대고 담배', 8], ['pair-10', '불꽃놀이', 9], ['pair-3', '같이 파르페', 10], ['pair-6', '우산 같이 쓰기', 11], ['pair-4', '같이 게임', 12], ['pair-11', '포장마차 건배', 13], ['pair-7', '스쿠터 둘이 타기', 14], ['pair-8', '팝콘 영화', 15], ['pair-12', '어깨에 기대 졸기', 16], ['pair-9', '하이파이브', 17]];
+// 옆으로 넓은 투샷 (무대 너비에 맞춰요)
+const WIDE = { 'pair-1': 1, 'pair-3': 1, 'pair-4': 1, 'pair-5': 1, 'pair-8': 1, 'pair-11': 1 };
+const poseList = kind => POSES[kind].concat(PAIRP);
+// 감정 마크 [키, 이름, 레벨] — 'none'은 없음
+const EMOS = [['exclaim', '느낌표', 1], ['note', '음표', 2], ['heart', '하트', 4], ['sweat', '땀방울', 5], ['angry', '빡침', 6], ['zzz', 'Zzz', 11], ['question', '물음표', 12], ['sparkle', '반짝이', 13]];
+const emoSrc = k => IMG + 'emo-' + k + '.webp';
+// 포즈마다 감정 마크 자리 (그림 안에서 가로%, 세로%)
+const EMO_AT = { 'gin-1': [12, 5], 'gin-2': [15, 4], 'gin-3': [12, 4], 'gin-4': [12, 6], 'gin-5': [88, 12], 'gin-6': [12, 6], 'gin-7': [30, 30], 'gin-8': [20, 22], 'gin-9': [75, 10], 'gin-10': [85, 10],
+  'hiji-1': [88, 6], 'hiji-2': [10, 6], 'hiji-3': [20, 3], 'hiji-4': [15, 5], 'hiji-5': [85, 8], 'hiji-6': [12, 8], 'hiji-7': [82, 28], 'hiji-8': [70, 40], 'hiji-9': [85, 6], 'hiji-10': [88, 6],
+  'pair-1': [50, 6], 'pair-2': [50, 8], 'pair-3': [48, 3], 'pair-4': [50, 6], 'pair-5': [50, 8], 'pair-6': [86, 36], 'pair-7': [50, 4], 'pair-8': [50, 5], 'pair-9': [85, 12], 'pair-10': [92, 22], 'pair-11': [50, 6], 'pair-12': [60, 6], 'pair-13': [50, 6] };
+// 캐릭터 그림 + 감정 마크
+function charaHTML(pose, emo, cls){
+  const at = EMO_AT[pose] || [80, 8];
+  return '<span class="' + cls + (WIDE[pose] ? ' wide' : '') + '"><img class="pimg" src="' + IMG + pose + '.webp" alt="">' + (emo && emo !== 'none' ? '<img class="emo" src="' + emoSrc(emo) + '" alt="" style="left:' + at[0] + '%;top:' + at[1] + '%">' : '') + '</span>';
+}
+// 2026-11-16 코타츠·돌담 뺌, 새 풍경 7장 추가
+const BGS = [['night', '밤하늘 단색', 1], ['room', '다다미 방', 2], ['street', '벚꽃 거리', 3], ['dango', '경단 가게', 4], ['gate', '둔영 정문', 6], ['sunset', '노을 옥상', 7], ['onsen', '벚꽃 노천 온천', 9], ['terrace', '벚꽃 전망대', 10], ['nightst', '등불 밤거리', 12], ['warehouse', '해질녘 창고', 14], ['snow', '눈 내리는 신사', 16]];
+const COUPLE_T = [['어쩌다 연인', 1], ['티격태격 커플', 5], ['서로의 반쪽', 8], ['천생연분', 10], ['마요와 딸기우유', 13], ['평생 파트너', 15]];
+const TITLES = { gin: COUPLE_T.concat([['게으른 해결사', 3], ['당분 돼지', 7]]).sort((a, b) => a[1] - b[1]),
+                 hiji: COUPLE_T.concat([['귀신 부장', 3], ['마요라', 7]]).sort((a, b) => a[1] - b[1]) };
+// 예전 칭호 이름으로 저장돼 있으면 새 이름으로 보여 줘요
+const OLD_T = { '어쩌다 한 팀': '어쩌다 연인', '오래된 콤비': '티격태격 커플', '서로의 라이벌': '서로의 반쪽', '전설의 콤비': '천생연분', '당분 대장': '당분 돼지', '마요 신도': '마요라' };
 const COLORS = [['white', '흰색', '#F4EEFF', 1], ['pink', '딸기우유', '#FF8FB0', 2], ['mayo', '마요', '#FFE27A', 2], ['mint', '민트', '#9BF0B6', 5], ['sky', '하늘', '#8FB8FF', 5], ['gold', '금색', '#E0B44A', 8]];
-const PAIRS = ['pair-1', 'pair-2', 'pair-3', 'pair-4'];
 const bgSrc = k => IMG + 'bg-' + k + '.webp';
+const bgThumb = k => IMG + 'bg-' + k + '-s.webp';   // 고르는 칸·레벨업 창용 작은 그림
 function rewardsAt(kind, n){
   const r = [];
   POSES[kind].forEach(p => { if (p[2] === n) r.push({ t: 'pose', k: p[0], name: p[1] }); });
+  PAIRP.forEach(p => { if (p[2] === n) r.push({ t: 'pair', k: p[0], name: p[1] }); });
+  EMOS.forEach(e => { if (e[2] === n) r.push({ t: 'emo', k: e[0], name: e[1] }); });
   BGS.forEach(b => { if (b[2] === n) r.push({ t: 'bg', k: b[0], name: b[1] }); });
   TITLES[kind].forEach(t => { if (t[1] === n) r.push({ t: 'title', name: t[0] }); });
   const cs = COLORS.filter(c => c[3] === n); if (cs.length) r.push({ t: 'color', cs });
@@ -420,12 +460,15 @@ function xpOf(uid){
 // 레벨에 맞게 열린 것만 쓰도록 맞춘 캐릭터
 function charOf(uid){
   const kind = kindOf(uid), lv = lvInfo(xpOf(uid)).lv, row = (uid && chars[uid]) || {};
-  const poses = POSES[kind].filter(p => p[2] <= lv), bgs = BGS.filter(b => b[2] <= lv), ttls = TITLES[kind].filter(t => t[1] <= lv), cols = COLORS.filter(c => c[3] <= lv);
+  const poses = poseList(kind).filter(p => p[2] <= lv), bgs = BGS.filter(b => b[2] <= lv), ttls = TITLES[kind].filter(t => t[1] <= lv), cols = COLORS.filter(c => c[3] <= lv);
+  const basic = poses.filter(p => /-[1-4]$/.test(p[0]) && !/^pair/.test(p[0]));   // 고른 적 없으면 기본 포즈 중 가장 최근 것
+  const emos = EMOS.filter(e => e[2] <= lv);
   return {
     kind, lv,
-    pose: poses.some(p => p[0] === row.pose) ? row.pose : poses[poses.length - 1][0],
+    pose: poses.some(p => p[0] === row.pose) ? row.pose : basic[basic.length - 1][0],
+    emo: emos.some(e => e[0] === row.emo) ? row.emo : 'none',
     bg: bgs.some(b => b[0] === row.bg) ? row.bg : 'night',
-    title: ttls.some(t => t[0] === row.title) ? row.title : (ttls[ttls.length - 1] || ['어쩌다 한 팀'])[0],
+    title: ttls.some(t => t[0] === (OLD_T[row.title] || row.title)) ? (OLD_T[row.title] || row.title) : (ttls[ttls.length - 1] || ['어쩌다 연인'])[0],
     color: cols.some(c => c[0] === row.color) ? row.color : 'white',
     say: row.say || ''
   };
@@ -470,7 +513,7 @@ function memCard(uid, isMe){
   const c = charOf(uid), x = xpOf(uid), L = lvInfo(x);
   const name = uid ? nameOf(uid) : partnerName();
   return '<a class="mem' + (isMe ? ' me' : '') + '" href="#char' + (isMe ? '' : '-partner') + '" aria-label="' + esc(name) + ' 캐릭터 보기, Lv.' + L.lv + ', 경험치 ' + L.cur + ' / ' + L.need + '">' +
-    '<span class="pz"><img src="' + IMG + c.pose + '.webp" alt=""></span><b>' + esc(name) + (isMe ? ' (나)' : '') + '</b><span class="tt">' + esc(c.title) + '</span>' +
+    '<span class="pz">' + charaHTML(c.pose, c.emo, 'cw') + '</span><b>' + esc(name) + (isMe ? ' (나)' : '') + '</b><span class="tt">' + esc(c.title) + '</span>' +
     '<span class="lv"><i>Lv.' + L.lv + '</i><span>' + L.cur + '/' + L.need + '</span></span>' + bar(L.cur, L.need) + '</a>';
 }
 function renderParty(){
@@ -591,7 +634,7 @@ function renderDetail(){
       (watch ? '<textarea id="cIn" maxlength="500" placeholder="한마디나 감상평을 남겨 주셔!"></textarea>' : '<input id="cIn" type="text" maxlength="500" placeholder="한마디 남겨 주셔!" autocomplete="off" enterkeyhint="send">') +
       '<button type="submit" class="btn">남기기</button></form></div>';
   h += (r.status !== 'done' ? '<button type="button" class="btn yel" id="doClear" style="min-height:48px;font-size:14px">퀘스트 클리어!</button>' : '') +
-    '<div class="dacts"><button type="button" class="lnk" id="dEdit">고치기</button><button type="button" class="lnk" id="dDel">지우기</button></div></div>';
+    (r.created_by === me.id ? '<div class="dacts"><button type="button" class="lnk" id="dEdit">고치기</button><button type="button" class="lnk" id="dDel">지우기</button></div>' : '<p style="margin:0;font-size:10.5px;color:var(--sub);text-align:right">고치기·지우기는 등록한 ' + esc(nameOf(r.created_by)) + '만 할 수 있어요</p>') + '</div>';
   box.innerHTML = h;
   const db = $('dBack'); if (db) db.onclick = closeDetail;
   box.querySelectorAll('[data-st]').forEach(b => b.onclick = () => setStatus(r, b.dataset.st));
@@ -614,8 +657,9 @@ function renderDetail(){
     saveQuest(r, { ratings }, ratings[me.id] ? '하트 ' + n + '개!' : '평점을 지웠어요');
   });
   const dc = $('doClear'); if (dc) dc.onclick = () => setStatus(r, 'done');
-  $('dEdit').onclick = () => openForm(r);
-  $('dDel').onclick = () => deleteQuest(r);
+  // 고치기·지우기는 등록한 사람만 (2026-11-16) — 상태·화수·평점·한마디는 둘 다
+  if ($('dEdit')) $('dEdit').onclick = () => openForm(r);
+  if ($('dDel')) $('dDel').onclick = () => deleteQuest(r);
   const f = $('cForm');
   f.onsubmit = async e => {
     e.preventDefault(); const inp = $('cIn'), body = inp.value.trim(); if (!body) { inp.focus(); return; }
@@ -691,6 +735,7 @@ function quickAct(act, id){
   if (act === 'next') return setStatus(r, r.status === 'want' ? 'doing' : 'done');
 }
 async function deleteQuest(r){
+  if (r.created_by !== me.id) return;
   const n = comments.filter(c => c.quest_id === r.id).length;
   const ok = await confirmBox('퀘스트 지우기', '「' + esc(r.title) + '」를 지울까요?' + (n ? '<br>한마디 ' + n + '개도 같이 지워져요.' : '') + '<br>등록·클리어·한마디로 받은 경험치도 빠져요.', '지우기', true);
   if (!ok) return;
@@ -729,6 +774,7 @@ function shrink(file){
 
 /* ---------- 등록 · 고치기 창 ---------- */
 function openForm(r){
+  if (r && r.created_by !== me.id) return;
   const editing = !!r;
   const fd = r ? { kind: r.kind, cat: r.cat, title: r.title, memo: r.memo, ep_total: r.ep_total || '', poster: r.poster || '' } : { kind: tab === 'clear' ? 'watch' : tab, cat: tab === 'clear' ? '' : cat, title: '', memo: '', ep_total: '', poster: '' };
   const prev = document.activeElement;
@@ -800,25 +846,41 @@ function confirmBox(title, html, okText, danger){
 
 /* ---------- 레벨업 ---------- */
 let lvShowing = false;
+const NEWREW_KEY = 'gbj-quest-rew-1116';
+const isNewRew = x => x.t === 'pair' || x.t === 'emo' || (x.t === 'pose' && +x.k.split('-')[1] >= 5);
 async function checkLevelUp(){
   if (missing || lvShowing || !chars[me.id]) return;
   const row = chars[me.id], lv = lvInfo(xpOf(me.id)).lv, seen = row.seen_level || 1;
-  if (lv <= seen) return;
+  // 2026-11-16 새로 넣은 보상: 이미 지나간 레벨 것도 한 번 알려 줘요 (기기마다 한 번)
+  let extra = [];
+  try {
+    if (!localStorage.getItem(NEWREW_KEY)) {
+      for (let n = 1; n <= Math.min(seen, lv); n++) extra.push(...rewardsAt(myKind, n).filter(isNewRew));
+      localStorage.setItem(NEWREW_KEY, '1');
+    }
+  } catch (e) {}
+  const up = lv > seen;
+  if (!up && !extra.length) return;
   lvShowing = true;
-  try { await q(sb.from('quest_chars').update({ seen_level: lv, updated_at: new Date().toISOString() }).eq('user_id', me.id)); row.seen_level = lv; } catch (e) { row.seen_level = lv; }
-  const rew = []; for (let n = seen + 1; n <= lv; n++) rew.push(...rewardsAt(myKind, n));
+  if (up) { try { await q(sb.from('quest_chars').update({ seen_level: lv, updated_at: new Date().toISOString() }).eq('user_id', me.id)); row.seen_level = lv; } catch (e) { row.seen_level = lv; } }
+  const rew = extra.slice(); for (let n = seen + 1; n <= lv; n++) rew.push(...rewardsAt(myKind, n));
+  // 창 그림: 이번에 받은 포즈 (내 포즈 먼저, 없으면 투샷) → 없으면 지금 장착한 포즈
+  const pz = rew.filter(x => x.t === 'pose'), pp = rew.filter(x => x.t === 'pair');
+  const lvPic = pz.length ? pz[pz.length - 1].k : pp.length ? pp[pp.length - 1].k : charOf(me.id).pose;
   const prev = document.activeElement;
   const el = document.createElement('div'); el.className = 'dimbg';
   const items = rew.map(x => {
-    if (x.t === 'pose') return '<div class="rew"><span class="im"><img src="' + IMG + x.k + '.webp" alt=""></span><span><small>새 포즈</small>' + esc(x.name) + '</span></div>';
-    if (x.t === 'bg') return '<div class="rew"><span class="im">' + (x.k === 'night' ? '<span style="width:100%;height:100%;background:linear-gradient(#251C45,#3D3270)"></span>' : '<img class="cover" src="' + bgSrc(x.k) + '" alt="">') + '</span><span><small>새 배경</small>' + esc(x.name) + '</span></div>';
+    if (x.t === 'pose' || x.t === 'pair') return '<div class="rew"><span class="im"><img src="' + IMG + x.k + '.webp" alt=""></span><span><small>' + (x.t === 'pair' ? '새 투샷 포즈' : '새 포즈') + '</small>' + esc(x.name) + '</span></div>';
+    if (x.t === 'emo') return '<div class="rew"><span class="im"><img src="' + emoSrc(x.k) + '" alt="" style="max-width:70%;max-height:70%"></span><span><small>새 감정 마크</small>' + esc(x.name) + '</span></div>';
+    if (x.t === 'bg') return '<div class="rew"><span class="im">' + (x.k === 'night' ? '<span style="width:100%;height:100%;background:linear-gradient(#251C45,#3D3270)"></span>' : '<img class="cover" src="' + bgThumb(x.k) + '" alt="">') + '</span><span><small>새 배경</small>' + esc(x.name) + '</span></div>';
     if (x.t === 'title') return '<div class="rew"><span class="im">★</span><span><small>새 칭호</small>' + esc(x.name) + '</span></div>';
     return '<div class="rew"><span class="im" style="display:flex;gap:3px;background:var(--ink)">' + x.cs.map(c => '<i style="width:14px;height:14px;display:block;background:' + c[2] + '"></i>').join('') + '</span><span><small>새 이름표 색</small>' + x.cs.map(c => c[1]).join(' · ') + '</span></div>';
   }).join('');
   el.innerHTML = '<section class="win dlg" role="dialog" aria-modal="true" aria-labelledby="lvT"><div class="lvup">' +
     '<div style="display:flex;align-items:center;gap:8px;font-size:13px"><img src="' + FACE[myKind] + '" alt="" style="height:34px">' + esc(nameOf(me.id)) + '</div>' +
-    '<div class="big" id="lvT">LEVEL UP!</div><div style="font-size:14px">Lv.' + seen + ' <span style="color:var(--yel)">▶</span> Lv.' + lv + '</div>' +
-    '<img src="' + IMG + PAIRS[(lv - 2) % 4] + '.webp" alt="" style="height:110px;width:auto">' +
+    (up ? '<div class="big" id="lvT">LEVEL UP!</div><div style="font-size:14px">Lv.' + seen + ' <span style="color:var(--yel)">▶</span> Lv.' + lv + '</div>'
+        : '<div class="big" id="lvT" style="font-size:28px">NEW REWARD!</div><div style="font-size:13px;line-height:1.6">새 포즈 · 감정 마크가 생겼어요.<br>Lv.' + lv + '까지 열린 것들이에요.</div>') +
+    '<img src="' + IMG + lvPic + '.webp" alt="" style="height:110px;width:auto;max-width:100%;object-fit:contain">' +
     (items ? '<div style="width:100%;display:flex;flex-direction:column;gap:8px">' + items + '</div>' : '<p style="margin:0;font-size:12px;color:var(--sub)">이번 레벨은 보상 없이 레벨만 올라요.</p>') +
     '<div style="display:flex;gap:10px;width:100%"><button type="button" class="btn" style="flex:1" data-x="close">닫기</button><button type="button" class="btn yel" style="flex:1.4" data-x="go">꾸미러 가기 ▶</button></div></div></section>';
   $('layer').appendChild(el);
@@ -840,7 +902,7 @@ function stageHTML(uid, c){
   const name = uid ? nameOf(uid) : partnerName();
   return '<div class="stage' + (c.bg === 'night' ? ' night' : '') + '" role="img" aria-label="' + esc(name) + ' 캐릭터: ' + esc(c.title) + (c.say ? ', 말풍선 ' + esc(c.say) : '') + '">' +
     (c.bg !== 'night' ? '<img class="bgimg" src="' + bgSrc(c.bg) + '" alt="">' : '') +
-    '<img class="chara" src="' + IMG + c.pose + '.webp" alt="">' + (c.say ? '<div class="bubble">' + esc(c.say) + '</div>' : '') +
+    charaHTML(c.pose, c.emo, 'chara') + (c.say ? '<div class="bubble">' + esc(c.say) + '</div>' : '') +
     '<div class="plate" style="background:' + colorHex(c.color) + '"><small>' + esc(c.title) + '</small>' + esc(name) + '</div></div>';
 }
 function renderChar(){
@@ -850,13 +912,16 @@ function renderChar(){
   const pC = charOf(partnerId), xm = lvInfo(xpOf(me.id)), xp = lvInfo(xpOf(partnerId));
   const myCnt = quests.filter(r => r.created_by === me.id).length;
   const partnerMode = document.body.classList.contains('cw-partner');
-  const optP = POSES[myKind].map(p => p[2] <= lv
+  const optP = poseList(myKind).map(p => p[2] <= lv
       ? '<button type="button" class="opt" data-pose="' + p[0] + '" aria-pressed="' + (mineC.pose === p[0]) + '" aria-label="포즈: ' + p[1] + '"><img src="' + IMG + p[0] + '.webp" alt=""></button>'
       : '<div class="opt lock" aria-label="포즈 잠김, Lv.' + p[2] + '에 열려요"><img src="' + IMG + p[0] + '.webp" alt=""><span>Lv.' + p[2] + '</span></div>').join('');
   const optB = BGS.map(b => b[2] <= lv
-      ? '<button type="button" class="opt bg' + (b[0] === 'night' ? ' solid' : '') + '" data-bg="' + b[0] + '" aria-pressed="' + (mineC.bg === b[0]) + '" aria-label="배경: ' + b[1] + '">' + (b[0] === 'night' ? '' : '<img src="' + bgSrc(b[0]) + '" alt="">') + '</button>'
+      ? '<button type="button" class="opt bg' + (b[0] === 'night' ? ' solid' : '') + '" data-bg="' + b[0] + '" aria-pressed="' + (mineC.bg === b[0]) + '" aria-label="배경: ' + b[1] + '">' + (b[0] === 'night' ? '' : '<img src="' + bgThumb(b[0]) + '" alt="" loading="lazy">') + '</button>'
       : '<div class="opt lock" aria-label="배경 잠김, Lv.' + b[2] + '에 열려요"><span>Lv.' + b[2] + '<br>???</span></div>').join('');
   const optT = TITLES[myKind].map(t => '<button type="button" data-ttl="' + esc(t[0]) + '" aria-pressed="' + (mineC.title === t[0]) + '"' + (t[1] > lv ? ' disabled aria-label="칭호 잠김, Lv.' + t[1] + '에 열려요"' : '') + '>' + (t[1] > lv ? 'Lv.' + t[1] + ' ???' : esc(t[0])) + '</button>').join('');
+  const optE = '<button type="button" class="opt" data-emo="none" aria-pressed="' + (mineC.emo === 'none') + '" aria-label="감정 마크 없음"><span style="font-size:11px;color:var(--sub)">없음</span></button>' + EMOS.map(e => e[2] <= lv
+      ? '<button type="button" class="opt" data-emo="' + e[0] + '" aria-pressed="' + (mineC.emo === e[0]) + '" aria-label="감정 마크: ' + e[1] + '"><img src="' + emoSrc(e[0]) + '" alt="" style="max-width:62%;max-height:62%"></button>'
+      : '<div class="opt lock" aria-label="감정 마크 잠김, Lv.' + e[2] + '에 열려요"><img src="' + emoSrc(e[0]) + '" alt="" style="max-width:62%;max-height:62%"><span>Lv.' + e[2] + '</span></div>').join('');
   const optC = COLORS.map(c => '<button type="button" data-col="' + c[0] + '" aria-pressed="' + (mineC.color === c[0]) + '" aria-label="이름표 ' + c[1] + (c[3] > lv ? ', Lv.' + c[3] + '에 열려요' : '') + '" style="background:' + c[2] + '"' + (c[3] > lv ? ' disabled' : '') + '></button>').join('');
   const cnt = (arr, i) => arr.filter(a => a[i] <= lv).length + ' / ' + arr.length;
   box.innerHTML = '<div class="top"><a class="btn" href="#">◀ 퀘스트로</a><span class="crumb">CHARACTER · 우리 파티</span></div>' +
@@ -866,7 +931,8 @@ function renderChar(){
       '<div class="stwrap pa"><span class="cap">' + esc(partnerName()) + ' · 구경만 가능</span>' + stageHTML(partnerId, pC) + '<p class="cinfo">Lv.' + xp.lv + ' · EXP ' + xp.cur + ' / ' + xp.need + (partnerId ? '' : ' · 아직 퀘스트 로그에 안 들어왔어요') + '</p></div>' +
     '</div></div>' +
     '<aside class="editor">' +
-      '<section class="win" aria-label="포즈"><div class="wt">포즈<span>' + cnt(POSES[myKind], 2) + ' · 레벨업마다 열려요</span></div><div class="in"><div class="grid" style="grid-template-columns:repeat(4,minmax(0,1fr))">' + optP + '</div></div></section>' +
+      '<section class="win" aria-label="포즈"><div class="wt">포즈<span>' + cnt(poseList(myKind), 2) + ' · 레벨업마다 열려요</span></div><div class="in"><div class="grid" style="grid-template-columns:repeat(4,minmax(0,1fr))">' + optP + '</div></div></section>' +
+      '<section class="win" aria-label="감정 마크"><div class="wt">감정 마크<span>' + cnt(EMOS, 2) + ' · 머리 위에 붙어요</span></div><div class="in"><div class="grid" style="grid-template-columns:repeat(5,minmax(0,1fr))">' + optE + '</div></div></section>' +
       '<section class="win" aria-label="배경"><div class="wt">배경<span>' + cnt(BGS, 2) + '</span></div><div class="in"><div class="grid" style="grid-template-columns:repeat(3,minmax(0,1fr))">' + optB + '</div></div></section>' +
       '<section class="win" aria-label="칭호와 이름표"><div class="wt">칭호 · 이름표<span>칭호 ' + cnt(TITLES[myKind], 1) + '</span></div><div class="in" style="display:flex;flex-direction:column;gap:14px"><div class="ttl">' + optT + '</div>' +
         '<div><p class="lbl">이름표 색</p><div class="sws">' + optC + '</div></div>' +
@@ -877,14 +943,20 @@ function renderChar(){
   box.querySelectorAll('[data-pose]').forEach(b => b.onclick = () => { editC.pose = b.dataset.pose; renderChar(); });
   box.querySelectorAll('[data-bg]').forEach(b => b.onclick = () => { editC.bg = b.dataset.bg; renderChar(); });
   box.querySelectorAll('[data-ttl]').forEach(b => b.onclick = () => { editC.title = b.dataset.ttl; renderChar(); });
+  box.querySelectorAll('[data-emo]').forEach(b => b.onclick = () => { editC.emo = b.dataset.emo; renderChar(); });
   box.querySelectorAll('[data-col]').forEach(b => b.onclick = () => { editC.color = b.dataset.col; renderChar(); });
   const si = $('sayIn');
   si.oninput = () => { editC.say = si.value; const st = box.querySelector('.stwrap.me .stage'); if (st) st.outerHTML = stageHTML(me.id, Object.assign({}, charOf(me.id), editC)); };
   $('charSave').onclick = async () => {
     const btn = $('charSave'); btn.disabled = true;
-    const row = { user_id: me.id, kind: myKind, pose: editC.pose, bg: editC.bg, title: editC.title, color: editC.color, say: (editC.say || '').trim().slice(0, 20), updated_at: new Date().toISOString() };
-    try { const saved = await q(sb.from('quest_chars').upsert(Object.assign({ seen_level: (chars[me.id] && chars[me.id].seen_level) || 1 }, row), { onConflict: 'user_id' }).select('*').single()); chars[me.id] = saved; toast('장착 완료!'); }
-    catch (e) { toast(esc(failMsg(e))); }
+    const row = { user_id: me.id, kind: myKind, pose: editC.pose, bg: editC.bg, title: editC.title, color: editC.color, emo: editC.emo || 'none', say: (editC.say || '').trim().slice(0, 20), updated_at: new Date().toISOString() };
+    const up = r => q(sb.from('quest_chars').upsert(Object.assign({ seen_level: (chars[me.id] && chars[me.id].seen_level) || 1 }, r), { onConflict: 'user_id' }).select('*').single());
+    try { chars[me.id] = await up(row); toast('장착 완료!'); }
+    catch (e) {
+      // 감정 마크 칸(emo)이 아직 없으면: 나머지만 저장하고 SQL 안내
+      if (/emo/.test(((e && e.message) || '') + '')) { try { delete row.emo; chars[me.id] = await up(row); toast('감정 마크를 저장하려면 Supabase에서 감정마크_추가.sql을 실행해 주세요.', 4200); } catch (e2) { toast(esc(failMsg(e2))); } }
+      else toast(esc(failMsg(e)));
+    }
     btn.disabled = false;
   };
 }

@@ -921,6 +921,17 @@ body[data-theme="night"] .yz-stamp{color:#d9675b;border-color:#d9675b}
  .yz-search input{font-size:19px}
  .yz-search .go{font-size:17px;padding:0 12px}
 }
+
+/* 고양이 마우스 커서 (PC만) 2026-11-16 */
+@media (hover:hover) and (pointer:fine){
+html,body{cursor:url(img/cursor/default.png) 0 0,auto}
+a[href],button:not(:disabled),select,summary,label,[role=button],[role=tab],input[type=checkbox],input[type=radio],input[type=file],input[type=submit],input[type=button],.editable,.pol,.phbtn{cursor:url(img/cursor/pointer.png) 1 1,pointer!important}
+input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=submit]):not([type=button]):not([type=range]):not([type=color]),textarea,[contenteditable=true]{cursor:url(img/cursor/text.png) 4 4,text!important}
+:disabled,[aria-disabled=true],.opt.lock,.hearts.ro .h{cursor:url(img/cursor/not-allowed.png) 7 7,not-allowed!important}
+.hearts.ro .h{cursor:url(img/cursor/default.png) 0 0,default!important}
+.btn:disabled,.login-submit:disabled,.go:disabled,.ghost:disabled,body.busy,body.busy *{cursor:url(img/cursor/wait.png) 5 4,wait!important}
+[draggable=true]{cursor:url(img/cursor/move.png) 16 16,move!important}
+}
 </style>
 </head>
 <body data-theme="berry">

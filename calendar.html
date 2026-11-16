@@ -370,6 +370,17 @@ input[type=date].in::-webkit-date-and-time-value,input[type=time].in::-webkit-da
 .pc-foot{margin:10px 0 0;font:400 11.5px/1.4 var(--f-body);color:#9A7A84;position:relative}
 @media (max-width:959px){.pin-card{padding:18px 16px 14px;margin:16px 2px 16px}.pc-k{font-size:19px}.pc-time{font-size:42px}.pc-seal{width:56px;height:56px;font-size:21px;right:10px}.cell.pin-cell .num::after{display:none}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* 고양이 마우스 커서 (PC만) 2026-11-16 */
+@media (hover:hover) and (pointer:fine){
+html,body{cursor:url(img/cursor/default.png) 0 0,auto}
+a[href],button:not(:disabled),select,summary,label,[role=button],[role=tab],input[type=checkbox],input[type=radio],input[type=file],input[type=submit],input[type=button],.editable,.pol,.phbtn{cursor:url(img/cursor/pointer.png) 1 1,pointer!important}
+input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=submit]):not([type=button]):not([type=range]):not([type=color]),textarea,[contenteditable=true]{cursor:url(img/cursor/text.png) 4 4,text!important}
+:disabled,[aria-disabled=true],.opt.lock,.hearts.ro .h{cursor:url(img/cursor/not-allowed.png) 7 7,not-allowed!important}
+.hearts.ro .h{cursor:url(img/cursor/default.png) 0 0,default!important}
+.btn:disabled,.login-submit:disabled,.go:disabled,.ghost:disabled,body.busy,body.busy *{cursor:url(img/cursor/wait.png) 5 4,wait!important}
+[draggable=true]{cursor:url(img/cursor/move.png) 16 16,move!important}
+}
 </style>
 </head>
 <body>
@@ -642,12 +653,13 @@ function detailHTML(ev){
     '<div><dt>' + SVG_BELL + '<span class="sr">알림</span></dt><dd>' + (ev.alarm_min == null ? '알림 없음' : (ALARMS.find(a => a[0] === ev.alarm_min) || [0, ev.alarm_min + '분 전'])[1] + ' · ' + (ev.alarm_to === 'me' ? '적은 사람에게만' : '두 사람 모두에게')) + '</dd></div></dl>' +
     (ph.length ? '<div class="photos">' + ph.map((p, i) => '<figure class="pol"><button type="button" class="phbtn" data-ph="' + esc(p.path) + '" aria-label="사진 ' + (i + 1) + ' 크게 보기" style="all:unset;display:block;cursor:zoom-in"><img alt="" data-path="' + esc(p.path) + '"' + (signed[p.path] ? ' src="' + esc(signed[p.path].url) + '"' : '') + '></button></figure>').join('') + '</div>' : '') +
     (ev.memo ? '<p class="memo">' + esc(ev.memo) + '</p>' : '') +
-    '<div class="by"><span>' + esc(nameOf(ev.created_by)) + '가 적음 · ' + fmtTS(ev.created_at) + (ev.updated_at ? ' (고침)' : '') + '</span><span><button type="button" id="evEdit">수정</button><button type="button" id="evDel">삭제</button></span></div>' +
+    '<div class="by"><span>' + esc(nameOf(ev.created_by)) + '가 적음 · ' + fmtTS(ev.created_at) + (ev.updated_at ? ' (고침)' : '') + '</span>' + (ev.created_by === me.id ? '<span><button type="button" id="evEdit">수정</button><button type="button" id="evDel">삭제</button></span>' : '') + '</div>' +
     '</article><section class="cm" id="cmBox" aria-label="댓글"></section>';
 }
 async function bindDetail(ev){
-  $('evEdit').onclick = () => openForm(ev, ev.day);
-  $('evDel').onclick = () => deleteEvent(ev);
+  // 수정·삭제는 적은 사람만 (2026-11-16)
+  if ($('evEdit')) $('evEdit').onclick = () => openForm(ev, ev.day);
+  if ($('evDel')) $('evDel').onclick = () => deleteEvent(ev);
   $('panelBody').querySelectorAll('.phbtn').forEach(b => b.onclick = () => lightbox(b.dataset.ph));
   loadComments(ev);
   const need = (photos[ev.id] || []).map(p => p.path).filter(p => !signed[p] || signed[p].exp < Date.now());
@@ -730,6 +742,7 @@ function drawComments(){
 
 /* ---------- 일정 적기 · 고치기 ---------- */
 function openForm(ev, k){
+  if (ev && ev.created_by !== me.id) return;
   adding = !ev; selKey = k || selKey;
   fd = ev ? {
     id: ev.id, who: ev.who, title: ev.title, day: ev.day, all_day: ev.all_day, start: hm(ev.start_time), end: hm(ev.end_time), repeat: ev.repeat,
@@ -874,6 +887,7 @@ async function saveForm(){
   toast(failedPh ? '일정은 저장했는데 사진 ' + failedPh + '장을 올리지 못했어요' : (wasEdit ? '일정을 고쳤어요' : '출동 일지에 적었어요!'), failedPh ? 4500 : 2600);
 }
 async function deleteEvent(ev){
+  if (ev.created_by !== me.id) return;
   if (!confirm('「' + ev.title + '」 일정을 지울까요?' + (ev.repeat !== 'none' ? '\n반복되는 날짜에서도 모두 사라져요.' : '') + '\n사진과 댓글도 함께 지워지고 되돌릴 수 없어요.')) return;
   try {
     const ph = photos[ev.id] || [];
