@@ -17,6 +17,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 @font-face{font-family:'Galmuri9';src:url('fonts/galmuri9.woff2') format('woff2');font-display:swap}
+@font-face{font-family:'DungGeunMo';src:url('fonts/dunggeunmo.woff2') format('woff2');font-display:swap}
 /* =========================================================
    게부장 타임 — 퀘스트 로그 (마요보로)  2026-11-16
    도트 게임 창: 남보라 바탕 + 흰 픽셀 테두리, 갈무리9
@@ -186,11 +187,13 @@ img{image-rendering:pixelated}
 .say .nm{display:flex;gap:6px;align-items:center;font-size:10.5px;color:var(--sub);margin-bottom:3px}
 .say .nm .acts{margin-left:auto;display:flex}
 .say .nm .acts button{border:0;background:none;color:var(--sub);font:400 10.5px/1 var(--f);padding:4px 5px}
-.say p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.say p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font:400 16px/1.5 'DungGeunMo','Galmuri9',sans-serif}
 .cf{display:flex;gap:8px;align-items:flex-end}
 .cf input,.cf textarea{flex:1;min-width:0;height:42px;padding:0 10px;background:var(--ink);border:2px solid var(--line2);color:#fff;font:400 12px/1 var(--f)}
 .cf textarea{height:auto;min-height:42px;padding:11px 10px 9px;line-height:1.6;resize:none;overflow-y:hidden;display:block}
 .cf textarea.tall{min-height:76px}
+/* 한마디 글·입력칸 = 둥근모꼴 (2026-11-17) */
+.cf textarea{font:400 16px/1.5 'DungGeunMo','Galmuri9',sans-serif;padding:10px 10px 8px}
 .cf input::placeholder,.cf textarea::placeholder,.fin::placeholder{color:#8C82B8;opacity:1}
 .dacts{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .dacts .lnk{border:0;background:none;color:var(--sub);font:400 11.5px/1 var(--f);padding:8px 4px;text-decoration:underline;text-underline-offset:3px}

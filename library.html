@@ -381,7 +381,8 @@ body[data-theme="night"] .tab.on .mk svg{color:#8E342E}
 .c-acts button:hover{color:var(--text);background:var(--hover)}
 .c-empty{color:var(--muted);font-size:14px;text-align:center;padding:12px 0 4px}
 .c-form{margin-top:18px;display:flex;flex-direction:column;gap:8px}
-.c-form textarea{width:100%;min-height:84px;resize:vertical;padding:12px 16px;border:1.5px solid var(--line);border-radius:16px;background:var(--surface);font:15px/1.6 var(--f-ui);color:var(--text)}
+.c-form textarea{width:100%;min-height:84px;resize:vertical;padding:12px 16px;border:1.5px solid var(--line);border-radius:16px;background:var(--surface);font:400 17px/1.6 'DongpaKkeujeogim',var(--f-ui);color:var(--text)}
+.c-form textarea::placeholder{font:inherit;color:var(--muted);opacity:1}
 .c-form textarea:focus{border-color:var(--focus);outline:none}
 .c-form .row2{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .c-form .cnt{font-size:12px;color:var(--muted)}
@@ -816,6 +817,31 @@ body[data-theme="night"] .yz .fbar{border-color:rgba(255,255,255,.16)}
 .yz .prog i{background:repeating-linear-gradient(45deg,#f6a6bd 0 4px,#ef8aa7 4px 8px);border-radius:0}
 .yz-stamp{display:inline-grid;place-items:center;width:62px;height:62px;border:3px double var(--red);border-radius:50%;color:var(--red);font:700 15px/1.05 var(--f-title);text-align:center;transform:rotate(-14deg);opacity:.9}
 body[data-theme="night"] .yz-stamp{color:#d9675b;border-color:#d9675b}
+/* 둘 다 읽음: 다 읽음 위에 분홍 도장을 겹쳐 찍어요 (2026-11-17) */
+.yz-stamps{position:relative;display:inline-block;width:88px;height:72px}
+.yz-stamps .yz-stamp{position:absolute;left:0;top:0}
+.yz-stamp2{position:absolute;left:26px;top:10px;display:grid;place-items:center;width:62px;height:62px;border:3px double #D4537E;border-radius:50%;color:#D4537E;background:color-mix(in srgb,var(--paper2) 55%,transparent);font:700 14px/1.05 var(--f-title);text-align:center;transform:rotate(10deg);opacity:.95}
+body[data-theme="night"] .yz-stamp2{color:#f4b6cc;border-color:#f4b6cc}
+/* 서재 소식 종 + 창 */
+.news-bell{position:relative}
+.nb-dot{position:absolute;top:8px;right:8px;width:9px;height:9px;border-radius:50%;background:#e2465a;border:2px solid var(--wall1,var(--page))}
+.newsbox{padding:0;width:min(360px,calc(100vw - 16px));max-height:min(70dvh,520px);overflow:auto;border-top:4px solid var(--gold)}
+.sheet.newsbox{width:auto;max-height:80dvh}
+.nhead{display:flex;justify-content:space-between;align-items:center;padding:12px 16px 9px;border-bottom:1.5px dashed var(--line)}
+.nhead b{font:700 19px/1 'DongpaKkeujeogim',var(--f-ui)}
+.nhead span{font:400 11px/1 'Galmuri9',var(--f-ui);color:var(--muted)}
+.nlist{display:flex;flex-direction:column;padding:4px 0 6px}
+.nitem{display:flex;gap:10px;align-items:flex-start;width:100%;padding:10px 16px;border:0;background:none;text-align:left;color:var(--text)}
+.nitem:hover{background:var(--hover)}
+.nitem.new{background:color-mix(in srgb,var(--heart) 10%,transparent)}
+.nitem .nt{flex:1;min-width:0;font:400 18px/1.35 'OwnglyphParkDaHyun','Jua',var(--f-ui);word-break:keep-all;overflow-wrap:anywhere}
+.nitem .nt b{font-weight:400;color:var(--heart)}
+.nitem .nt small{display:block;margin-top:3px;font:400 10.5px/1 'Galmuri9',var(--f-ui);color:var(--muted)}
+.ni{flex-shrink:0;width:16px;height:16px;margin-top:3px;display:grid;place-items:center}
+.ni.read{color:var(--red,#c8463a)}.ni.cmt{color:var(--gold)}
+.ni.hl{border-radius:4px;background:var(--hl-h-s,#FFD95A)}
+.nd{flex-shrink:0;width:8px;height:8px;margin-top:9px;border-radius:50%;background:#e2465a}
+.nempty{margin:0;padding:22px 16px;text-align:center;font:400 18px/1.4 'OwnglyphParkDaHyun',var(--f-ui);color:var(--muted)}
 .yz .r-more{color:var(--ymuted)}
 /* 이름은 끝까지 보이게 */
 .yz .row .rate .who{max-width:none;width:auto;min-width:0;white-space:nowrap;overflow:visible;text-overflow:clip;color:var(--ytext)}
@@ -876,6 +902,9 @@ body[data-theme="night"] .yz-stamp{color:#d9675b;border-color:#d9675b}
  .yz .r-title{font-size:14.5px}
  .yz .r-status{position:static}
  .yz-stamp{position:absolute;right:38px;top:6px;width:46px;height:46px;font-size:11px;border-width:2.6px}
+ .yz-stamps{position:absolute;right:56px;top:4px;width:66px;height:56px}
+ .yz-stamps .yz-stamp{right:auto;left:0;top:0}
+ .yz-stamp2{left:20px;top:8px;width:46px;height:46px;font-size:10.5px;border-width:2.6px}
  .yz .row .rate .who{font-size:10.5px}
  .yz-pager{gap:4px;margin-top:18px}
  .yz-pager .pg{min-width:32px;height:32px;font-size:13px;padding:0 7px;box-shadow:2px 2px 0 var(--ysh)}
@@ -1055,7 +1084,8 @@ const P = {
   minus:'<path d="M6 12h12"/>', plus:'<path d="M12 6v12M6 12h12"/>',
   user:'<circle cx="12" cy="8" r="3.6"/><path d="M5 20c1.2-3.6 4-5.2 7-5.2s5.8 1.6 7 5.2"/>',
   chat:'<path d="M4 5h16v11H9l-5 4z"/>',
-  search:'<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>'
+  search:'<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>',
+  bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>'
 };
 
 /* ---------- 직접 그린 장식 (글자 없음) ---------- */
@@ -1113,10 +1143,11 @@ const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3 4.6
 let sb = null, me = null, isOwner = false, ready = false, loadFailed = false;
 // 간판 이름: 지난번에 불러온 이름을 기억해 두었다가 처음부터 보여 줘요
 let lib = { name: (() => { try { const n = localStorage.getItem('lib-name'); return n && OLD_NAMES.indexOf(n) < 0 ? n : DEFAULT_NAME; } catch(e) { return DEFAULT_NAME; } })(), folders: [], novels: [] };
-let progress = {}, ratings = {}, members = {}, rateAt = {};   // rateAt: novelId -> {userId: 하트 찍은 시각}
+let progress = {}, ratings = {}, members = {}, rateAt = {}, ptRead = {}, ptHl = {};   // ptRead: 상대가 다 읽은 작품 -> 시각 / ptHl: 상대가 형광펜 처음 그은 작품 -> 시각
+   // rateAt: novelId -> {userId: 하트 찍은 시각}
 let cmtMeta = {}, cmtSeen = {}, cmtOK = true;   // novelId -> [{user_id, created_at}] / novelId -> seen time
 const textCache = {};
-let curFolder = 'all', sortMode = 'new', view = 'library', readerId = null;
+let curFolder = 'all', sortMode = 'recent', view = 'library', readerId = null;
 let curPage = 1, searchQ = '';            // 한 페이지 5편 + 제목 검색
 const PAGE = 5;
 
@@ -1132,7 +1163,7 @@ if (!prefs.winter1) {
   savePrefs();
 }
 if (prefs.theme !== 'berry' && prefs.theme !== 'night') prefs.theme = 'berry';
-try { const s = localStorage.getItem('lib-ui'); if (s) { const u = JSON.parse(s); curFolder = u.f || 'all'; sortMode = u.s || 'new'; } } catch(e){}
+try { const s = localStorage.getItem('lib-ui'); if (s) { const u = JSON.parse(s); curFolder = u.f || 'all'; sortMode = u.s || 'recent'; } if (['recent','old','mine','avg'].indexOf(sortMode) < 0) sortMode = 'recent'; } catch(e){}
 function saveUi(){ try{ localStorage.setItem('lib-ui', JSON.stringify({f:curFolder,s:sortMode})); }catch(e){} }
 function savePrefs(){ try{ localStorage.setItem('reader-prefs', JSON.stringify(prefs)); }catch(e){} }
 function FONTS_OK(k){ return ['ridi','serif','batang','nanum','sans'].indexOf(k) >= 0; }
@@ -1181,7 +1212,10 @@ const isRead = id => (progress[id] || 0) >= 0.95;
 const byTitle = (x,y) => x.title.localeCompare(y.title, 'ko', {numeric:true});
 function sorted(list){
   const a = list.slice();
-  if (sortMode === 'new') a.sort((x,y) => y.added - x.added);
+  if (sortMode === 'recent') {   // 최근 하트순: 두 사람 중 누구든 가장 최근에 하트 찍은 작품부터 (하트 없는 작품은 뒤로, 최근 올린 순)
+    const t = id => { const r = rateAt[id], s = ratings[id]; if (!r || !s) return 0; return Math.max(0, ...Object.keys(s).map(u => r[u] || 0)); };
+    a.sort((x,y) => (t(y.id) - t(x.id)) || (y.added - x.added));
+  }
   else if (sortMode === 'old') a.sort((x,y) => x.added - y.added);
   else if (sortMode === 'mine') a.sort((x,y) => (myScore(y.id) - myScore(x.id)) || byTitle(x,y));
   else if (sortMode === 'pt') {   // 상대가 최근에 하트 찍은 순 (하트 없는 작품은 뒤로, 최근 올린 순)
@@ -1382,7 +1416,7 @@ async function loadAll(){
     q(sb.from('meta').select('value').eq('key', 'name').maybeSingle()),
     q(sb.from('folders').select('id,name,is_private,sort').order('sort').order('created_at')),
     q(sb.from('novels').select('id,folder_id,title,type,chars,created_at')),
-    q(sb.from('progress').select('novel_id,pct')),
+    q(sb.from('progress').select('user_id,novel_id,pct,updated_at')),
     q(sb.rpc('is_owner')),
     q(sb.from('ratings').select('user_id,novel_id,score,updated_at')),
     q(sb.from('members').select('user_id,name'))
@@ -1392,7 +1426,9 @@ async function loadAll(){
   lib = { name: fixName(storedName), folders: folders.map(mapFolder), novels: novels.map(mapNovel) };
   // 예전 기본 이름이 저장돼 있으면 주인 계정에서 한 번 새 이름으로 바꿔 둬요
   if (isOwner && storedName && OLD_NAMES.indexOf(storedName) >= 0) sb.from('meta').upsert({ key: 'name', value: DEFAULT_NAME }).then(() => {}, () => {});
-  progress = {}; prog.forEach(p => progress[p.novel_id] = p.pct);
+  // 읽음 기록: 내 것 + (서재_읽음_소식_추가.sql 실행 후) 상대가 다 읽은 것
+  progress = {}; ptRead = {};
+  prog.forEach(p => { if (!p.user_id || p.user_id === me.id) progress[p.novel_id] = p.pct; else if (p.pct >= 0.95) ptRead[p.novel_id] = Date.parse(p.updated_at) || 0; });
   ratings = {}; rateAt = {}; rates.forEach(r => { (ratings[r.novel_id] = ratings[r.novel_id] || {})[r.user_id] = r.score; (rateAt[r.novel_id] = rateAt[r.novel_id] || {})[r.user_id] = Date.parse(r.updated_at) || 0; });
   members = {}; mems.forEach(m => members[m.user_id] = m.name);
   if (!members[me.id]) {
@@ -1401,6 +1437,12 @@ async function loadAll(){
     sb.from('members').upsert({ user_id: me.id, name: nm }).then(() => {}, () => {});
   }
   await loadCommentMeta();
+  // 상대가 형광펜을 그은 작품 (작품마다 처음 그은 때 한 번만 소식)
+  ptHl = {};
+  try {
+    const hs = await q(sb.from('highlights').select('novel_id,user_id,created_at').neq('user_id', me.id));
+    hs.forEach(h => { const t = Date.parse(h.created_at) || 0; if (!ptHl[h.novel_id] || t < ptHl[h.novel_id]) ptHl[h.novel_id] = t; });
+  } catch(e) {}
   ready = true;
   if (curFolder !== 'all' && !getFolder(curFolder)) curFolder = 'all';
 }
@@ -1494,6 +1536,54 @@ async function backupAll(){
   toast('작품 ' + lib.novels.length + '편을 zip으로 내려받았어요', 3500);
 }
 
+/* ---------- 서재 소식 (2026-11-17): 상대가 다 읽음 · 댓글 · 형광펜(작품마다 한 번). 푸시 없음 ---------- */
+const NEWS_KEY = 'lib-news-seen';
+function newsSeen(){
+  try { const v = +localStorage.getItem(NEWS_KEY); if (v) return v; const t = Date.now() - 3 * 864e5; localStorage.setItem(NEWS_KEY, t); return t; } catch(e) { return 0; }
+}
+function newsItems(){
+  if (!me) return [];
+  const out = [], has = id => !!getNovel(id);
+  Object.keys(ptRead).forEach(id => { if (has(id) && ptRead[id]) out.push({ k: 'read', id, uid: partnerId(), at: ptRead[id] }); });
+  Object.keys(cmtMeta).forEach(id => { if (has(id)) cmtMeta[id].forEach(c => { if (c.user_id !== me.id) out.push({ k: 'cmt', id, uid: c.user_id, at: Date.parse(c.created_at) || 0 }); }); });
+  Object.keys(ptHl).forEach(id => { if (has(id)) out.push({ k: 'hl', id, uid: partnerId(), at: ptHl[id] }); });
+  return out.sort((a, b) => b.at - a.at).slice(0, 30);
+}
+const newsCount = () => { const s = newsSeen(); return newsItems().filter(x => x.at > s).length; };
+const josa = (w, a, b) => { const c = String(w).charCodeAt(String(w).length - 1); return c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28 ? a : b; };
+function newsDay(t){
+  const kd = x => Math.floor((x + 9 * 36e5) / 864e5), d = kd(Date.now()) - kd(t);
+  return d <= 0 ? '오늘' : d === 1 ? '어제' : fmtD(t).slice(5);
+}
+function newsPanel(anchor){
+  const seen = newsSeen(), items = newsItems(), fresh = items.filter(x => x.at > seen).length;
+  try { localStorage.setItem(NEWS_KEY, Date.now()); } catch(e) {}
+  const b = document.getElementById('newsBell'); if (b) { const d = b.querySelector('.nb-dot'); if (d) d.remove(); b.setAttribute('aria-label', '서재 소식'); }
+  const prevFocus = anchor, sheet = isMobile();
+  const sc = document.createElement('div'); sc.className = 'scrim' + (sheet ? '' : ' clear');
+  const el = document.createElement('div'); el.className = (sheet ? 'sheet' : 'pop') + ' newsbox'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', '서재 소식');
+  const line = x => {
+    const n = getNovel(x.id), who = (x.uid && members[x.uid]) || partnerName(), t = '「' + n.title + '」';
+    const txt = esc(who) + josa(who, '이', '가') + ' <b>' + esc(t) + '</b>' + (x.k === 'read' ? josa(n.title, '을', '를') + ' 다 읽었다!' : x.k === 'cmt' ? '에 댓글을 남겼다!' : '에 형광펜을 그었다!');
+    const icon = x.k === 'read' ? '<span class="ni read" aria-hidden="true">' + ic('check','sm') + '</span>' : x.k === 'cmt' ? '<span class="ni cmt" aria-hidden="true">' + ic('chat','sm') + '</span>' : '<span class="ni hl" aria-hidden="true"></span>';
+    return '<button class="nitem' + (x.at > seen ? ' new' : '') + '" data-nid="' + x.id + '">' + icon + '<span class="nt">' + txt + '<small>' + newsDay(x.at) + '</small></span>' + (x.at > seen ? '<span class="nd"><span class="sr">새 소식</span></span>' : '') + '</button>';
+  };
+  el.innerHTML = '<div class="nhead"><b>서재 소식</b><span>' + (fresh ? '새 소식 ' + fresh : '') + '</span></div>' +
+    (items.length ? '<div class="nlist">' + items.map(line).join('') + '</div>' : '<p class="nempty">아직 소식이 없다!</p>');
+  document.body.appendChild(sc);
+  if (sheet) sc.appendChild(el); else document.body.appendChild(el);
+  if (!sheet) {
+    const r = anchor.getBoundingClientRect(), w = el.offsetWidth;
+    el.style.left = (Math.max(8, Math.min(r.right - w, innerWidth - w - 8)) + scrollX) + 'px'; el.style.top = (r.bottom + 6 + scrollY) + 'px';
+  }
+  const close = () => { sc.remove(); el.remove(); document.removeEventListener('keydown', onKey, true); try { prevFocus && prevFocus.focus(); } catch(e) {} };
+  const onKey = e => { if (e.key === 'Escape') { e.stopPropagation(); close(); } };
+  document.addEventListener('keydown', onKey, true);
+  sc.addEventListener('mousedown', e => { if (e.target === sc) close(); });
+  el.querySelectorAll('[data-nid]').forEach(x => x.onclick = () => { close(); openNovel(x.dataset.nid); });
+  const f = el.querySelector('button'); if (f) setTimeout(() => f.focus({ preventScroll: true }), 20);
+}
+
 async function accountMenu(anchor){
   const items = [{key:'name', label:'내 표시 이름 바꾸기'}];
   if (isOwner) items.push({key:'backup', label:'전체 백업 내려받기'});
@@ -1582,6 +1672,7 @@ function topBar(){
     '<a class="desk-btn" href="index.html" aria-label="책상으로 돌아가기">' + ic('back') + '책상으로</a>' +
     themeBtnHTML() +
     '<button class="acct-btn" id="acctBtn" aria-haspopup="menu">' + ic('user') + '<span>' + esc(members[me.id] || '계정') + '</span>' + ic('down','sm') + '</button>' +
+    '<button class="icon-btn theme-btn news-bell" id="newsBell" aria-haspopup="dialog" aria-label="서재 소식' + (newsCount() ? ', 새 소식 ' + newsCount() + '개' : '') + '" title="서재 소식">' + ic('bell') + (newsCount() ? '<span class="nb-dot"></span>' : '') + '</button>' +
     '</div></header>';
 }
 function rowHTML(n){
@@ -1589,12 +1680,12 @@ function rowHTML(n){
   const parts = [];
   if (isAll) parts.push('<span class="fold">' + (isPrivFolder(n.folderId) ? ic('lock','sm') + '<span class="sr">비공개 폴더</span>' : '') + esc(folderName(n.folderId)) + '</span>');
   parts.push('<span>' + fmtN(n.chars) + '자</span>', '<span>' + fmtD(n.added) + '</span>');
-  if (sortMode === 'pt') { const pid = partnerId(), ps = partnerScore(n.id), pt = pid && rateAt[n.id] && rateAt[n.id][pid]; if (ps && pt) parts.push('<span class="r-pt">' + esc(partnerName()) + ' ♥' + ps + ' · ' + fmtD(pt).slice(5) + '</span>'); }
   const cc = cmtCount(n.id);
   if (cc) parts.push('<span class="r-cmt' + (cmtNew(n.id) ? ' new' : '') + '">' + ic('chat','sm') + cc + (cmtNew(n.id) ? '<span class="newdot"></span><span class="sr">새 댓글 있음</span>' : '') + '</span>');
   const meta = parts.join('<span aria-hidden="true">·</span>');
   let status = '';
-  if (rd) status = '<span class="yz-stamp">다<br>읽음</span><span class="sr">읽음</span>';
+  if (rd && ptRead[n.id]) status = '<span class="yz-stamps"><span class="yz-stamp">다<br>읽음</span><span class="yz-stamp2">둘 다<br>읽음</span></span><span class="sr">둘 다 읽음</span>';
+  else if (rd) status = '<span class="yz-stamp">다<br>읽음</span><span class="sr">읽음</span>';
   else if (p > 0.01) status = '읽는 중 ' + Math.round(p*100) + '%<span class="prog"><i style="width:' + Math.round(p*100) + '%"></i></span>';
   return '<div class="row' + (rd ? ' read' : '') + '" data-n="' + n.id + '">' +
     '<div class="r-main"><span class="r-ico' + (rd ? ' mayo' : '') + '" aria-hidden="true">' + (rd ? MAYO_SM : MILK_SM) + '</span><div class="r-txt"><a class="r-title" href="#r-' + n.id + '">' + esc(n.title) + '</a><div class="r-meta">' + meta + '</div></div></div>' +
@@ -1648,7 +1739,7 @@ function renderLibrary(){
     if (isOwner) h += '<button class="btn" id="folderMenu" aria-haspopup="menu">폴더 설정' + ic('down','sm') + '</button>';
   }
   h += '</div><label class="sort"><span class="sr">정렬</span><select id="sortSel">' +
-       [['new','최근 올린 순'],['name','제목순'],['old','올린 순서'],['mine','내 하트순'],['avg','평균 하트순'],['pt', partnerName() + ' 최근 하트순']].map(o => '<option value="' + o[0] + '"' + (sortMode === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') +
+       [['recent','최근 하트순'],['old','올린 순'],['mine','내 하트순'],['avg','평균 하트순']].map(o => '<option value="' + o[0] + '"' + (sortMode === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') +
        '</select>' + ic('down','sm') + '</label></div>';
 
   if (!ready) h += skeleton();
@@ -1685,6 +1776,7 @@ function renderLibrary(){
   const on = (sel, fn) => { const el = $app.querySelector(sel); if (el) el.onclick = fn; };
   $app.querySelectorAll('[data-up]').forEach(b => b.onclick = () => fileInput.click());
   on('#acctBtn', e => accountMenu(e.currentTarget));
+  on('#newsBell', e => newsPanel(e.currentTarget));
   on('[data-theme-toggle]', e => themeMenu(e.currentTarget, render));
   on('#retryBtn', () => { ready = false; render(); refresh(); });
   on('#libName', async () => {
@@ -1975,7 +2067,7 @@ function drawComments(n){
         '<div class="c-body">' + esc(c.body) + '</div>' +
         (mine ? '<div class="c-acts"><button data-cedit="' + c.id + '">수정</button><button data-cdel="' + c.id + '">삭제</button></div>' : '') + '</li>';
     }).join('') + '</ul>';
-    h += '<form class="c-form" id="cForm"><label class="sr" for="cTxt">댓글 쓰기</label><textarea id="cTxt" maxlength="2000" placeholder="이 작품 어땠는지 한마디 남겨 주세요"></textarea>' +
+    h += '<form class="c-form" id="cForm"><label class="sr" for="cTxt">댓글 쓰기</label><textarea id="cTxt" maxlength="2000" placeholder="이 작품이 어땠는지 한마디!"></textarea>' +
          '<div class="row2"><span class="cnt" id="cCnt"></span><button class="btn primary" type="submit">남기기</button></div></form>';
   }
   box.innerHTML = h;
@@ -2063,7 +2155,7 @@ function drawPreview(n){
   let h = '<div class="cpv-head"><h2>미리 보기</h2><button class="icon-btn" data-cx aria-label="닫기">' + ic('x') + '</button></div>' +
     '<div class="cpv-tabs" role="tablist"><button role="tab" data-t="c" aria-selected="' + (cpvTab === 'c') + '">댓글 ' + cc + '</button><button role="tab" data-t="h" aria-selected="' + (cpvTab === 'h') + '">형광펜 ' + hlList.length + '</button></div>';
   if (cpvTab === 'c') {
-    h += '<p class="cpv-note">끝까지 안 읽어도 볼 수 있어요. 결말 이야기가 있을 수 있으니 조심!</p><div class="cpv-list">';
+    h += '<div class="cpv-list">';
     if (cmtState === 'loading') h += '<div class="c-empty">댓글을 불러오는 중…</div>';
     else if (cmtState !== 'ok') h += '<div class="c-empty">댓글을 불러오지 못했어요.</div>';
     else if (!cmtList.length) h += '<div class="c-empty">아직 댓글이 없어요.</div>';
@@ -2073,11 +2165,11 @@ function drawPreview(n){
     }).join('') + '</ul>';
     h += '</div><div class="cpv-foot"><button class="btn primary" data-goend>끝으로 가서 댓글 쓰기 ↓</button></div>';
   } else {
-    h += '<p class="cpv-note">누르면 그 줄로 가요. 내 형광펜은 그은 곳을 눌러서 첨언을 쓰거나 지울 수 있어요. 점선 밑줄 = 첨언 있음</p><div class="cpv-list">';
+    h += '<p class="cpv-note">누르면 그 줄로 간다. 내 형광펜은 그은 곳을 눌러서 첨언을 쓰거나 지울 수 있다고? 점선 밑줄 = 첨언 있음</p><div class="cpv-list">';
     if (!hlOK) h += '<div class="c-empty">형광펜을 쓰려면 Supabase에서 형광펜_퀘스트날짜_추가.sql을 실행해 주세요.</div>';
     else if (!hlList.length) h += '<div class="c-empty">아직 그은 형광펜이 없어요.<br>본문 글자를 길게 눌러 골라 보세요.</div>';
     else h += hlList.slice().sort((a, b) => a.start_pos - b.start_pos).map(x =>
-      '<button class="hli ' + hlKind(x.user_id) + '" data-hgo="' + x.id + '"><i aria-hidden="true"></i><span><small>' + esc(hlName(x.user_id)) + ' · ' + fmtD(x.created_at) + '</small><span class="qt">' + esc(x.quote) + '</span>' + (x.note ? '<span class="hn">✎ ' + esc(x.note) + '</span>' : '') + '</span></button>').join('');
+      '<button class="hli ' + hlKind(x.user_id) + '" data-hgo="' + x.id + '"><i aria-hidden="true"></i><span><small>' + esc(hlName(x.user_id)) + '</small><span class="qt">' + esc(x.quote) + '</span>' + (x.note ? '<span class="hn">✎ ' + esc(x.note) + '</span>' : '') + '</span></button>').join('');
     h += '</div>';
   }
   p.innerHTML = h;
@@ -2257,7 +2349,7 @@ document.addEventListener('click', e => {
   if (!hs.length) return;
   const mine = hs.filter(h => h.user_id === me.id);
   const pop = document.createElement('div'); pop.className = 'hlpop';
-  pop.innerHTML = hs.map(h => '<div class="hp-it"><span><i class="sw ' + hlKind(h.user_id) + '" aria-hidden="true"></i><b>' + esc(hlName(h.user_id)) + '</b>가 그음 · ' + fmtD(h.created_at) + '</span>' +
+  pop.innerHTML = hs.map(h => '<div class="hp-it"><span><i class="sw ' + hlKind(h.user_id) + '" aria-hidden="true"></i><b>' + esc(hlName(h.user_id)) + '</b>가 그음</span>' +
       (h.note ? '<p class="hp-note">' + esc(h.note) + '</p>' : '') + '</div>').join('') +
     (mine.length ? '<div class="hp-acts"><button class="btn text" data-hn>' + (mine[0].note ? '✎ 첨언 고치기' : '✎ 첨언 쓰기') + '</button><button class="btn text del" data-hx>지우기</button></div>' : '');
   document.body.appendChild(pop);
