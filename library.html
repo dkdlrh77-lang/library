@@ -1172,7 +1172,7 @@ if (!prefs.winter1) {
   savePrefs();
 }
 if (prefs.theme !== 'berry' && prefs.theme !== 'night') prefs.theme = 'berry';
-try { const s = localStorage.getItem('lib-ui'); if (s) { const u = JSON.parse(s); curFolder = u.f || 'all'; sortMode = u.s || 'recent'; } if (['recent','old','mine','avg'].indexOf(sortMode) < 0) sortMode = 'recent'; } catch(e){}
+try { const s = localStorage.getItem('lib-ui'); if (s) { const u = JSON.parse(s); curFolder = u.f || 'all'; sortMode = u.s || 'recent'; } if (['recent','old','mine','avg','long','short'].indexOf(sortMode) < 0) sortMode = 'recent'; } catch(e){}
 function saveUi(){ try{ localStorage.setItem('lib-ui', JSON.stringify({f:curFolder,s:sortMode})); }catch(e){} }
 function savePrefs(){ try{ localStorage.setItem('reader-prefs', JSON.stringify(prefs)); }catch(e){} }
 function FONTS_OK(k){ return ['ridi','serif','batang','nanum','sans'].indexOf(k) >= 0; }
@@ -1232,6 +1232,8 @@ function sorted(list){
     const t = id => { const p = partnerId(); return (p && partnerScore(id) && rateAt[id] && rateAt[id][p]) || 0; };
     a.sort((x,y) => (t(y.id) - t(x.id)) || (y.added - x.added));
   }
+  else if (sortMode === 'long') a.sort((x,y) => (y.chars - x.chars) || byTitle(x,y));   // 글자 많은 순 (2026-11-18)
+  else if (sortMode === 'short') a.sort((x,y) => (x.chars - y.chars) || byTitle(x,y));  // 글자 적은 순
   else if (sortMode === 'avg') a.sort((x,y) => (avgScore(y.id) - avgScore(x.id)) || (rateCount(y.id) - rateCount(x.id)) || byTitle(x,y));
   else a.sort(byTitle);
   return a;
@@ -1749,7 +1751,7 @@ function renderLibrary(){
     if (isOwner) h += '<button class="btn" id="folderMenu" aria-haspopup="menu">폴더 설정' + ic('down','sm') + '</button>';
   }
   h += '</div><label class="sort"><span class="sr">정렬</span><select id="sortSel">' +
-       [['recent','최근 하트순'],['old','올린 순'],['mine','내 하트순'],['avg','평균 하트순']].map(o => '<option value="' + o[0] + '"' + (sortMode === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') +
+       [['recent','최근 하트순'],['old','올린 순'],['mine','내 하트순'],['avg','평균 하트순'],['long','글자 많은 순'],['short','글자 적은 순']].map(o => '<option value="' + o[0] + '"' + (sortMode === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') +
        '</select>' + ic('down','sm') + '</label></div>';
 
   if (!ready) h += skeleton();
