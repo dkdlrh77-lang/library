@@ -98,6 +98,10 @@ img{image-rendering:pixelated}
 .tabs{display:flex;gap:6px;flex-wrap:wrap}
 .tab{flex:1 1 auto;min-height:40px;padding:0 10px;background:var(--win);color:var(--sub);border:0;box-shadow:0 0 0 3px var(--ink),inset 0 0 0 2px var(--line2);font:400 12px/1.2 var(--f);white-space:nowrap}
 .tab small{font-size:11px;margin-left:4px;opacity:.85}
+/* 탭 빨간 점 = 새로 등록·클리어된 게 있어요 (2026-11-18) */
+.tab{position:relative}
+.tab .nd{position:absolute;top:-6px;right:-6px;width:14px;height:14px;background:#FF3B5C;box-shadow:0 0 0 2px var(--ink),inset -3px -3px 0 #B8173A,inset 2px 2px 0 #FF9DB0;animation:ndp 1.4s steps(2) infinite}
+@keyframes ndp{50%{transform:translateY(-2px)}}
 .tab[aria-selected=true]{background:var(--yel);color:#2A1A00;box-shadow:0 0 0 3px var(--ink),inset -3px -3px 0 var(--yel2)}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
 .chip{min-height:30px;padding:0 10px;border:0;background:var(--ink);color:var(--sub);box-shadow:inset 0 0 0 2px var(--dim);font:400 11px/1 var(--f)}
@@ -180,7 +184,8 @@ img{image-rendering:pixelated}
 .ep button{width:40px;height:40px;border:0;background:var(--ink);color:var(--yel);font:400 16px/1 var(--f);box-shadow:inset 0 0 0 2px var(--line2)}
 .ep input{width:64px;height:40px;padding:0 8px;background:var(--ink);border:2px solid var(--line2);color:#fff;font:400 13px/1 var(--f);text-align:center}
 .ep input#epN{border-color:var(--yel);font-size:15px}
-.memo{margin:0;padding:9px 11px;background:var(--ink);border:2px solid var(--dim);font-size:12px;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere}
+/* 메모: 입력칸처럼 안 보이게 그냥 글로 (2026-11-18) — 고치는 건 [수정하기]에서 */
+.memo{margin:0;padding:1px 0 1px 11px;border-left:3px solid var(--line2);font-size:12.5px;line-height:1.75;color:#fff;white-space:pre-wrap;overflow-wrap:anywhere;cursor:auto}
 .say{display:flex;gap:9px;align-items:flex-start;font-size:12px;line-height:1.6;color:#fff}
 .say>img{height:40px;width:auto;flex-shrink:0}
 .say .bx{flex:1;min-width:0;background:var(--ink);border:2px solid var(--line2);padding:6px 9px 7px}
@@ -372,7 +377,13 @@ const CATS = { play: [['mobile', '모바일'], ['pc', 'PC게임'], ['etc', '기�
 const CATN = { mobile: '모바일', pc: 'PC게임', etc: '기타', movie: '영화', drama: '드라마', anime: '애니' };
 const XP_ADD = 10, XP_SAY = 5;   // 등록 +10: 메인·도감은 둘 다, 로망은 등록한 사람만 (2026-11-16)
 const addXpText = k => k === 'roman' ? '등록한 사람 +10 EXP' : '둘 다 +10 EXP';
-const xpClear = q => q.kind === 'roman' ? 50 : 20;
+// 메인 퀘스트 모바일·PC게임: 클리어 경험치 대신 [오늘]을 누른 날마다 둘 다 +5 (2026-11-18)
+//   한 날 수는 ep_cur 칸에 저장 (메인은 화수를 안 써서 빈 칸) — 예전 퀘스트는 마지막으로 한 날이 있으면 1일로 쳐요
+const XP_DAY = 5;
+const isDaily = r => r.kind === 'play' && (r.cat === 'mobile' || r.cat === 'pc');
+const playDays = r => r.kind === 'play' && r.status !== 'want' ? Math.max(r.ep_cur || 0, r.last_at ? 1 : 0) : 0;
+const dayXP = r => isDaily(r) ? playDays(r) * XP_DAY : 0;
+const xpClear = q => isDaily(q) ? 0 : q.kind === 'roman' ? 50 : 20;
 // 레벨: 누적 경험치 — 2026-11-16 다시 줄임: Lv.2 40 · Lv.3 +70 · Lv.4~7 +80씩 · Lv.8부터 +120씩
 const CUM = [0, 40, 110, 190, 270, 350, 430];
 const cum = n => n <= 7 ? CUM[n - 1] : 430 + 120 * (n - 7);
@@ -457,7 +468,9 @@ const dayNo = t => t ? dayIdx(new Date().toISOString()) - dayIdx(t) + 1 : 0;
 const daySpan = (a, b) => a && b ? dayIdx(b) - dayIdx(a) + 1 : 0;
 const isToday = t => !!t && dayIdx(t) === dayIdx(new Date().toISOString());
 const fromYmd = v => new Date(v + 'T12:00:00+09:00').toISOString();
-const showDays = r => r.kind !== 'play';   // 메인 퀘스트는 며칠째 대신 '마지막으로 한 날'
+// 도감 영화: 볼래 / 완료만 — 시작한 날·화수 없이, 완료 누른 날 = 클리어한 날 (2026-11-18)
+const isMovie = r => r.kind === 'watch' && r.cat === 'movie';
+const showDays = r => r.kind !== 'play' && !isMovie(r);   // 메인 퀘스트는 며칠째 대신 '마지막으로 한 날'
 
 function toast(html, ms){
   const box = $('toasts'); box.innerHTML = '';
@@ -482,7 +495,7 @@ function xpOf(uid){
   if (!uid) return 0;
   let x = 0; const said = new Set(), ids = new Set(quests.map(r => r.id));
   // 퀘스트 등록 +10: 메인·도감은 누가 올렸든 둘 다, 로망은 올린 사람만 (2026-11-16)
-  quests.forEach(r => { if (r.kind !== 'roman' || r.created_by === uid) x += XP_ADD; if (r.status === 'done') x += xpClear(r); x += epXP(r); });
+  quests.forEach(r => { if (r.kind !== 'roman' || r.created_by === uid) x += XP_ADD; if (r.status === 'done') x += xpClear(r); x += epXP(r) + dayXP(r); });
   comments.forEach(c => { if (c.user_id === uid && ids.has(c.quest_id)) said.add(c.quest_id); });
   return x + said.size * XP_SAY;
 }
@@ -551,15 +564,36 @@ function renderParty(){
   $('heroSt').innerHTML = '<span class="c">클리어<b>' + st[0][0] + '</b></span><span class="d">하는 중<b>' + st[1][0] + '</b></span><span class="w">대기<b>' + st[2][0] + '</b></span>';
   $('party').innerHTML = '<section class="win" aria-label="파티 상태"><div class="wt">PARTY STATUS<span>각자 레벨</span></div><div class="in" style="display:flex;flex-direction:column;gap:12px">' +
     '<div class="party">' + memCard(me.id, true) + memCard(partnerId, false) + '</div>' +
-    '<p class="rule">퀘스트 등록 둘 다 +10 (로망은 등록한 사람만) · 클리어 둘 다 +20 (로망 +50) · 도감 드라마 5화마다 · 애니 10화마다 둘 다 +10 · 한마디 +5 (남긴 사람, 퀘스트마다 한 번)</p>' +
+    '<p class="rule">퀘스트 등록 둘 다 +10 (로망은 등록한 사람만) · 클리어 둘 다 +20 (로망 +50) · 메인 모바일·PC게임은 클리어 대신 [오늘]마다 둘 다 +5 · 도감 드라마 5화마다 · 애니 10화마다 둘 다 +10 · 한마디 +5 (남긴 사람, 퀘스트마다 한 번)</p>' +
     '<div class="stats">' + st.map(s => '<div><b>' + s[0] + '</b>' + s[1] + '</div>').join('') + '</div>' +
     '<a class="btn" href="#char" style="width:100%">캐릭터 꾸미기 ▶</a></div></section>';
 }
 const TABS = [['watch', '도감 · 볼 것'], ['play', '메인 퀘스트 · 함께'], ['roman', '서브 퀘스트 · 로망'], ['clear', 'CLEAR']];
+/* 탭 빨간 점 (2026-11-18): 상대가 새로 등록한 퀘스트 / 새로 클리어된 퀘스트가 있으면 — 그 탭을 열면 사라져요 (기기마다 기억) */
+const SEEN_KEY = 'gbj-quest-tab-seen', MYCLR_KEY = 'gbj-quest-my-clears';
+let tabSeen = null;
+function loadSeen(){
+  if (tabSeen) return tabSeen;
+  try { tabSeen = JSON.parse(localStorage.getItem(SEEN_KEY) || 'null'); } catch (e) {}
+  if (!tabSeen) { const now = Date.now(); tabSeen = { watch: now, play: now, roman: now, clear: now }; saveSeen(); }   // 처음엔 점 없이 시작
+  return tabSeen;
+}
+function saveSeen(){ try { localStorage.setItem(SEEN_KEY, JSON.stringify(tabSeen)); } catch (e) {} }
+function myClears(){ try { return JSON.parse(localStorage.getItem(MYCLR_KEY) || '[]'); } catch (e) { return []; } }
+function addMyClear(id){ try { const a = myClears().filter(x => x !== id); a.push(id); localStorage.setItem(MYCLR_KEY, JSON.stringify(a.slice(-200))); } catch (e) {} }
+const tms = t => Date.parse(t || '') || 0;
+function hasNew(k){
+  const s = loadSeen()[k] || 0;
+  if (k === 'clear') { const mine = new Set(myClears()); return quests.some(r => r.status === 'done' && tms(r.done_at) > s && !mine.has(r.id)); }
+  return quests.some(r => r.kind === k && r.status !== 'done' && r.created_by !== me.id && tms(r.created_at) > s);
+}
 function renderTabs(){
+  const live = ready && !missing && me;
+  if (live) { loadSeen()[tab] = Date.now(); saveSeen(); }   // 지금 보고 있는 탭은 본 걸로
   $('tabs').innerHTML = TABS.map(t => {
     const n = t[0] === 'clear' ? quests.filter(r => r.status === 'done').length : quests.filter(r => r.kind === t[0] && r.status !== 'done').length;
-    return '<button type="button" class="tab" role="tab" aria-selected="' + (tab === t[0]) + '" data-tab="' + t[0] + '">' + t[1] + '<small>' + n + '</small></button>';
+    const dot = live && tab !== t[0] && hasNew(t[0]);
+    return '<button type="button" class="tab" role="tab" aria-selected="' + (tab === t[0]) + '" data-tab="' + t[0] + '">' + t[1] + '<small>' + n + '</small>' + (dot ? '<i class="nd" aria-hidden="true"></i><span class="sr">, 새 소식 있음</span>' : '') + '</button>';
   }).join('');
   $('tabs').querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { tab = b.dataset.tab; cat = ''; selId = null; renderQuests(); });
 }
@@ -573,6 +607,7 @@ function listItems(){
 function epText(r){ return r.ep_total ? r.ep_cur + ' / ' + r.ep_total + '화' : r.ep_cur + '화'; }
 // 목록 날짜 딱지: 도감·로망 = 'M.DD 시작 · N일째' / 클리어 'N일 만에 클리어', 메인 = '마지막 M.DD'
 function dayTag(r){
+  if (isMovie(r)) return '';
   if (r.kind === 'play') return r.status !== 'want' && r.last_at ? '<span class="tag day">마지막 ' + (isToday(r.last_at) ? '오늘' : fmtS(r.last_at)) + '</span>' : '';
   if (r.status === 'done') return r.started_at && r.done_at ? '<span class="tag day">' + daySpan(r.started_at, r.done_at) + '일 만에 클리어</span>' : '';
   if (r.status === 'doing' && r.started_at) return '<span class="tag day">' + fmtS(r.started_at) + ' 시작 · ' + dayNo(r.started_at) + '일째</span>';
@@ -589,21 +624,22 @@ function itemHTML(r){
   const meta = '<span class="meta">' + (r.cat ? '<span class="tag">' + CATN[r.cat] + '</span>' : (tab === 'clear' ? '<span class="tag">' + KSUB[r.kind] + '</span>' : '')) +
     '<span class="who"><img src="' + FACE[kindOf(r.created_by)] + '" alt="">' + esc(nameOf(r.created_by)) + '</span>' +
     (r.status === 'done' ? '<span>' + fmtD(r.done_at) + '</span>' : '') + dayTag(r) +
-    (r.status === 'done' ? '' : '<span class="tag xp">+' + xpClear(r) + ' EXP</span>') + rt + '</span>';
+    (r.status === 'done' ? '' : '<span class="tag xp">' + (isDaily(r) ? '오늘마다 +' + XP_DAY : '+' + xpClear(r)) + ' EXP</span>') + rt + '</span>';
   let pg = '';
-  if (r.kind === 'watch' && r.status === 'doing') {
+  if (r.kind === 'watch' && r.status === 'doing' && !isMovie(r)) {
     const n = r.ep_total ? Math.floor(r.ep_cur / r.ep_total * 10) : 0;
     pg = '<span class="pg">' + (r.ep_total ? '<span class="t">' + Array.from({ length: 10 }, (_, i) => '<i class="' + (i < n ? 'on' : '') + '"></i>').join('') + '</span>' : '') + epText(r) + '</span>';
   }
   let right;
   if (r.status === 'done') right = '<span class="clear">CLEAR!</span>';
+  else if (isMovie(r)) right = '<button type="button" class="st want" data-act="seen" data-id="' + r.id + '" aria-label="' + esc(r.title) + ': 볼래, 누르면 완료">봤어! ▸</button>';
   else if (r.kind === 'watch') right = r.status === 'want' ? '<button type="button" class="st want" data-act="start" data-id="' + r.id + '">볼래! ▸</button>' : '<button type="button" class="st doing" data-act="ep" data-id="' + r.id + '">+1화</button>';
   else right = '<button type="button" class="st ' + r.status + '" data-act="next" data-id="' + r.id + '" aria-label="' + esc(r.title) + ': ' + (r.status === 'want' ? '하고 싶어, 누르면 하는 중으로' : '하는 중, 누르면 클리어') + '">' + (r.status === 'want' ? '하고 싶어 ▸' : '하는 중 ▸') + '</button>';
   return '<li><div class="q' + (sel ? ' sel' : '') + (r.status === 'done' ? ' done' : '') + '"><button type="button" class="qm" data-open="' + r.id + '" aria-label="' + esc(r.title) + ' 자세히 보기">' + icHTML(r) + '<span class="qt"><h4>' + esc(r.title) + '</h4>' + meta + pg + '</span></button>' + right + '</div></li>';
 }
 function renderList(){
   $('listT').textContent = tab === 'clear' ? 'CLEAR · 다 한 것' : KIND[tab];
-  $('listS').textContent = tab === 'clear' ? '클리어한 날 순서' : KSUB[tab] + (tab === 'roman' ? ' · 둘 다 +50 EXP' : tab === 'watch' ? ' · 드라마 5화 · 애니 10화마다 +10 · 클리어 +20' : ' · 둘 다 +20 EXP');
+  $('listS').textContent = tab === 'clear' ? '클리어한 날 순서' : KSUB[tab] + (tab === 'roman' ? ' · 둘 다 +50 EXP' : tab === 'watch' ? ' · 드라마 5화 · 애니 10화마다 +10 · 클리어 +20' : ' · 모바일·PC [오늘]마다 +5 · 기타 클리어 +20');
   const chipList = tab === 'clear' ? [['watch', '도감'], ['play', '메인'], ['roman', '서브']] : CATS[tab];
   $('chips').innerHTML = chipList.length ? ['', ...chipList].map(c => {
     const k = c ? c[0] : '', nm = c ? c[1] : '전체';
@@ -658,16 +694,17 @@ function renderDetail(){
     '<div class="dhead">' + icHTML(r) + '<div><h2>' + esc(r.title) + '</h2><p>' + KSUB[r.kind] + (r.cat ? ' · ' + CATN[r.cat] : '') + '</p>' +
       (showDays(r) && r.status === 'doing' && r.started_at ? '<span class="dday">시작한 지 ' + dayNo(r.started_at) + '일째</span>' : '') +
       (showDays(r) && r.status === 'done' && r.started_at && r.done_at ? '<span class="dday">' + daySpan(r.started_at, r.done_at) + '일 만에 클리어</span>' : '') + '</div></div>' +
-    '<div><p class="lbl">상태</p><div class="seg" role="group" aria-label="상태">' +
-      [['want', watch ? '볼래' : '하고 싶어'], ['doing', watch ? '보는 중' : '하는 중'], ['done', '완료']].map(s => '<button type="button" class="' + s[0] + '" data-st="' + s[0] + '" aria-pressed="' + (r.status === s[0]) + '">' + s[1] + '</button>').join('') + '</div></div>';
-  if (watch) h += '<div><p class="lbl">본 화수<span>' + epRuleText(r) + (epXP(r) ? ' · 지금까지 +' + epXP(r) : '') + '</span></p><div class="ep"><button type="button" id="epM" aria-label="1화 빼기">−</button><span class="epv" aria-live="polite">' + r.ep_cur + ' <small>/ ' + (r.ep_total || '?') + '화</small></span><button type="button" id="epP" aria-label="1화 더하기">+</button></div></div>';
+    '<div><p class="lbl">상태</p><div class="seg"' + (isMovie(r) ? ' style="grid-template-columns:repeat(2,minmax(0,1fr))"' : '') + ' role="group" aria-label="상태">' +
+      (isMovie(r) ? [['want', '볼래'], ['done', '완료']] : [['want', watch ? '볼래' : '하고 싶어'], ['doing', watch ? '보는 중' : '하는 중'], ['done', '완료']]).map(s => '<button type="button" class="' + s[0] + '" data-st="' + s[0] + '" aria-pressed="' + (isMovie(r) && s[0] === 'want' ? r.status !== 'done' : r.status === s[0]) + '">' + s[1] + '</button>').join('') + '</div></div>';
+  if (watch && !isMovie(r)) h += '<div><p class="lbl">본 화수<span>' + epRuleText(r) + (epXP(r) ? ' · 지금까지 +' + epXP(r) : '') + '</span></p><div class="ep"><button type="button" id="epM" aria-label="1화 빼기">−</button><span class="epv" aria-live="polite">' + r.ep_cur + ' <small>/ ' + (r.ep_total || '?') + '화</small></span><button type="button" id="epP" aria-label="1화 더하기">+</button></div></div>';
   // 시작한 날·전체 화수·메모는 보기만 — 바꾸는 건 [수정하기]에서 (2026-11-16)
   h += '<div class="dl"><div><span>등록</span><b>' + esc(nameOf(r.created_by)) + ' · ' + fmtD(r.created_at) + '</b></div>' +
-    (r.status !== 'want' ? '<div><span>시작한 날</span><b>' + (r.started_at ? fmtD(r.started_at) + (showDays(r) && r.status === 'doing' ? ' <span style="color:var(--yel)">· ' + dayNo(r.started_at) + '일째</span>' : '') : '—') + '</b></div>' : '') +
+    (r.status !== 'want' && !isMovie(r) ? '<div><span>시작한 날</span><b>' + (r.started_at ? fmtD(r.started_at) + (showDays(r) && r.status === 'doing' ? ' <span style="color:var(--yel)">· ' + dayNo(r.started_at) + '일째</span>' : '') : '—') + '</b></div>' : '') +
     (r.kind === 'play' && r.status !== 'want' ? '<div><span>마지막으로 한 날</span><b style="display:flex;align-items:center;justify-content:flex-end">' + (r.last_at ? fmtD(r.last_at) : '아직') +
       (r.status === 'doing' ? '<button type="button" class="today" id="dToday"' + (isToday(r.last_at) ? ' disabled' : '') + '>' + (isToday(r.last_at) ? '오늘 했음' : '오늘') + '</button>' : '') + '</b></div>' : '') +
-    (r.done_at && r.status === 'done' ? '<div><span>클리어한 날</span><b>' + fmtD(r.done_at) + '</b></div>' : '') +
-    '<div><span>보상</span><b style="color:var(--mint)">' + (r.status === 'done' ? '둘 다 +' + xpClear(r) + ' EXP 받음' : '클리어하면 둘 다 +' + xpClear(r) + ' EXP') + '</b></div></div>';
+    (r.done_at && r.status === 'done' ? '<div><span>' + '클리어한 날' + '</span><b>' + fmtD(r.done_at) + '</b></div>' : '') +
+    (isDaily(r) && r.status !== 'want' ? '<div><span>같이 한 날</span><b>' + playDays(r) + '일 <span style="color:var(--mint)">· 둘 다 +' + dayXP(r) + ' EXP</span></b></div>' : '') +
+    '<div><span>보상</span><b style="color:var(--mint)">' + (isDaily(r) ? '[오늘]을 누른 날마다 둘 다 +' + XP_DAY + ' EXP' + (r.status === 'want' ? '<br><span style="color:var(--sub)">시작한 날도 1일로 쳐요</span>' : '') : r.status === 'done' ? '둘 다 +' + xpClear(r) + ' EXP 받음' : '클리어하면 둘 다 +' + xpClear(r) + ' EXP') + '</b></div></div>';
   // 다 본 도감: 하트 평점 (각자 매기기)
   if (watch && r.status === 'done') {
     const my = rateOf(r, me.id), pr = rateOf(r, partnerId);
@@ -698,7 +735,7 @@ function renderDetail(){
   }
   // 메인 퀘스트: [오늘] = 마지막으로 한 날을 오늘로 (둘 다 누를 수 있어요)
   const dt = $('dToday');
-  if (dt) dt.onclick = () => { dt.disabled = true; saveQuest(r, { last_at: new Date().toISOString() }, '오늘 했어요!'); };
+  if (dt) dt.onclick = () => { dt.disabled = true; saveQuest(r, { last_at: new Date().toISOString(), ep_cur: playDays(r) + 1 }, '오늘 했어요!'); };   // 모바일·PC게임은 +5 EXP
   box.querySelectorAll('[data-rate]').forEach(b => b.onclick = () => {
     const n = +b.dataset.rate, ratings = Object.assign({}, r.ratings || {});
     if (rateOf(r, me.id) === n) delete ratings[me.id]; else ratings[me.id] = n;
@@ -752,23 +789,24 @@ async function saveQuest(r, patch, msg){
 async function setStatus(r, st){
   if (st === r.status) return;
   if (st === 'done') {
-    const ok = await confirmBox('퀘스트 클리어!', '「' + esc(r.title) + '」를 클리어할까요?<br><b style="color:var(--mint);font-weight:400">' + esc(nameOf(me.id)) + ' · ' + esc(partnerName()) + ' 둘 다 +' + xpClear(r) + ' EXP</b>' + (r.kind === 'watch' ? '<br>클리어하면 하트 평점을 매길 수 있어요.' : ''), '클리어!');
+    const ok = await confirmBox('퀘스트 클리어!', '「' + esc(r.title) + '」를 클리어할까요?<br><b style="color:var(--mint);font-weight:400">' + esc(nameOf(me.id)) + ' · ' + esc(partnerName()) + (isDaily(r) ? ' 둘 다 같이 한 ' + playDays(r) + '일 · +' + dayXP(r) + ' EXP 그대로</b><br>모바일·PC게임은 클리어 경험치 없이 [오늘]마다 +' + XP_DAY + '이에요.' : ' 둘 다 +' + xpClear(r) + ' EXP</b>') + (r.kind === 'watch' ? '<br>클리어하면 하트 평점을 매길 수 있어요.' : ''), '클리어!');
     if (!ok) { renderQuests(); return; }
     const patch = { status: 'done', done_at: new Date().toISOString() };
-    if (!r.started_at) patch.started_at = patch.done_at;
+    if (!r.started_at && !isMovie(r)) patch.started_at = patch.done_at;
     if (r.kind === 'watch' && r.ep_total) patch.ep_cur = r.ep_total;
+    addMyClear(r.id);   // 내가 클리어한 건 CLEAR 탭 빨간 점에서 빼요
     await saveQuest(r, patch);
     if (r.status === 'done') notify({ type: 'quest', id: r.id, action: 'clear' });
     return;
   }
-  if (r.status === 'done') {
+  if (r.status === 'done' && xpClear(r)) {
     const ok = await confirmBox('클리어 취소', '클리어를 취소하면 둘 다 받은 +' + xpClear(r) + ' EXP가 빠져요. 취소할까요?', '취소하기', true);
     if (!ok) return;
   }
   const patch = { status: st, done_at: null };
   if (st === 'doing' && !r.started_at) patch.started_at = new Date().toISOString();
   if (st === 'doing' && r.kind === 'play' && !r.last_at) patch.last_at = patch.started_at || new Date().toISOString();   // 시작한 날 = 처음 한 날
-  if (st === 'want') { patch.started_at = null; if (r.kind === 'play' && r.last_at) patch.last_at = null; }
+  if (st === 'want') { patch.started_at = null; if (r.kind === 'play') { if (r.last_at) patch.last_at = null; if (r.ep_cur) patch.ep_cur = 0; } }   // 대기로 돌리면 한 날 수도 0
   saveQuest(r, patch);
 }
 async function setEp(r, n){
@@ -781,6 +819,7 @@ async function setEp(r, n){
 function quickAct(act, id){
   const r = quests.find(x => x.id === id); if (!r) return;
   if (act === 'start') return setStatus(r, 'doing');
+  if (act === 'seen') return setStatus(r, 'done');
   if (act === 'ep') return setEp(r, r.ep_cur + 1);
   if (act === 'next') return setStatus(r, r.status === 'want' ? 'doing' : 'done');
 }
@@ -826,8 +865,11 @@ function shrink(file, kind){
 function openForm(r){
   if (r && r.created_by !== me.id) return;
   const editing = !!r;
-  const fd = r ? { kind: r.kind, cat: r.cat, title: r.title, memo: r.memo, ep_total: r.ep_total || '', poster: r.poster || '', start: ymd(r.started_at), last: ymd(r.last_at) } : { kind: tab === 'clear' ? 'watch' : tab, cat: tab === 'clear' ? '' : cat, title: '', memo: '', ep_total: '', poster: '', start: '', last: '' };
+  const fd = r ? { kind: r.kind, cat: r.cat, title: r.title, memo: r.memo, ep_total: r.ep_total || '', poster: r.poster || '', start: ymd(r.started_at), last: ymd(r.last_at), seen: r.status === 'done' ? ymd(r.done_at) : '' } : { kind: tab === 'clear' ? 'watch' : tab, cat: tab === 'clear' ? '' : cat, title: '', memo: '', ep_total: '', poster: '', start: '', last: '', seen: '' };
   const started = editing && r.status !== 'want';   // 시작한 날은 시작한 퀘스트만 고쳐요
+  const fdMovie = () => fd.kind === 'watch' && fd.cat === 'movie';
+  const startNew = () => !editing && (fd.kind === 'watch' || fd.kind === 'play') && !fdMovie();
+  const seenField = () => fdMovie() && (!editing || r.status === 'done');   // 영화: 클리어한 날
   const prev = document.activeElement;
   const el = document.createElement('div'); el.className = 'dimbg';
   el.innerHTML = '<section class="win dlg" role="dialog" aria-modal="true" aria-labelledby="fT"><div class="wt"><span id="fT" style="color:var(--yel);font-size:13px">' + (editing ? '퀘스트 수정하기' : '새 퀘스트 등록') + '</span><span id="fXp"></span></div><form class="in" id="qf" novalidate style="display:flex;flex-direction:column;gap:16px"></form></section>';
@@ -846,15 +888,18 @@ function openForm(r){
       (cats.length ? '<div><p class="fl">분류</p><div class="chips" style="margin:0">' + cats.map(c => '<button type="button" class="chip" data-c="' + c[0] + '" aria-pressed="' + (fd.cat === c[0]) + '">' + c[1] + '</button>').join('') + '</div></div>' : '') +
       '<div><label class="fl" for="fTitle">' + (fd.kind === 'watch' ? '무엇을 볼까?' : fd.kind === 'roman' ? '언젠가 하고 싶은 것' : '같이 하고 싶은 것') + '</label><input class="fin" id="fTitle" type="text" maxlength="100" placeholder="' + (fd.kind === 'watch' ? '예) 보고 싶은 영화·드라마·애니 제목' : fd.kind === 'roman' ? '예) 벚꽃 필 때 같이 여행 가기' : '예) 같이 하고 싶은 게임') + '" value="' + esc(fd.title) + '"></div>' +
       (hasPic(fd.kind) ? '<div><p class="fl">' + (fd.kind === 'play' ? '사진' : '작품 사진') + ' <span style="color:var(--line2)">' + (fd.kind === 'play' ? '게임 화면이나 같이 찍은 사진' : '포스터나 장면') + ' · 안 넣어도 돼요</span></p><div class="pf"><span class="pv' + (fd.kind === 'play' ? ' wide' : '') + '">' + (fd.poster ? '<img src="' + esc(fd.poster) + '" alt="고른 사진">' : SV[fd.kind]) + '</span><div class="pb"><input class="sr" id="fPic" type="file" accept="image/*"><label class="btn" for="fPic">' + (fd.poster ? '사진 바꾸기' : '사진 고르기') + '</label>' + (fd.poster ? '<button type="button" class="btn" id="fPicX">사진 빼기</button>' : '') + '</div></div></div>' : '') +
-      (fd.kind === 'watch' ? '<div><label class="fl" for="fEp">전체 화수 <span style="color:var(--line2)">몰라도 돼요 · 영화는 비워 두기</span></label><input class="fin" id="fEp" type="number" min="1" max="9999" inputmode="numeric" style="width:120px" value="' + esc(fd.ep_total) + '"></div>' : '') +
-      (started ? '<div class="fdates"><div><label class="fl" for="fStart">시작한 날</label><input class="fin" id="fStart" type="date" max="' + ymd(new Date().toISOString()) + '" value="' + esc(fd.start) + '"></div>' +
+      (fd.kind === 'watch' && !fdMovie() ? '<div><label class="fl" for="fEp">전체 화수 <span style="color:var(--line2)">몰라도 돼요</span></label><input class="fin" id="fEp" type="number" min="1" max="9999" inputmode="numeric" style="width:120px" value="' + esc(fd.ep_total) + '"></div>' : '') +
+      (seenField() ? '<div><label class="fl" for="fSeen">클리어한 날 <span style="color:var(--line2)">' + (editing ? '완료한 날' : '이미 봤으면 적기 · 비워 두면 \'볼래\'로 등록') + '</span></label><div style="display:flex;gap:8px;align-items:center"><input class="fin" id="fSeen" type="date" max="' + ymd(new Date().toISOString()) + '" value="' + esc(fd.seen) + '" style="max-width:200px">' + (fd.seen && !editing ? '<button type="button" class="btn" id="fSeenX" style="min-height:36px">비우기</button>' : '') + '</div></div>' : '') +
+      (started && !fdMovie() ? '<div class="fdates"><div><label class="fl" for="fStart">시작한 날</label><input class="fin" id="fStart" type="date" max="' + ymd(new Date().toISOString()) + '" value="' + esc(fd.start) + '"></div>' +
         (fd.kind === 'play' ? '<div><label class="fl" for="fLast">마지막으로 한 날</label><input class="fin" id="fLast" type="date" max="' + ymd(new Date().toISOString()) + '" value="' + esc(fd.last) + '"></div>' : '') + '</div>' : '') +
+      // 새로 등록할 때 도감·메인은 시작한 날을 바로 적을 수 있어요 — 적으면 '보는 중·하는 중'으로 등록 (2026-11-18)
+      (startNew() ? '<div><label class="fl" for="fStart">시작한 날 <span style="color:var(--line2)">이미 시작했으면 적기 · 비워 두면 \'' + (fd.kind === 'watch' ? '볼래' : '하고 싶어') + '\'로 등록</span></label><div style="display:flex;gap:8px;align-items:center"><input class="fin" id="fStart" type="date" max="' + ymd(new Date().toISOString()) + '" value="' + esc(fd.start) + '" style="max-width:200px">' + (fd.start ? '<button type="button" class="btn" id="fStartX" style="min-height:36px">비우기</button>' : '') + '</div></div>' : '') +
       '<div><label class="fl" for="fMemo">메모 <span style="color:var(--line2)">안 적어도 돼요</span></label><textarea class="fin" id="fMemo" maxlength="1000" placeholder="어디서 · 언제 · 왜 하고 싶은지">' + esc(fd.memo) + '</textarea></div>' +
       '<p class="ferr" id="fErr" role="alert"></p>' +
       '<div class="dbtns"><button type="button" class="btn" id="fNo">취소</button><button type="submit" class="btn yel" id="fGo">' + (editing ? '수정 완료' : '퀘스트 등록!') + '</button></div>';
-    const sync = () => { fd.title = $('fTitle').value; fd.memo = $('fMemo').value; const ep = $('fEp'); if (ep) fd.ep_total = ep.value; const s1 = $('fStart'); if (s1) fd.start = s1.value; const s2 = $('fLast'); if (s2) fd.last = s2.value; };
+    const sync = () => { fd.title = $('fTitle').value; fd.memo = $('fMemo').value; const ep = $('fEp'); if (ep) fd.ep_total = ep.value; const s1 = $('fStart'); if (s1) fd.start = s1.value; const s2 = $('fLast'); if (s2) fd.last = s2.value; const s3 = $('fSeen'); if (s3) fd.seen = s3.value; };
     f.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { sync(); fd.kind = b.dataset.k; draw(); });
-    f.querySelectorAll('[data-c]').forEach(b => b.onclick = () => { sync(); fd.cat = b.dataset.c; f.querySelectorAll('[data-c]').forEach(x => x.setAttribute('aria-pressed', x === b)); });
+    f.querySelectorAll('[data-c]').forEach(b => b.onclick = () => { sync(); fd.cat = b.dataset.c; draw(); });
     const pic = $('fPic');
     if (pic) pic.onchange = async () => {
       const file = pic.files && pic.files[0]; if (!file) return;
@@ -863,23 +908,37 @@ function openForm(r){
       catch (e) { $('fErr').textContent = '사진을 읽지 못했어요. 다른 사진으로 해 주셔.'; }
     };
     const px = $('fPicX'); if (px) px.onclick = () => { sync(); fd.poster = ''; draw(); };
+    const sIn = $('fStart'); if (sIn && startNew()) sIn.onchange = () => { sync(); draw(); };
+    const vIn = $('fSeen'); if (vIn && !editing) vIn.onchange = () => { sync(); draw(); };
+    const vx = $('fSeenX'); if (vx) vx.onclick = () => { sync(); fd.seen = ''; draw(); };
+    const sx = $('fStartX'); if (sx) sx.onclick = () => { sync(); fd.start = ''; draw(); };
     $('fNo').onclick = close;
     f.onsubmit = async e => {
       e.preventDefault(); sync();
       const title = fd.title.trim(); if (!title) { $('fErr').textContent = '이름을 적어 주셔!'; $('fTitle').focus(); return; }
       const ept = parseInt(fd.ep_total, 10);
-      const row = { kind: fd.kind, cat: fd.cat, title, memo: fd.memo.trim(), ep_total: fd.kind === 'watch' && ept > 0 ? Math.min(ept, 9999) : null };
+      const row = { kind: fd.kind, cat: fd.cat, title, memo: fd.memo.trim(), ep_total: fd.kind === 'watch' && !fdMovie() && ept > 0 ? Math.min(ept, 9999) : null };
       if (hasPic(fd.kind) || (editing && r.poster)) row.poster = hasPic(fd.kind) ? fd.poster : '';
-      if (started) {
+      if (started && !fdMovie()) {
         if (fd.start && fd.start !== ymd(r.started_at)) row.started_at = fromYmd(fd.start);
         if (fd.kind === 'play' && fd.last !== ymd(r.last_at)) row.last_at = fd.last ? fromYmd(fd.last) : null;
         if (fd.start && fd.kind === 'play' && fd.last && fd.last < fd.start) { $('fErr').textContent = '마지막으로 한 날이 시작한 날보다 빨라요.'; return; }
       }
+      if (startNew() && fd.start) {
+        if (fd.start > ymd(new Date().toISOString())) { $('fErr').textContent = '시작한 날은 오늘이나 그 전이어야 해요.'; return; }
+        row.status = 'doing'; row.started_at = fromYmd(fd.start);
+        if (fd.kind === 'play') row.last_at = row.started_at;   // 메인: 시작한 날 = 처음 한 날
+      }
+      if (seenField() && fd.seen) {
+        if (fd.seen > ymd(new Date().toISOString())) { $('fErr').textContent = '클리어한 날은 오늘이나 그 전이어야 해요.'; return; }
+        if (!editing) { row.status = 'done'; row.done_at = fromYmd(fd.seen); }
+        else if (fd.seen !== ymd(r.done_at)) row.done_at = fromYmd(fd.seen);
+      }
       const go = $('fGo'); go.disabled = true; go.textContent = '저장 중…';
       const before = xpOf(me.id);
       try {
-        if (editing) { row.updated_at = new Date().toISOString(); if (r.kind !== row.kind || (row.kind !== 'watch')) row.ep_cur = row.kind === 'watch' ? r.ep_cur : 0; await q(sb.from('quests').update(row).eq('id', r.id)); Object.assign(r, row); }
-        else { const saved = await q(sb.from('quests').insert(row).select('*').single()); quests.push(saved); selId = saved.id; tab = saved.kind; cat = ''; notify({ type: 'quest', id: saved.id, action: 'add' }); }
+        if (editing) { row.updated_at = new Date().toISOString(); if (r.kind !== row.kind || row.kind === 'roman') row.ep_cur = row.kind === 'watch' && r.kind === 'watch' ? r.ep_cur : 0; await q(sb.from('quests').update(row).eq('id', r.id)); Object.assign(r, row); }
+        else { const saved = await q(sb.from('quests').insert(row).select('*').single()); quests.push(saved); if (saved.status === 'done') addMyClear(saved.id); selId = saved.id; tab = saved.status === 'done' ? 'clear' : saved.kind; cat = ''; notify({ type: 'quest', id: saved.id, action: 'add' }); }
         close(); afterChange(before, editing ? '퀘스트를 수정했어요' : row.kind === 'roman' ? '퀘스트 등록!' : '퀘스트 등록! 둘 다');
         if (!editing && isMobile()) document.body.classList.remove('m-detail');
       } catch (err) { go.disabled = false; go.textContent = editing ? '수정 완료' : '퀘스트 등록!'; $('fErr').textContent = /last_at/.test(((err && err.message) || '') + '') ? 'Supabase에서 형광펜_퀘스트날짜_추가.sql을 먼저 실행해 주세요.' : failMsg(err); }
@@ -1141,11 +1200,73 @@ renderTabs(); renderList();
   const nm = members[me.id] || '';
   myKind = /히지|토시|부장/.test(nm) ? 'hiji' : /긴|은|해결사/.test(nm) ? 'gin' : (isOwner ? 'gin' : 'hiji');
   await ensureMyChar();
+  // 당겨서 새로고침 전에 보던 탭·퀘스트 되살리기
+  window.__qKeep = () => ({ tab, cat, sel: selId, open: document.body.classList.contains('m-detail') });
+  let keep = null; try { keep = JSON.parse(sessionStorage.getItem('gbj-q-keep') || 'null'); sessionStorage.removeItem('gbj-q-keep'); } catch (e) {}
+  if (keep && !location.hash && TABS.some(t => t[0] === keep.tab)) { tab = keep.tab; cat = keep.cat || ''; selId = quests.some(r => r.id === keep.sel) ? keep.sel : null; }
   route();
+  if (keep && keep.open && selId && isMobile() && !location.hash) openDetail(selId);
   checkLevelUp();
   // 이미 알림을 켠 기기는 정보를 새로 맞춰 둬요
   if (pushSupport() === 'ok' && 'Notification' in window && Notification.permission === 'granted') { const s = await refreshBell(); if (s) saveSub(s).catch(() => {}); }
 })();
+})();
+</script>
+<script>
+// 새로고침해도 보던 탭·퀘스트 그대로
+window.beforePullRefresh = function(){ try { sessionStorage.setItem('gbj-q-keep', JSON.stringify(window.__qKeep ? window.__qKeep() : null)); } catch (e) {} };
+</script>
+<!-- 당겨서 새로고침 (폰, 2026-11-18): 맨 위에서 아래로 끌었다 놓으면 새로고침 -->
+<div id="ptr" aria-hidden="true" style="position:fixed;left:50%;top:0;z-index:200;width:44px;height:44px;margin-left:-22px;border-radius:50%;background:#191513;border:2.5px solid #fffdf8;box-shadow:0 3px 0 rgba(0,0,0,.35);display:grid;place-items:center;transform:translateY(-60px);opacity:0;pointer-events:none"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fffdf8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 3v5h-5"/></svg></div>
+<style>@keyframes ptrspin{to{transform:rotate(360deg)}}#ptr.go svg{animation:ptrspin .7s linear infinite}#ptr.ready{background:#c8463a}</style>
+<script>
+(function(){
+  var el = document.getElementById('ptr'); if (!el) return;
+  var svg = el.querySelector('svg'), y0 = null, x0 = 0, dy = 0, on = false, busy = false, MAX = 120, GO = 75;
+  function blocked(t){
+    if (busy || window.scrollY > 0) return true;
+    if (window.ptrBlock && window.ptrBlock()) return true;              // 화면마다 따로 막을 곳
+    var a = document.activeElement; if (a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) return true;
+    var s = window.getSelection && window.getSelection(); if (s && !s.isCollapsed) return true;
+    for (var n = t; n && n !== document.body && n.nodeType === 1; n = n.parentElement) {
+      if (n.scrollTop > 0) return true;                                // 안쪽 칸이 내려가 있으면
+      if (getComputedStyle(n).position === 'fixed') return true;       // 창·시트 위에서는 안 함
+    }
+    return false;
+  }
+  function show(d){
+    var p = Math.min(d, MAX);
+    el.style.transition = 'none';
+    el.style.opacity = Math.min(1, p / 50);
+    el.style.transform = 'translateY(' + (p * .7 - 20) + 'px)';
+    svg.style.transform = 'rotate(' + (p * 3) + 'deg)';
+    el.classList.toggle('ready', d >= GO);
+  }
+  function hide(){
+    el.style.transition = 'transform .2s, opacity .2s';
+    el.style.transform = 'translateY(-60px)'; el.style.opacity = 0; el.classList.remove('ready');
+  }
+  addEventListener('touchstart', function(e){
+    if (e.touches.length !== 1 || blocked(e.target)) { y0 = null; return; }
+    y0 = e.touches[0].clientY; x0 = e.touches[0].clientX; dy = 0; on = false;
+  }, { passive: true });
+  addEventListener('touchmove', function(e){
+    if (y0 == null) return;
+    var d = e.touches[0].clientY - y0, dx = Math.abs(e.touches[0].clientX - x0);
+    if (!on && (d < 10 || dx > d || window.scrollY > 0)) { if (d < 0 || dx > 20) y0 = null; return; }
+    on = true; dy = (d - 10) * .6; show(dy);
+  }, { passive: true });
+  addEventListener('touchend', function(){
+    if (y0 == null) return; y0 = null;
+    if (on && dy >= GO) {
+      busy = true; el.classList.add('go'); el.classList.remove('ready');
+      el.style.transition = 'transform .15s'; el.style.transform = 'translateY(28px)';
+      try { window.beforePullRefresh && window.beforePullRefresh(); } catch (e) {}
+      setTimeout(function(){ location.reload(); }, 250);
+    } else hide();
+    on = false;
+  }, { passive: true });
+  addEventListener('touchcancel', function(){ y0 = null; on = false; hide(); }, { passive: true });
 })();
 </script>
 </body>

@@ -1053,5 +1053,62 @@ tick(); setInterval(tick, 1000); renderCal(); renderUp(); renderPanel();
 })();
 })();
 </script>
+<script>
+// 일정 적는 화면에서는 당겨서 새로고침 안 함 (쓰던 내용이 날아가지 않게)
+window.ptrBlock = function(){ return document.body.classList.contains('m-form'); };
+</script>
+<!-- 당겨서 새로고침 (폰, 2026-11-18): 맨 위에서 아래로 끌었다 놓으면 새로고침 -->
+<div id="ptr" aria-hidden="true" style="position:fixed;left:50%;top:0;z-index:200;width:44px;height:44px;margin-left:-22px;border-radius:50%;background:#191513;border:2.5px solid #fffdf8;box-shadow:0 3px 0 rgba(0,0,0,.35);display:grid;place-items:center;transform:translateY(-60px);opacity:0;pointer-events:none"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fffdf8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 3v5h-5"/></svg></div>
+<style>@keyframes ptrspin{to{transform:rotate(360deg)}}#ptr.go svg{animation:ptrspin .7s linear infinite}#ptr.ready{background:#c8463a}</style>
+<script>
+(function(){
+  var el = document.getElementById('ptr'); if (!el) return;
+  var svg = el.querySelector('svg'), y0 = null, x0 = 0, dy = 0, on = false, busy = false, MAX = 120, GO = 75;
+  function blocked(t){
+    if (busy || window.scrollY > 0) return true;
+    if (window.ptrBlock && window.ptrBlock()) return true;              // 화면마다 따로 막을 곳
+    var a = document.activeElement; if (a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) return true;
+    var s = window.getSelection && window.getSelection(); if (s && !s.isCollapsed) return true;
+    for (var n = t; n && n !== document.body && n.nodeType === 1; n = n.parentElement) {
+      if (n.scrollTop > 0) return true;                                // 안쪽 칸이 내려가 있으면
+      if (getComputedStyle(n).position === 'fixed') return true;       // 창·시트 위에서는 안 함
+    }
+    return false;
+  }
+  function show(d){
+    var p = Math.min(d, MAX);
+    el.style.transition = 'none';
+    el.style.opacity = Math.min(1, p / 50);
+    el.style.transform = 'translateY(' + (p * .7 - 20) + 'px)';
+    svg.style.transform = 'rotate(' + (p * 3) + 'deg)';
+    el.classList.toggle('ready', d >= GO);
+  }
+  function hide(){
+    el.style.transition = 'transform .2s, opacity .2s';
+    el.style.transform = 'translateY(-60px)'; el.style.opacity = 0; el.classList.remove('ready');
+  }
+  addEventListener('touchstart', function(e){
+    if (e.touches.length !== 1 || blocked(e.target)) { y0 = null; return; }
+    y0 = e.touches[0].clientY; x0 = e.touches[0].clientX; dy = 0; on = false;
+  }, { passive: true });
+  addEventListener('touchmove', function(e){
+    if (y0 == null) return;
+    var d = e.touches[0].clientY - y0, dx = Math.abs(e.touches[0].clientX - x0);
+    if (!on && (d < 10 || dx > d || window.scrollY > 0)) { if (d < 0 || dx > 20) y0 = null; return; }
+    on = true; dy = (d - 10) * .6; show(dy);
+  }, { passive: true });
+  addEventListener('touchend', function(){
+    if (y0 == null) return; y0 = null;
+    if (on && dy >= GO) {
+      busy = true; el.classList.add('go'); el.classList.remove('ready');
+      el.style.transition = 'transform .15s'; el.style.transform = 'translateY(28px)';
+      try { window.beforePullRefresh && window.beforePullRefresh(); } catch (e) {}
+      setTimeout(function(){ location.reload(); }, 250);
+    } else hide();
+    on = false;
+  }, { passive: true });
+  addEventListener('touchcancel', function(){ y0 = null; on = false; hide(); }, { passive: true });
+})();
+</script>
 </body>
 </html>
