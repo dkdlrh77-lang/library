@@ -13,7 +13,7 @@
 <meta name="apple-mobile-web-app-title" content="게부장 타임">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500&family=Jua&display=swap">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 @font-face{font-family:'Galmuri9';src:url('fonts/galmuri9.woff2') format('woff2');font-display:swap}
@@ -187,13 +187,14 @@ img{image-rendering:pixelated}
 .say .nm{display:flex;gap:6px;align-items:center;font-size:10.5px;color:var(--sub);margin-bottom:3px}
 .say .nm .acts{margin-left:auto;display:flex}
 .say .nm .acts button{border:0;background:none;color:var(--sub);font:400 10.5px/1 var(--f);padding:4px 5px}
-.say p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font:400 16px/1.5 'DungGeunMo','Galmuri9',sans-serif}
+/* 한마디 글씨 = IBM Plex Sans KR 13px (2026-11-17, 글꼴 시안 ②) */
+.say p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font:400 13px/1.6 'IBM Plex Sans KR','Galmuri9',sans-serif}
 .cf{display:flex;gap:8px;align-items:flex-end}
 .cf input,.cf textarea{flex:1;min-width:0;height:42px;padding:0 10px;background:var(--ink);border:2px solid var(--line2);color:#fff;font:400 12px/1 var(--f)}
 .cf textarea{height:auto;min-height:42px;padding:11px 10px 9px;line-height:1.6;resize:none;overflow-y:hidden;display:block}
 .cf textarea.tall{min-height:76px}
-/* 한마디 글·입력칸 = 둥근모꼴 (2026-11-17) */
-.cf textarea{font:400 16px/1.5 'DungGeunMo','Galmuri9',sans-serif;padding:10px 10px 8px}
+/* 한마디 입력칸 = IBM Plex Sans KR (2026-11-17) — 아이폰 확대 막으려고 16px 그대로 */
+.cf textarea{font:400 16px/1.5 'IBM Plex Sans KR','Galmuri9',sans-serif;padding:10px 10px 8px}
 .cf input::placeholder,.cf textarea::placeholder,.fin::placeholder{color:#8C82B8;opacity:1}
 .dacts{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .dacts .lnk{border:0;background:none;color:var(--sub);font:400 11.5px/1 var(--f);padding:8px 4px;text-decoration:underline;text-underline-offset:3px}

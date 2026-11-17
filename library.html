@@ -1045,6 +1045,15 @@ body[data-theme="night"] .yz .r-meta .r-pt{color:#f4b6cc}
 .body{text-align:justify;word-break:normal;line-break:normal}
 .body.txt p.brk{text-align:center}
 .body.md pre{text-align:left}
+
+/* ===== 형광펜 보이기·숨기기 (2026-11-17, A안): 댓글 버튼 왼쪽 분홍·노랑 칩. 끄면 점선 빈칸 + 형광펜 전부 숨김 (기기마다 기억) ===== */
+.rb-hl{height:34px;width:38px;padding:0;border:1.5px solid var(--line);border-radius:17px;background:var(--surface);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.rb-hl:hover{background:var(--hover)}
+.rb-hl .sw2{width:14px;height:14px;border-radius:4px;background:linear-gradient(135deg,var(--hl-g-s) 0 50%,var(--hl-h-s) 50% 100%);border:1px solid rgba(25,21,19,.25);box-sizing:border-box}
+.rb-hl[aria-pressed="false"]{background:var(--hover)}
+.rb-hl[aria-pressed="false"] .sw2{background:none;border:1.5px dashed var(--muted)}
+body.hl-off .body mark.hl{background:none;text-decoration:none;cursor:inherit}
+@media (max-width:767px){.rb-hl{width:36px}}
 </style>
 </head>
 <body data-theme="berry">
@@ -1178,6 +1187,7 @@ const FONTS = {
 const THEMES = { berry:{ label:'낮 · 은빛 딸기우유', bg:'#F8F2F4', bar:'#3F4A63' }, night:{ label:'밤 · 먹색 금장', bg:'#1B1D22', bar:'#121317' } };
 function applyPrefs(){
   document.body.dataset.theme = prefs.theme;
+  document.body.classList.toggle('hl-off', !!prefs.hlOff);   // 형광펜 숨기기 (2026-11-17)
   const m = document.querySelector('meta[name=theme-color]'); if (m) m.content = view === 'reader' ? THEMES[prefs.theme].bg : THEMES[prefs.theme].bar;
   const r = document.documentElement.style;
   r.setProperty('--rfont', (FONTS[prefs.font] || FONTS.ridi).css);
@@ -1954,6 +1964,7 @@ async function renderReader(id){
     '<header class="rbar"><button class="back" id="backBtn" aria-label="서재로">' + ic('back') + '<span>서재로</span></button>' +
     '<div class="rbar-title">' + esc(n.title) + '</div>' +
     '<div class="rbar-right"><span class="rpct" id="rpct" aria-label="읽은 정도">0%</span>' +
+    '<button class="rb-hl" id="hlBtn" aria-pressed="' + !prefs.hlOff + '" aria-label="형광펜 보기" title="형광펜 보이기 · 숨기기"><span class="sw2" aria-hidden="true"></span></button>' +
     '<button class="rb-cm" id="cmBtn" aria-haspopup="dialog" aria-expanded="false">' + ic('chat','sm') + '<span class="lb">댓글</span> <span id="cmN">' + (cmtCount(n.id) || '') + '</span><span class="dot hidden" id="cmDot"></span><span class="sr" id="cmSr"></span></button>' +
     '<button class="btn ghost" id="setBtn" aria-haspopup="dialog">보기 설정</button></div></header>' +
     '<main><article class="article"><div class="a-folder">' + (isPrivFolder(n.folderId) ? ic('lock','sm') : '') + esc(folderName(n.folderId)) + '</div>' +
@@ -1965,6 +1976,7 @@ async function renderReader(id){
   drawMeta();
   $app.querySelector('#backBtn').onclick = () => { location.hash = ''; };
   $app.querySelector('#setBtn').onclick = toggleSettings;
+  $app.querySelector('#hlBtn').onclick = toggleHl;
   $app.querySelector('#cmBtn').onclick = () => togglePreview(n);
   closeReaderLayers();
   hlList = []; hlFor = n.id; hlText = null;
@@ -2193,6 +2205,13 @@ const NOTE_SQL = '첨언을 쓰려면 Supabase에서 형광펜_첨언_추가.sql
 // 주인 계정 = 긴토키, 다른 계정 = 히지카타
 const hlKind = uid => ((uid === me.id) === isOwner) ? 'gin' : 'hiji';
 const hlName = uid => members[uid] || (hlKind(uid) === 'gin' ? '긴토키' : '히지카타');
+// 형광펜 보이기 · 숨기기 (2026-11-17, A안) — 기기마다 기억해요. 숨겨도 긋기·모아 보기는 그대로
+function syncHlBtn(){ const b = document.getElementById('hlBtn'); if (b) b.setAttribute('aria-pressed', String(!prefs.hlOff)); }
+function setHlOff(off){ prefs.hlOff = !!off; savePrefs(); applyPrefs(); syncHlBtn(); }
+function toggleHl(){
+  setHlOff(!prefs.hlOff); hideHlPop();
+  toast(prefs.hlOff ? '형광펜을 숨겼다! 다시 누르면 보여요' : '형광펜을 다시 보여 준다!');
+}
 async function loadHighlights(n){
   try {
     let rows;
@@ -2287,6 +2306,8 @@ function clearSel(){ try { window.getSelection().removeAllRanges(); } catch(e){}
 async function addHighlight(n, sel, note){
   if (!sel) return;
   if (!hlOK) { toast('형광펜을 쓰려면 Supabase에서 형광펜_퀘스트날짜_추가.sql을 실행해 주세요.', 4500); return; }
+  // 숨겨 둔 채로 새로 그으면 안 보이니까 다시 켜요
+  if (prefs.hlOff) { setHlOff(false); toast('형광펜을 다시 켰어요'); }
   // 내 형광펜과 겹치면 하나로 합쳐요
   const ov = hlList.filter(h => h.user_id === me.id && h.start_pos <= sel.end && h.end_pos >= sel.start);
   const s = Math.min(sel.start, ...ov.map(h => h.start_pos)), e = Math.max(sel.end, ...ov.map(h => h.end_pos));
@@ -2342,7 +2363,7 @@ document.addEventListener('click', e => {
   if (e.target.closest && e.target.closest('.hlpop')) return;
   const m = e.target.closest && e.target.closest('.body mark.hl');
   hideHlPop();
-  if (!m) return;
+  if (!m || prefs.hlOff) return;   // 숨겨 둔 동안은 눌러도 아무것도 안 떠요
   const s = window.getSelection(); if (s && !s.isCollapsed) return;
   const n = getNovel(readerId); if (!n) return;
   const ids = (m.dataset.hl || '').split(' '), hs = hlList.filter(h => ids.indexOf(h.id) >= 0);
@@ -2391,7 +2412,7 @@ function toggleSettings(){
       prefs[k] = Math.round(Math.min(c.max, Math.max(c.min, prefs[k] + (+d) * c.step)) * 100) / 100;
       commit('[data-step="' + b.dataset.step + '"]');
     });
-    s.querySelector('[data-reset]').onclick = () => { prefs = Object.assign({}, defaults, { theme: prefs.theme, winter1: true }); if (isMobile()) prefs.size = 17; commit('[data-reset]'); };
+    s.querySelector('[data-reset]').onclick = () => { prefs = Object.assign({}, defaults, { theme: prefs.theme, winter1: true, hlOff: prefs.hlOff }); if (isMobile()) prefs.size = 17; commit('[data-reset]'); };
   };
   const commit = focusSel => {
     const max = document.documentElement.scrollHeight - innerHeight, pct = max > 0 ? scrollY / max : 0;
