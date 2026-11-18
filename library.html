@@ -1061,6 +1061,7 @@ body.hl-off .body mark.hl{background:none;text-decoration:none;cursor:inherit}
 <div id="app"></div>
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
 <input type="file" id="fileInput" accept=".txt,.md,.markdown,text/plain,text/markdown" multiple class="hidden">
+<input type="file" id="replaceInput" accept=".txt,.md,.markdown,.zip,text/plain,text/markdown,application/zip" multiple class="hidden">
 
 <script>
 /* ================= 설정: Supabase 프로젝트 값 ================= */
@@ -1073,6 +1074,7 @@ const ID_DOMAIN = 'library.local';               // 아이디만 입력하면 '�
 "use strict";
 const $app = document.getElementById('app');
 const fileInput = document.getElementById('fileInput');
+const replaceInput = document.getElementById('replaceInput');
 const DEFAULT_NAME = '게부장떠먹이기';
 const SITE_NAME = '게부장 타임';                // 사이트 이름 (서재는 그 안의 메뉴)
 const pageTitle = t => t + ' | ' + SITE_NAME;
@@ -1549,6 +1551,105 @@ async function backupAll(){
   toast('작품 ' + lib.novels.length + '편을 zip으로 내려받았어요', 3500);
 }
 
+/* ---------- 본문 교체 (2026-11-18): 같은 제목 작품의 본문만 바꿔요. 댓글 · 읽음 · 하트는 그대로, 형광펜은 위치를 맞춰요 ---------- */
+const normTitle = t => (t || '').normalize('NFC').replace(/\.(txt|md|markdown)$/i, '').trim();
+// 화면에 보이는 본문 글자 (형광펜 위치를 세는 기준과 같아요)
+function shownText(n, text){ const d = document.createElement('div'); d.innerHTML = renderBody(n, text); return d.textContent; }
+// 바뀐 구간 찾기: [옛 시작, 옛 끝, 새 시작, 새 끝]
+function diffSegs(a, b){
+  const segs = [], N = a.length, M = b.length, K = 12;
+  let i = 0, j = 0;
+  while (i < N && j < M) {
+    if (a.charCodeAt(i) === b.charCodeAt(j)) { i++; j++; continue; }
+    let best = null;
+    for (let W = 64; W <= 262144 && !best; W *= 8) {
+      const win = b.slice(j, j + W + K);
+      for (let di = 0; di <= W && i + di + K <= N; di++) {
+        if (best && di >= best.c) break;
+        const k = win.indexOf(a.substr(i + di, K));
+        if (k >= 0 && (!best || di + k < best.c)) best = { di, dj: k, c: di + k };
+      }
+    }
+    if (!best) { segs.push([i, N, j, M]); return segs; }
+    segs.push([i, i + best.di, j, j + best.dj]); i += best.di; j += best.dj;
+  }
+  if (i < N || j < M) segs.push([i, N, j, M]);
+  return segs;
+}
+function mapPos(p, segs){
+  let d = 0;
+  for (const s of segs) {
+    if (p <= s[0]) return p + d;
+    if (p < s[1]) return s[2] + Math.min(p - s[0], s[3] - s[2]);
+    d = s[3] - s[1];
+  }
+  return p + d;
+}
+async function collectTexts(files){
+  const out = [];
+  for (const f of files) {
+    if (/\.zip$/i.test(f.name)) {
+      if (!window.JSZip) { toast('zip을 여는 도구를 불러오지 못했어요. txt 파일로 골라 주세요.', 4500); continue; }
+      const zip = await window.JSZip.loadAsync(f);
+      for (const path of Object.keys(zip.files)) {
+        const e = zip.files[path];
+        if (e.dir || /(^|\/)(__MACOSX|\.)/.test(path) || !/\.(txt|md|markdown)$/i.test(path)) continue;
+        const blob = new Blob([await e.async('uint8array')]);
+        out.push({ name: path.split('/').pop(), text: await readFileText(blob) });
+      }
+    } else if (/\.(txt|md|markdown)$/i.test(f.name)) out.push({ name: f.name, text: await readFileText(f) });
+  }
+  return out;
+}
+async function replaceTexts(files){
+  if (!isOwner) return;
+  let items;
+  try { toast('파일을 읽는 중…', 0); items = await collectTexts(files); }
+  catch(e) { toast('파일을 읽지 못했어요. ' + (e && e.message || ''), 4500); return; }
+  if (!items.length) { toast('txt, md, zip 파일만 쓸 수 있어요'); return; }
+  const jobs = [], miss = [];
+  items.forEach(it => {
+    const t = normTitle(it.name), hit = lib.novels.filter(n => normTitle(n.title) === t);
+    if (hit.length) hit.forEach(n => jobs.push({ n, text: it.text.replace(/\r\n?/g, '\n') })); else miss.push(t);
+  });
+  if (!jobs.length) { toast('서재에서 같은 제목을 찾지 못했어요', 4000); return; }
+  const ok = await confirmBox('본문 교체', '같은 제목 ' + jobs.length + '편의 본문을 새 파일로 바꿔요.' + (miss.length ? ' (서재에 없는 제목 ' + miss.length + '개는 건너뛰어요)' : '') + ' 댓글 · 읽음 · 하트는 그대로 두고, 형광펜은 바뀐 글자에 맞춰 위치를 옮겨요.', '바꾸기');
+  if (!ok) return;
+  let changed = 0, same = 0, failed = 0, hlMoved = 0, hlFail = 0, lastErr = null;
+  for (let x = 0; x < jobs.length; x++) {
+    const { n, text } = jobs[x];
+    toast('바꾸는 중… ' + (x + 1) + ' / ' + jobs.length, 0);
+    try {
+      const row = await q(sb.from('novels').select('content').eq('id', n.id).single());
+      const old = (row.content || '').replace(/\r\n?/g, '\n');
+      if (old === text) { same++; continue; }
+      const chars = text.replace(/\s/g, '').length;
+      await q(sb.from('novels').update({ content: text, chars }).eq('id', n.id));
+      n.chars = chars; textCache[n.id] = text; changed++;
+      let hls = [];
+      try { hls = await q(sb.from('highlights').select('id,start_pos,end_pos,quote').eq('novel_id', n.id)); } catch(e) { hls = []; }
+      if (!hls.length) continue;
+      const a = shownText(n, old), b = shownText(n, text), segs = diffSegs(a, b);
+      for (const h of hls) {
+        let s = mapPos(h.start_pos, segs), e = mapPos(h.end_pos, segs);
+        s = Math.max(0, Math.min(s, b.length)); e = Math.max(s, Math.min(e, b.length)); if (e === s && s < b.length) e = s + 1;
+        const quote = b.slice(s, e).replace(/\s+/g, ' ').trim().slice(0, 1000);
+        if (s === h.start_pos && e === h.end_pos && quote === h.quote) continue;
+        try { await q(sb.from('highlights').update({ start_pos: s, end_pos: e, quote }).eq('id', h.id)); hlMoved++; }
+        catch(err) { hlFail++; }
+      }
+    } catch(e) { failed++; lastErr = e; }
+  }
+  render();
+  let msg = changed + '편 본문을 바꿨어요';
+  if (same) msg += ' · 이미 같은 내용 ' + same + '편';
+  if (hlMoved) msg += ' · 형광펜 ' + hlMoved + '개 맞춤';
+  if (hlFail) msg += ' · 형광펜 ' + hlFail + '개는 못 옮겼어요';
+  if (failed) msg += ' · 실패 ' + failed + '편 — ' + failMsg(lastErr);
+  if (miss.length) msg += ' · 못 찾은 제목: ' + miss.slice(0, 5).join(', ') + (miss.length > 5 ? ' 외 ' + (miss.length - 5) + '개' : '');
+  toast(msg, 8000);
+}
+
 /* ---------- 서재 소식 (2026-11-17): 상대가 다 읽음 · 댓글 · 형광펜(작품마다 한 번). 푸시 없음 ---------- */
 const NEWS_KEY = 'lib-news-seen';
 function newsSeen(){
@@ -1599,7 +1700,7 @@ function newsPanel(anchor){
 
 async function accountMenu(anchor){
   const items = [{key:'name', label:'내 표시 이름 바꾸기'}];
-  if (isOwner) items.push({key:'backup', label:'전체 백업 내려받기'});
+  if (isOwner) items.push({key:'backup', label:'전체 백업 내려받기'}, {key:'replace', label:'본문 교체 (같은 제목 덮어쓰기)'});
   items.push({sep:true}, {key:'out', label:'로그아웃'});
   const k = await menu(anchor, (members[me.id] || '') + (isOwner ? ' · 주인' : ''), items);
   if (k === 'name') {
@@ -1610,6 +1711,7 @@ async function accountMenu(anchor){
     }
   }
   if (k === 'backup') backupAll();
+  if (k === 'replace') replaceInput.click();
   if (k === 'out') {
     const { error } = await sb.auth.signOut();
     if (error) { toast('로그아웃하지 못했어요. 다시 시도해 주세요.'); return; }
@@ -2457,6 +2559,7 @@ function render(){
 
 /* ---------- drag & drop ---------- */
 fileInput.addEventListener('change', () => { const f = fileInput.files; if (f && f.length) uploadFiles(f); fileInput.value = ''; });
+replaceInput.addEventListener('change', () => { const f = Array.from(replaceInput.files || []); replaceInput.value = ''; if (f.length) replaceTexts(f); });
 let dragDepth = 0, dropEl = null, dropTarget = null;
 function dropText(){
   const fid = dropTarget || (curFolder !== 'all' ? curFolder : null);
