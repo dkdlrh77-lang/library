@@ -729,7 +729,7 @@ function renderDetail(){
   box.innerHTML = h;
   const db = $('dBack'); if (db) db.onclick = closeDetail;
   box.querySelectorAll('[data-st]').forEach(b => b.onclick = () => setStatus(r, b.dataset.st));
-  if (watch) {
+  if (watch && !isMovie(r)) {
     $('epM').onclick = () => setEp(r, Math.max(0, r.ep_cur - 1));
     $('epP').onclick = () => setEp(r, r.ep_cur + 1);
   }
