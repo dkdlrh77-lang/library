@@ -869,7 +869,8 @@ function openForm(r){
   const started = editing && r.status !== 'want';   // 시작한 날은 시작한 퀘스트만 고쳐요
   const fdMovie = () => fd.kind === 'watch' && fd.cat === 'movie';
   const startNew = () => !editing && (fd.kind === 'watch' || fd.kind === 'play') && !fdMovie();
-  const seenField = () => fdMovie() && (!editing || r.status === 'done');   // 영화: 클리어한 날
+  // 클리어한 날: 새로 등록할 땐 영화만, 수정할 땐 클리어한 퀘스트 전부 (2026-11-20)
+  const seenField = () => editing ? r.status === 'done' : fdMovie();
   const prev = document.activeElement;
   const el = document.createElement('div'); el.className = 'dimbg';
   el.innerHTML = '<section class="win dlg" role="dialog" aria-modal="true" aria-labelledby="fT"><div class="wt"><span id="fT" style="color:var(--yel);font-size:13px">' + (editing ? '퀘스트 수정하기' : '새 퀘스트 등록') + '</span><span id="fXp"></span></div><form class="in" id="qf" novalidate style="display:flex;flex-direction:column;gap:16px"></form></section>';
@@ -931,6 +932,7 @@ function openForm(r){
       }
       if (seenField() && fd.seen) {
         if (fd.seen > ymd(new Date().toISOString())) { $('fErr').textContent = '클리어한 날은 오늘이나 그 전이어야 해요.'; return; }
+        if (editing && !fdMovie() && fd.start && fd.seen < fd.start) { $('fErr').textContent = '클리어한 날이 시작한 날보다 빨라요.'; return; }
         if (!editing) { row.status = 'done'; row.done_at = fromYmd(fd.seen); }
         else if (fd.seen !== ymd(r.done_at)) row.done_at = fromYmd(fd.seen);
       }
