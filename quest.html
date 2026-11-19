@@ -137,8 +137,10 @@ img{image-rendering:pixelated}
 .meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:11px;color:var(--sub)}
 .who{display:inline-flex;align-items:center;gap:3px}
 .who img{height:20px;width:auto;display:block}
-.meta .rt{display:inline-flex;align-items:center;gap:3px}
-.meta .rt img{height:18px;width:auto;display:block}
+/* 평점: 날짜 줄 아래에 나·상대 위아래로 (2026-11-20) */
+.rts{display:flex;flex-direction:column;gap:4px}
+.rts .rt{display:flex;align-items:center;gap:3px}
+.rts .rt img{height:18px;width:auto;display:block}
 .pg{display:flex;gap:8px;align-items:center;font-size:10.5px;color:var(--mint)}
 .pg .t{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:2px;width:120px}
 .pg .t i{height:7px;background:var(--win2)}.pg .t i.on{background:var(--mint)}
@@ -620,11 +622,12 @@ function itemHTML(r){
   if (r.kind === 'watch' && r.status === 'done') {
     const ids = Object.keys(r.ratings || {}).filter(u => rateOf(r, u)).sort((a, b) => (b === me.id) - (a === me.id));
     rt = ids.map(u => '<span class="rt"><img src="' + FACE[kindOf(u)] + '" alt="' + esc(nameOf(u)) + '">' + hearts(rateOf(r, u)) + '</span>').join('');
+    if (rt) rt = '<span class="rts">' + rt + '</span>';
   }
   const meta = '<span class="meta">' + (r.cat ? '<span class="tag">' + CATN[r.cat] + '</span>' : (tab === 'clear' ? '<span class="tag">' + KSUB[r.kind] + '</span>' : '')) +
     '<span class="who"><img src="' + FACE[kindOf(r.created_by)] + '" alt="">' + esc(nameOf(r.created_by)) + '</span>' +
     (r.status === 'done' ? '<span>' + fmtD(r.done_at) + '</span>' : '') + dayTag(r) +
-    (r.status === 'done' ? '' : '<span class="tag xp">' + (isDaily(r) ? '오늘마다 +' + XP_DAY : '+' + xpClear(r)) + ' EXP</span>') + rt + '</span>';
+    (r.status === 'done' ? '' : '<span class="tag xp">' + (isDaily(r) ? '오늘마다 +' + XP_DAY : '+' + xpClear(r)) + ' EXP</span>') + '</span>' + rt;
   let pg = '';
   if (r.kind === 'watch' && r.status === 'doing' && !isMovie(r)) {
     const n = r.ep_total ? Math.floor(r.ep_cur / r.ep_total * 10) : 0;
